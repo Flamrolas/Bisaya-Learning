@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://visitor-badge.laobi.icu; connect-src 'self' https://formspree.io https://*.workers.dev https://oauth2.googleapis.com https://accounts.google.com; frame-src https://accounts.google.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://visitor-badge.laobi.icu; connect-src 'self' https://formspree.io https://*.workers.dev https://*.googleapis.com https://accounts.google.com https://*.firebaseapp.com; frame-src https://accounts.google.com https://*.firebaseapp.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none';">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Bisaya Lebendig — Birkenbihl-Methode</title>
+<title>Bisaya Lebendig lernen — inspiriert von Birkenbihl</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" defer onload="initGoogleSignIn()"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <style>
 :root{
   --bg:#fbf7f0; --panel:rgba(255,255,255,0.90); --ink:#2b2420; --sub:#6b5f54;
@@ -41,14 +43,15 @@ header.top{
   color:#fff; padding:26px 24px 40px;
   box-shadow:var(--shadow); backdrop-filter:blur(1px); -webkit-backdrop-filter:blur(1px);
 }
-header.top .titlerow{display:flex; align-items:center; gap:14px; position:relative; z-index:2;}
+header.top .titlerow{display:flex; align-items:center; gap:14px; flex-wrap:wrap; position:relative; z-index:2;}
+header.top .titlerow h1{min-width:0; word-break:break-word;}
 header.top .sun-badge{
   font-size:2.1rem; line-height:1; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.25));
   animation:bob 4s ease-in-out infinite;
 }
 @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
 header.top h1{
-  margin:0; font-family:'Baloo 2',cursive; font-weight:800; font-size:2.15rem; letter-spacing:0.3px;
+  margin:0; font-family:'Fredoka',cursive; font-weight:700; font-size:2.15rem; letter-spacing:0.3px;
   text-shadow:0 3px 10px rgba(0,0,0,0.28); line-height:1.1;
 }
 header.top h1 .accent-word{
@@ -75,8 +78,8 @@ nav.tabs button.active{background:var(--accent); color:#fff; border-color:var(--
 main{max-width:880px; margin:0 auto; padding:20px 16px 80px;}
 section.view{display:none;}
 section.view.active{display:block;}
-h2{color:var(--accent); font-size:1.4rem; margin-top:0; font-family:'Baloo 2',cursive; font-weight:700; letter-spacing:0.2px;}
-h3{color:#5a4632; font-size:1.1rem; font-family:'Baloo 2',cursive; font-weight:700;}
+h2{color:var(--accent); font-size:1.4rem; margin-top:0; font-family:'Fredoka',cursive; font-weight:700; letter-spacing:0.2px;}
+h3{color:#5a4632; font-size:1.1rem; font-family:'Fredoka',cursive; font-weight:700;}
 .card{
   background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px;
   margin-bottom:16px; box-shadow:var(--shadow);
@@ -142,7 +145,7 @@ h3{color:#5a4632; font-size:1.1rem; font-family:'Baloo 2',cursive; font-weight:7
 }
 .vip-lockbox b{color:var(--accent);}
 .vip-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:16px; box-shadow:var(--shadow);}
-.vip-price{font-size:2.2rem; font-weight:800; color:var(--accent); font-family:'Baloo 2',cursive;}
+.vip-price{font-size:2.2rem; font-weight:800; color:var(--accent); font-family:'Fredoka',cursive;}
 .vip-price span{font-size:1rem; color:var(--sub); font-weight:500;}
 .note{
   background:#f4efe3; border-left:4px solid var(--accent3); padding:10px 14px; border-radius:6px;
@@ -195,8 +198,14 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 .modal-overlay.hidden{display:none;}
 .modal-box{
   background:var(--panel); border-radius:16px; padding:26px 24px; max-width:400px; width:100%;
-  box-shadow:0 10px 40px rgba(0,0,0,0.25);
+  box-shadow:0 10px 40px rgba(0,0,0,0.25); max-height:90vh; overflow-y:auto; box-sizing:border-box;
+  position:relative;
 }
+.modal-close{
+  position:absolute; top:14px; right:16px; cursor:pointer; font-size:1.1rem; color:var(--sub);
+  line-height:1; padding:2px 4px;
+}
+.modal-close:hover{color:var(--warn);}
 .modal-box h2{margin-top:0;}
 .modal-box label{display:block; font-size:0.85rem; font-weight:700; color:var(--sub); margin:14px 0 4px;}
 .modal-box input[type=text], .modal-box input[type=email]{width:100%; font-size:1rem; padding:10px 12px;}
@@ -219,6 +228,26 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
   display:flex; align-items:center; gap:10px; margin:14px 0; color:var(--sub); font-size:0.78rem;
 }
 .divider-or::before, .divider-or::after{content:""; flex:1; height:1px; background:var(--line);}
+.version-tag{text-align:right; font-size:0.72rem; color:var(--sub); opacity:0.65; margin-top:-4px;}
+
+/* ============ RESPONSIVE: kleine Handy-Displays (z.B. ältere/kompakte Android-Geräte) ============ */
+@media (max-width:480px){
+  header.top{padding:20px 16px 34px;}
+  header.top h1{font-size:1.7rem;}
+  header.top .sun-badge{font-size:1.7rem;}
+  header.top p{font-size:0.88rem;}
+  nav.tabs{padding:8px 10px; gap:5px;}
+  nav.tabs button{padding:7px 11px; font-size:0.82rem;}
+  main{padding:14px 10px 70px;}
+  .card{padding:14px;}
+  .modal-box{padding:20px 16px;}
+  .lesson-grid{grid-template-columns:1fr;}
+  .statgrid{grid-template-columns:repeat(auto-fit,minmax(96px,1fr));}
+}
+/* ============ RESPONSIVE: sehr große Desktop-Bildschirme (Full HD und mehr) ============ */
+@media (min-width:1600px){
+  main{max-width:1000px;}
+}
 </style>
 </head>
 <body>
@@ -281,9 +310,10 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <div class="modal-overlay hidden" id="regOverlay">
   <div class="modal-box">
+    <span class="modal-close" onclick="closeRegOverlay()" title="Schließen">✕</span>
     <div id="regFormStep">
-      <h2>Willkommen bei Bisaya Lebendig 🌴</h2>
-      <p class="small">Trag kurz deinen Namen und deine E-Mail-Adresse ein. Deine E-Mail muss anschließend bestätigt werden. Alles bleibt lokal auf diesem Gerät gespeichert — es gibt keinen Server und kein echtes Konto.</p>
+      <h2>Fast geschafft 🌴</h2>
+      <p class="small" id="regIntroText">Um mit dem Lernen zu starten, brauchst du ein kostenloses Profil. Trag kurz deinen Namen und deine E-Mail-Adresse ein — deine E-Mail muss anschließend bestätigt werden. Alles bleibt lokal auf diesem Gerät gespeichert — es gibt keinen Server und kein echtes Konto.</p>
       <div id="googleSignInWrap" style="margin:10px 0; display:none;">
         <div id="googleSignInBtn"></div>
         <div class="divider-or"><span>oder mit Name/E-Mail</span></div>
@@ -296,6 +326,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
       <div class="btnrow" style="justify-content:flex-end; margin-top:12px;">
         <button class="action primary" onclick="submitRegistration()">Bestätigungscode anfordern</button>
       </div>
+      <span class="steplink" id="guestSkipLink" onclick="closeRegOverlay()">Erst mal nur umsehen (als Gast)</span>
     </div>
     <div id="regConfirmStep" style="display:none;">
       <h2>E-Mail bestätigen</h2>
@@ -310,18 +341,60 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
       <span class="steplink" onclick="resendCode()">Code erneut anzeigen</span> ·
       <span class="steplink" onclick="backToForm()">E-Mail-Adresse ändern</span>
     </div>
+
+    <!-- FIREBASE: echtes Konto (aktiv sobald FIREBASE_CONFIG eingetragen ist) -->
+    <div id="fbSignupStep" style="display:none;">
+      <h2>Konto erstellen 🌴</h2>
+      <p class="small">Um mit dem Lernen zu starten, brauchst du ein kostenloses Konto. Deine Daten werden über Firebase (Google) sicher verwaltet, und du bekommst eine echte Bestätigungs-E-Mail.</p>
+      <button class="action neutral" style="width:100%;" onclick="firebaseGoogleSignIn()">🔵 Mit Google fortfahren</button>
+      <div class="divider-or"><span>oder mit E-Mail</span></div>
+      <label for="fbName">Name</label>
+      <input type="text" id="fbName" placeholder="z. B. Flamrolas">
+      <label for="fbEmail">E-Mail</label>
+      <input type="email" id="fbEmail" placeholder="du@beispiel.de">
+      <label for="fbPassword">Passwort (mind. 6 Zeichen)</label>
+      <input type="password" id="fbPassword" placeholder="••••••••">
+      <div class="err" id="fbSignupErr"></div>
+      <div class="btnrow" style="justify-content:flex-end; margin-top:12px;">
+        <button class="action primary" onclick="firebaseSignUp()">Konto erstellen</button>
+      </div>
+      <span class="steplink" onclick="goToFbLogin()">Schon ein Konto? Anmelden</span> ·
+      <span class="steplink" onclick="closeRegOverlay()">Erst mal nur umsehen (als Gast)</span>
+    </div>
+    <div id="fbLoginStep" style="display:none;">
+      <h2>Anmelden</h2>
+      <label for="fbLoginEmail">E-Mail</label>
+      <input type="email" id="fbLoginEmail" placeholder="du@beispiel.de">
+      <label for="fbLoginPassword">Passwort</label>
+      <input type="password" id="fbLoginPassword" placeholder="••••••••">
+      <div class="err" id="fbLoginErr"></div>
+      <div class="btnrow" style="justify-content:flex-end; margin-top:12px;">
+        <button class="action primary" onclick="firebaseSignIn()">Anmelden</button>
+      </div>
+      <span class="steplink" onclick="firebaseForgotPassword()">Passwort vergessen?</span> ·
+      <span class="steplink" onclick="goToFbSignup()">Neues Konto erstellen</span>
+    </div>
+    <div id="fbVerifyStep" style="display:none;">
+      <h2>E-Mail bestätigen</h2>
+      <p class="small">Wir haben eine Bestätigungs-E-Mail an <b id="fbVerifyEmailTarget"></b> geschickt (bitte auch den Spam-Ordner prüfen). Klicke auf den Link in der E-Mail und dann hier auf "Ich habe bestätigt".</p>
+      <div class="err" id="fbVerifyErr"></div>
+      <div class="btnrow" style="justify-content:flex-end; margin-top:12px;">
+        <button class="action primary" onclick="firebaseCheckVerified()">Ich habe bestätigt</button>
+      </div>
+      <span class="steplink" onclick="firebaseResendVerification()">E-Mail erneut senden</span>
+    </div>
   </div>
 </div>
 
 <header class="top">
   <div class="titlerow">
     <span class="sun-badge">🌴☀️ 🇵🇭</span>
-    <h1>Bisaya <span class="accent-word">Lebendig</span></h1>
+    <h1>Bisaya <span class="accent-word">Lebendig</span> lernen</h1>
   </div>
-  <p>Cebuano/Bisaya lernen nach der Birkenbihl-Methode — dekodieren, verstehen, anwenden.</p>
+  <p>Cebuano/Bisaya lernen — inspiriert von der Birkenbihl-Idee: dekodieren, verstehen, anwenden.</p>
   <div class="profile-badge" id="profileBadge" style="display:none;">
     <span id="profileGreeting"></span>
-    <button onclick="editProfile()">Profil bearbeiten</button>
+    <button onclick="profileButtonAction()" id="profileActionBtn">Profil bearbeiten</button>
   </div>
   <div class="wave-divider">
     <svg viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -350,7 +423,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <section class="view active" id="view-start">
   <div class="card">
     <h2>Willkommen!</h2>
-    <p>Dieses Programm bringt dir <b>Bisaya (Cebuano)</b> bei — die Sprache, die in Cebu, Davao und weiten Teilen der Visayas und Mindanaos gesprochen wird. Der Ansatz folgt der <b>Birkenbihl-Methode</b>: kein Auswendiglernen von Grammatikregeln, sondern <i>dekodieren, verstehen, aufnehmen und dann lebendig anwenden</i>.</p>
+    <p>Dieses Programm bringt dir <b>Bisaya (Cebuano)</b> bei — die Sprache, die in Cebu, Davao und weiten Teilen der Visayas und Mindanaos gesprochen wird. Der Ansatz ist von der <b>Idee von Vera F. Birkenbihl</b> inspiriert: kein Auswendiglernen von Grammatikregeln, sondern <i>dekodieren, verstehen, aufnehmen und dann lebendig anwenden</i>.</p>
     <p>Ziel ist nicht "die Grammatik können", sondern: <b>du sollst die Sprache tatsächlich benutzen können</b> — im Gespräch, beim Reisen, mit Freunden.</p>
     <div class="btnrow">
       <button class="action primary" onclick="goView('methode')">Wie funktioniert die Methode?</button>
@@ -360,19 +433,20 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
   <div class="statgrid">
     <div class="stat"><div class="num">12</div><div class="lbl">Lektionen</div></div>
     <div class="stat"><div class="num" id="vocabCountStart">–</div><div class="lbl">Wörter &amp; Wendungen</div></div>
-    <div class="stat"><div class="num">4</div><div class="lbl">Birkenbihl-Schritte</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl">Lernschritte</div></div>
   </div>
   <div class="card">
     <h3>Was du in diesem Modul lernst</h3>
     <p>Zwölf Alltagsthemen — Begrüßung, Familie, Zahlen &amp; Uhrzeit, Wochentage, Markt, Essen, Wegbeschreibung, Wetter, Zuhause, Gefühle, Hobbys/Freunde, Reisen &amp; Abschied — jeweils als kurzer Dialog mit vollständiger Wort-für-Wort-Dekodierung, Lautschrift und natürlicher Übersetzung. Dazu ein wachsender Wortschatz von über 1.000 Wörtern und Wendungen als Karteikarten — von Verben über Körperteile, Berufe und Essen bis zu Redewendungen und Slang — plus Übungen, die dich zum aktiven Sprechen und Schreiben bringen.</p>
   </div>
+  <div class="version-tag">v1.4.0</div>
 </section>
 
 <!-- METHODE -->
 <section class="view" id="view-methode">
   <div class="card">
-    <h2>Die Birkenbihl-Methode — angepasst für Bisaya</h2>
-    <p>Vera F. Birkenbihls Ansatz beruht auf vier Schritten. Da wir hier textbasiert arbeiten (ohne eingebautes Audio), sind die Schritte leicht angepasst — du bringst dir am besten <b>eigenes Hörmaterial</b> (z. B. Cebuano-Podcasts, YouTube-Videos mit Muttersprachlern, Musik) parallel dazu mit.</p>
+    <h2>Unsere Lernmethode — inspiriert von der Birkenbihl-Idee, angepasst für Bisaya</h2>
+    <p>Die Idee von Vera F. Birkenbihl beruht auf vier Schritten, die wir hier als Inspiration aufgreifen und für Bisaya anpassen. Da wir hier textbasiert arbeiten (ohne eingebautes Audio), sind die Schritte leicht angepasst — du bringst dir am besten <b>eigenes Hörmaterial</b> (z. B. Cebuano-Podcasts, YouTube-Videos mit Muttersprachlern, Musik) parallel dazu mit.</p>
   </div>
   <div class="card">
     <h3>1. Dekodieren (nicht übersetzen!)</h3>
@@ -407,7 +481,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <section class="view" id="view-wortschatz">
   <div class="card">
     <h2>Wortschatz-Trainer</h2>
-    <p class="small">Klicke auf die Karte, um die Übersetzung zu sehen. Markiere danach ehrlich, ob du das Wort schon kannst — dein Fortschritt wird lokal auf diesem Gerät gespeichert. Mit 🎤 kannst du deine eigene Aussprache direkt per Mikrofon prüfen (Browser fragt einmalig nach Mikrofon-Zugriff; Cebuano wird von keinem Browser direkt unterstützt, daher ist die Bewertung ein bestmöglicher Näherungswert über die verwandte Filipino-Spracherkennung — kein Ersatz für echtes Feedback von Muttersprachlern).</p>
+    <p class="small">Klicke auf die Karte, um die Übersetzung zu sehen. Markiere danach ehrlich, ob du das Wort schon kannst — dein Fortschritt wird lokal auf diesem Gerät gespeichert. Mit 🎤 kannst du deine eigene Aussprache direkt per Mikrofon prüfen (Browser fragt einmalig nach Mikrofon-Zugriff; Cebuano wird von keinem Browser direkt unterstützt, daher ist die Bewertung ein bestmöglicher Näherungswert über die verwandte Filipino-Spracherkennung — kein Ersatz für echtes Feedback von Muttersprachlern). <b>Hinweis:</b> die Mikrofon-Prüfung funktioniert zuverlässig in Chrome; Safari (auch auf dem Mac) unterstützt diese Funktion bislang nicht — dort steht dir aber weiterhin 🔊 zum Anhören zur Verfügung.</p>
     <div class="filterbar">
       <label class="small">Kategorie:
         <select id="catFilter" onchange="refreshDeck()"></select>
@@ -600,7 +674,25 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
          alt="Besucherzähler" style="height:20px; vertical-align:middle;"
          onerror="this.style.display='none'">
   </div>
+  <div style="margin-top:8px;">
+    <span class="steplink" onclick="showImpressum()">Impressum</span>
+  </div>
 </footer>
+
+<div class="modal-overlay hidden" id="impressumOverlay">
+  <div class="modal-box" style="max-width:520px; text-align:left;">
+    <span class="modal-close" onclick="hideImpressum()" title="Schließen">✕</span>
+    <h2>Impressum</h2>
+    <div class="small" style="line-height:1.7;">
+      <p><b>Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz)</b></p>
+      <p>[DEIN VOR- UND NACHNAME]<br>[DEINE STRASSE, HAUSNUMMER]<br>[DEINE PLZ, ORT]<br>[DEIN LAND]</p>
+      <p><b>Kontakt</b><br>E-Mail: [DEINE-EMAIL@BEISPIEL.DE]</p>
+      <p><b>Umsatzsteuer-ID</b><br>[Falls vorhanden: USt-IdNr. gemäß § 27a UStG. Falls du Kleinunternehmer nach § 19 UStG bist, kannst du stattdessen ergänzen: "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet."]</p>
+      <p><b>Verantwortlich für den Inhalt</b><br>[DEIN VOR- UND NACHNAME], [DEINE ADRESSE]</p>
+      <p style="opacity:0.7; font-size:0.78rem; border-top:1px dashed var(--line); padding-top:10px; margin-top:14px;">Dies ist eine allgemeine Vorlage, keine Rechtsberatung. Bitte die eckigen Platzhalter durch deine echten Angaben ersetzen und die Angaben im Zweifel mit einem Anwalt oder Impressum-Generator (z. B. e-recht24.de) prüfen, bevor die Seite dauerhaft live läuft.</p>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============ SICHERHEIT: HTML-Escaping ============ */
@@ -2304,11 +2396,18 @@ function textSimilarity(a,b){
 }
 
 let activeRecognition = null;
+function isSafariBrowser(){
+  const ua = navigator.userAgent;
+  return /^((?!chrome|crios|android).)*safari/i.test(ua);
+}
 function checkPronunciation(targetText, btnEl){
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   const resultEl = btnEl.nextElementSibling;
   if(!SpeechRec){
-    if(resultEl) resultEl.innerHTML = `<span class="mic-fail">Spracherkennung wird von diesem Browser nicht unterstützt.</span>`;
+    const tip = isSafariBrowser()
+      ? "Spracherkennung wird von Safari nicht unterstützt. Bitte nutze Chrome für die Ausspracheprüfung mit Mikrofon (🔊 Anhören funktioniert in Safari weiterhin normal)."
+      : "Spracherkennung wird von diesem Browser nicht unterstützt.";
+    if(resultEl) resultEl.innerHTML = `<span class="mic-fail">${tip}</span>`;
     return;
   }
   if(activeRecognition){ try{ activeRecognition.stop(); }catch(e){} }
@@ -2334,7 +2433,11 @@ function checkPronunciation(targetText, btnEl){
   recog.onerror = (e)=>{
     let msg = "Fehler bei der Spracherkennung (Code: " + (e.error||"unbekannt") + "). Bitte erneut versuchen.";
     if(e.error === "not-allowed" || e.error === "permission-denied") msg = "Mikrofon-Zugriff wurde nicht erlaubt. Bitte in den Browser-/Website-Einstellungen freigeben.";
-    if(e.error === "service-not-allowed") msg = "Der Browser blockiert die Spracherkennung auf dieser Seite (evtl. weil sie nicht über https läuft, oder wegen Browser-Einstellungen).";
+    if(e.error === "service-not-allowed"){
+      msg = isSafariBrowser()
+        ? "Safari unterstützt die Live-Spracherkennung nicht zuverlässig (bekannte Einschränkung von Safari, keine Frage der Website). Bitte nutze Chrome für die Ausspracheprüfung — 🔊 Anhören funktioniert in Safari weiterhin normal."
+        : "Der Browser blockiert die Spracherkennung auf dieser Seite (evtl. weil sie nicht über https läuft, oder wegen Browser-Einstellungen).";
+    }
     if(e.error === "no-speech") msg = "Nichts gehört — bitte nochmal versuchen.";
     if(e.error === "audio-capture") msg = "Kein Mikrofon gefunden. Bitte prüfe, ob eins angeschlossen/aktiviert ist.";
     if(e.error === "network") msg = "Netzwerkfehler — die Spracherkennung braucht eine Internetverbindung (die Auswertung läuft über den Server des Browsers). Bitte Verbindung prüfen oder Chrome verwenden.";
@@ -2352,6 +2455,10 @@ function checkPronunciation(targetText, btnEl){
 
 /* ============ REGISTRIERUNG / PROFIL ============ */
 const PROFILE_KEY = "bisaya_profile_v1";
+// Rubriken, die zum Lernen gehören — hier wird erst zur Registrierung aufgefordert,
+// wenn der Gast tatsächlich damit anfangen will. Start/Methode/Grammatik/VIP/Support bleiben frei.
+const GATED_VIEWS = ["lektionen","wortschatz","wendungen","geschichten","anwenden","fortschritt"];
+let pendingView = null;
 function loadProfile(){
   try{ return JSON.parse(localStorage.getItem(PROFILE_KEY)) || null; }
   catch(e){ return null; }
@@ -2359,16 +2466,45 @@ function loadProfile(){
 function saveProfile(p){ localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); }
 function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function generateCode(){ return String(Math.floor(100000 + Math.random()*900000)); }
+function closeRegOverlay(){
+  hideRegOverlay();
+  pendingView = null;
+}
+function showImpressum(){ document.getElementById("impressumOverlay").classList.remove("hidden"); }
+function hideImpressum(){ document.getElementById("impressumOverlay").classList.add("hidden"); }
+function afterAuthSuccess(){
+  hideRegOverlay();
+  renderProfileBadge();
+  if(pendingView){
+    const target = pendingView;
+    pendingView = null;
+    goView(target);
+  }
+}
 
 function showRegOverlay(prefill){
   document.getElementById("regOverlay").classList.remove("hidden");
+  if(firebaseConfigured()){
+    // Echtes Konto aktiv -> simulierten Ablauf komplett ausblenden, Firebase-Schritte zeigen
+    const fbUser = fbAuth ? fbAuth.currentUser : null;
+    if(fbUser && !fbUser.emailVerified){ goToFbVerify(fbUser.email); }
+    else { goToFbSignup(); }
+    return;
+  }
+  const introEl = document.getElementById("regIntroText");
+  const guestLink = document.getElementById("guestSkipLink");
+  if(guestLink) guestLink.style.display = (prefill && prefill.confirmed) ? "none" : "inline-block";
   if(prefill && prefill.confirmed){
     // schon mal bestätigt (z.B. "Profil bearbeiten") -> Formular mit bestehenden Daten öffnen
+    if(introEl) introEl.textContent = "Bearbeite hier deinen Namen oder deine E-Mail-Adresse. Alles bleibt lokal auf diesem Gerät gespeichert.";
     goToFormStep(prefill.name, prefill.email);
   } else if(prefill && prefill.pendingCode){
     // Bestätigung war noch offen -> direkt zum Code-Schritt
     goToConfirmStep(prefill);
   } else {
+    if(introEl) introEl.textContent = pendingView
+      ? "Um diesen Bereich zu nutzen, brauchst du ein kostenloses Profil. Trag kurz deinen Namen und deine E-Mail-Adresse ein — deine E-Mail muss anschließend bestätigt werden. Alles bleibt lokal auf diesem Gerät gespeichert — es gibt keinen Server und kein echtes Konto."
+      : "Trag kurz deinen Namen und deine E-Mail-Adresse ein. Deine E-Mail muss anschließend bestätigt werden. Alles bleibt lokal auf diesem Gerät gespeichert — es gibt keinen Server und kein echtes Konto.";
     goToFormStep(prefill ? prefill.name : "", prefill ? prefill.email : "");
   }
 }
@@ -2400,8 +2536,7 @@ function submitRegistration(){
   // Wenn dieselbe E-Mail bereits bestätigt wurde, keine erneute Bestätigung nötig
   if(existing && existing.confirmed && existing.email===email){
     saveProfile({name, email, confirmed:true});
-    hideRegOverlay();
-    renderProfileBadge();
+    afterAuthSuccess();
     return;
   }
   const code = generateCode();
@@ -2417,8 +2552,7 @@ function confirmCode(){
   if(!p || !p.pendingCode){ err.textContent = "Bitte fordere zuerst einen Code an."; return; }
   if(input !== p.pendingCode){ err.textContent = "Der Code stimmt nicht überein. Bitte erneut versuchen."; return; }
   saveProfile({name:p.name, email:p.email, confirmed:true});
-  hideRegOverlay();
-  renderProfileBadge();
+  afterAuthSuccess();
 }
 function resendCode(){
   const p = loadProfile();
@@ -2433,6 +2567,149 @@ function backToForm(){
   goToFormStep(p ? p.name : "", p ? p.email : "");
 }
 function editProfile(){ showRegOverlay(loadProfile()); }
+
+/* ============ FIREBASE: echtes Konto ============ */
+// Trage hier deine eigene Firebase-Projektkonfiguration ein
+// (siehe VIP-SETUP-ANLEITUNG.md, Abschnitt "Firebase-Konto einrichten").
+// Solange der Platzhalter drinsteht, bleibt die einfache lokale Simulation aktiv — nichts bricht.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC_GLIKYYLkTqYE_OUNbsSXGY8vsKophoU",
+  authDomain: "bisaya-lebendig.firebaseapp.com",
+  projectId: "bisaya-lebendig",
+  appId: "1:567617633237:web:74d095dff3723ad1b21b5c"
+};
+function firebaseConfigured(){ return !FIREBASE_CONFIG.apiKey.includes("DEIN-FIREBASE-API-KEY"); }
+let fbAuth = null;
+if(firebaseConfigured() && typeof firebase !== "undefined"){
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    fbAuth = firebase.auth();
+  } catch(e){ console.error("Firebase-Initialisierung fehlgeschlagen:", e); }
+}
+
+function hideAllRegSteps(){
+  ["regFormStep","regConfirmStep","fbSignupStep","fbLoginStep","fbVerifyStep"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = "none";
+  });
+}
+function goToFbSignup(){
+  hideAllRegSteps();
+  document.getElementById("fbSignupStep").style.display = "block";
+  document.getElementById("fbSignupErr").textContent = "";
+}
+function goToFbLogin(){
+  hideAllRegSteps();
+  document.getElementById("fbLoginStep").style.display = "block";
+  document.getElementById("fbLoginErr").textContent = "";
+}
+function goToFbVerify(email){
+  hideAllRegSteps();
+  document.getElementById("fbVerifyStep").style.display = "block";
+  document.getElementById("fbVerifyEmailTarget").textContent = email || "";
+  document.getElementById("fbVerifyErr").textContent = "";
+}
+
+async function firebaseSignUp(){
+  const err = document.getElementById("fbSignupErr");
+  const name = document.getElementById("fbName").value.trim().slice(0,60);
+  const email = document.getElementById("fbEmail").value.trim().slice(0,120);
+  const pw = document.getElementById("fbPassword").value;
+  err.textContent = "";
+  if(!name){ err.textContent = "Bitte gib deinen Namen ein."; return; }
+  if(!isValidEmail(email)){ err.textContent = "Bitte gib eine gültige E-Mail-Adresse ein."; return; }
+  if(pw.length < 6){ err.textContent = "Das Passwort muss mindestens 6 Zeichen haben."; return; }
+  try{
+    const cred = await fbAuth.createUserWithEmailAndPassword(email, pw);
+    await cred.user.updateProfile({displayName: name});
+    await cred.user.sendEmailVerification();
+    saveProfile({name, email, confirmed:false, via:"firebase"});
+    goToFbVerify(email);
+  } catch(e){
+    err.textContent = firebaseErrorMessage(e);
+  }
+}
+async function firebaseSignIn(){
+  const err = document.getElementById("fbLoginErr");
+  const email = document.getElementById("fbLoginEmail").value.trim().slice(0,120);
+  const pw = document.getElementById("fbLoginPassword").value;
+  err.textContent = "";
+  if(!isValidEmail(email)){ err.textContent = "Bitte gib eine gültige E-Mail-Adresse ein."; return; }
+  if(!pw){ err.textContent = "Bitte gib dein Passwort ein."; return; }
+  try{
+    const cred = await fbAuth.signInWithEmailAndPassword(email, pw);
+    const u = cred.user;
+    if(!u.emailVerified){ goToFbVerify(u.email); return; }
+    saveProfile({name: u.displayName || email.split("@")[0], email: u.email, confirmed:true, via:"firebase"});
+    afterAuthSuccess();
+  } catch(e){
+    err.textContent = firebaseErrorMessage(e);
+  }
+}
+async function firebaseCheckVerified(){
+  const err = document.getElementById("fbVerifyErr");
+  const u = fbAuth.currentUser;
+  if(!u){ err.textContent = "Bitte melde dich erneut an."; goToFbLogin(); return; }
+  try{
+    await u.reload();
+    if(u.emailVerified){
+      saveProfile({name: u.displayName || u.email.split("@")[0], email: u.email, confirmed:true, via:"firebase"});
+      afterAuthSuccess();
+    } else {
+      err.textContent = "Noch nicht bestätigt — bitte prüfe deine E-Mails (auch den Spam-Ordner).";
+    }
+  } catch(e){ err.textContent = firebaseErrorMessage(e); }
+}
+async function firebaseResendVerification(){
+  const err = document.getElementById("fbVerifyErr");
+  const u = fbAuth.currentUser;
+  if(!u){ err.textContent = "Bitte melde dich erneut an."; return; }
+  try{ await u.sendEmailVerification(); err.textContent = "E-Mail erneut gesendet."; }
+  catch(e){ err.textContent = firebaseErrorMessage(e); }
+}
+async function firebaseForgotPassword(){
+  const err = document.getElementById("fbLoginErr");
+  const email = document.getElementById("fbLoginEmail").value.trim();
+  if(!isValidEmail(email)){ err.textContent = "Bitte trag oben zuerst deine E-Mail-Adresse ein."; return; }
+  try{ await fbAuth.sendPasswordResetEmail(email); err.textContent = "E-Mail zum Zurücksetzen des Passworts wurde verschickt."; }
+  catch(e){ err.textContent = firebaseErrorMessage(e); }
+}
+async function firebaseGoogleSignIn(){
+  const err = document.getElementById("fbSignupErr");
+  try{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await fbAuth.signInWithPopup(provider);
+    const u = result.user;
+    saveProfile({name: u.displayName || (u.email||"").split("@")[0], email: u.email, confirmed:true, via:"google-firebase"});
+    afterAuthSuccess();
+  } catch(e){
+    if(err) err.textContent = firebaseErrorMessage(e);
+  }
+}
+function firebaseLogout(){
+  if(fbAuth) fbAuth.signOut().catch(()=>{});
+  localStorage.removeItem(PROFILE_KEY);
+  renderProfileBadge();
+  goView("start");
+}
+function firebaseErrorMessage(e){
+  const code = e && e.code || "";
+  const map = {
+    "auth/email-already-in-use": "Diese E-Mail-Adresse ist bereits registriert. Bitte stattdessen anmelden.",
+    "auth/invalid-email": "Ungültige E-Mail-Adresse.",
+    "auth/weak-password": "Das Passwort ist zu schwach (mind. 6 Zeichen).",
+    "auth/wrong-password": "Falsches Passwort.",
+    "auth/user-not-found": "Kein Konto mit dieser E-Mail-Adresse gefunden.",
+    "auth/too-many-requests": "Zu viele Versuche. Bitte später erneut versuchen.",
+    "auth/popup-closed-by-user": "Anmeldefenster wurde geschlossen.",
+    "auth/network-request-failed": "Netzwerkfehler. Bitte Internetverbindung prüfen.",
+  };
+  return map[code] || ("Fehler: " + (e && e.message ? e.message : "unbekannt"));
+}
+function profileButtonAction(){
+  if(firebaseConfigured()) firebaseLogout();
+  else editProfile();
+}
 
 /* ============ GOOGLE-ANMELDUNG ============ */
 // Ersetze den Platzhalter durch deine eigene Google-Cloud-Client-ID
@@ -2451,7 +2728,10 @@ function initGoogleSignIn(){
   if(wrap) wrap.style.display = "block";
   const target = document.getElementById("googleSignInBtn");
   if(target){
-    google.accounts.id.renderButton(target, { theme:"outline", size:"large", width:280, text:"continue_with", locale:"de" });
+    // Breite dynamisch an den verfügbaren Platz anpassen (statt fest 280px), damit der
+    // Button auch auf sehr schmalen Handy-Displays nicht über den Rand hinausragt.
+    const availWidth = Math.min(280, Math.max(200, target.parentElement.clientWidth || 280));
+    google.accounts.id.renderButton(target, { theme:"outline", size:"large", width:availWidth, text:"continue_with", locale:"de" });
   }
 }
 
@@ -2470,8 +2750,7 @@ async function handleGoogleCredential(response){
     const email = claims.email.toLowerCase().slice(0,120);
     // Google hat die E-Mail bereits geprüft -> kein zusätzlicher Bestätigungscode nötig
     saveProfile({name, email, confirmed:true, via:"google"});
-    hideRegOverlay();
-    renderProfileBadge();
+    afterAuthSuccess();
   } catch(e){
     if(err) err.textContent = "Google-Anmeldung fehlgeschlagen. Bitte erneut versuchen oder manuell registrieren.";
   }
@@ -2480,6 +2759,8 @@ async function handleGoogleCredential(response){
 function renderProfileBadge(){
   const p = loadProfile();
   const badge = document.getElementById("profileBadge");
+  const btn = document.getElementById("profileActionBtn");
+  if(btn) btn.textContent = firebaseConfigured() ? "Abmelden" : "Profil bearbeiten";
   if(p){
     badge.style.display = "flex";
     if(p.confirmed){
@@ -2492,8 +2773,8 @@ function renderProfileBadge(){
   }
 }
 function initRegistration(){
-  const p = loadProfile();
-  if(!p || !p.confirmed){ showRegOverlay(p); }
+  // Kein Zwangs-Login mehr beim Laden: Gäste dürfen sich frei umsehen (Start, Methode, Grammatik, VIP, Support).
+  // Die Registrierung wird erst ausgelöst, wenn jemand tatsächlich eine Lern-Rubrik öffnen will (siehe goView()).
   renderProfileBadge();
 }
 
@@ -2643,6 +2924,14 @@ function allVocab(){
 
 /* ============ NAV ============ */
 function goView(name){
+  if(GATED_VIEWS.includes(name)){
+    const p = loadProfile();
+    if(!p || !p.confirmed){
+      pendingView = name;
+      showRegOverlay(p);
+      return;
+    }
+  }
   document.querySelectorAll("section.view").forEach(s=>s.classList.remove("active"));
   document.getElementById("view-"+name).classList.add("active");
   document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
@@ -2697,8 +2986,8 @@ document.getElementById("tabs").addEventListener("click", e=>{
 function renderStoryList(){
   const el = document.getElementById("geschichtenList");
   el.innerHTML = `<div class="card">
-      <h2>📖 Geschichten — Birkenbihl live erleben</h2>
-      <p>Hier siehst du die Birkenbihl-Methode in Aktion: Zeile für Zeile erst der deutsche Satz, direkt darunter der passende Bisaya-Satz. Lies zuerst nur die deutschen Zeilen durch, dann die Bisaya-Zeilen laut mit — so verknüpft dein Gehirn Klang und Bedeutung, ohne Grammatikregeln zu pauken.</p>
+      <h2>📖 Geschichten — die Lernidee live erleben</h2>
+      <p>Hier siehst du das Prinzip in Aktion (inspiriert von Birkenbihl): Zeile für Zeile erst der deutsche Satz, direkt darunter der passende Bisaya-Satz. Lies zuerst nur die deutschen Zeilen durch, dann die Bisaya-Zeilen laut mit — so verknüpft dein Gehirn Klang und Bedeutung, ohne Grammatikregeln zu pauken.</p>
     </div>
     <div class="lesson-grid">` +
     STORIES_DATA.map((s,i)=>`
@@ -2715,7 +3004,7 @@ function openStory(i){
   let html = `<div class="card">
     <span class="backlink" onclick="renderStoryList()">← alle Geschichten</span>
     <h2>${s.title}</h2>
-    <p class="small">Deutsch zuerst, dann Bisaya — genau wie beim Birkenbihl-Dekodieren. Nutze 🔊 zum Anhören.</p>`;
+    <p class="small">Deutsch zuerst, dann Bisaya — genau wie beim Dekodieren nach dieser Lernidee. Nutze 🔊 zum Anhören.</p>`;
   s.lines.forEach((line, idx)=>{
     html += `<div class="story-line">
       <div class="de-line"><span class="num">${idx+1}.</span>${line.de}</div>

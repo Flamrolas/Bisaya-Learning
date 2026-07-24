@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://visitor-badge.laobi.icu; connect-src 'self' https://formspree.io https://*.workers.dev https://*.googleapis.com https://accounts.google.com https://*.firebaseapp.com; frame-src https://accounts.google.com https://*.firebaseapp.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://visitor-badge.laobi.icu; connect-src 'self' https://formspree.io https://*.workers.dev https://*.googleapis.com https://accounts.google.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://accounts.google.com https://*.firebaseapp.com https://apis.google.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none';">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Bisaya Lebendig lernen — inspiriert von Birkenbihl</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2684,6 +2684,7 @@ async function firebaseGoogleSignIn(){
     // pendingView muss überleben, da die Seite bei der Weiterleitung komplett neu lädt
     // (alle normalen JS-Variablen gehen sonst verloren).
     if(pendingView) localStorage.setItem("bisaya_fb_pending_view", pendingView);
+    localStorage.setItem("bisaya_fb_redirect_attempted", "1");
     fbAuth.signInWithRedirect(provider); // Seite navigiert weg, Ergebnis wird nach Rückkehr in firebaseHandleRedirectResult() verarbeitet
     return;
   }
@@ -2698,9 +2699,11 @@ async function firebaseGoogleSignIn(){
 }
 async function firebaseHandleRedirectResult(){
   if(!firebaseConfigured() || !fbAuth) return;
+  const wasAttempted = localStorage.getItem("bisaya_fb_redirect_attempted") === "1";
   try{
     const result = await fbAuth.getRedirectResult();
     if(result && result.user){
+      localStorage.removeItem("bisaya_fb_redirect_attempted");
       const u = result.user;
       saveProfile({name: u.displayName || (u.email||"").split("@")[0], email: u.email, confirmed:true, via:"google-firebase"});
       const savedView = localStorage.getItem("bisaya_fb_pending_view");
@@ -2708,8 +2711,17 @@ async function firebaseHandleRedirectResult(){
       hideRegOverlay();
       renderProfileBadge();
       if(savedView) goView(savedView);
+    } else if(wasAttempted){
+      // Weiterleitung wurde gestartet, aber es kam kein Ergebnis zurück — typisch für Safaris
+      // "Website-übergreifende Verfolgung verhindern", das den nötigen Speicherzugriff blockiert.
+      localStorage.removeItem("bisaya_fb_redirect_attempted");
+      const savedView = localStorage.getItem("bisaya_fb_pending_view");
+      if(savedView){ pendingView = savedView; showRegOverlay(); }
+      const err = document.getElementById("fbSignupErr");
+      if(err) err.textContent = "Die Google-Anmeldung wurde von Safaris Datenschutzeinstellungen blockiert (\"Website-übergreifende Verfolgung verhindern\"). Bitte nutze stattdessen E-Mail + Passwort, oder schalte diese Safari-Einstellung testweise aus (Einstellungen → Safari → Datenschutz) und versuche es erneut.";
     }
   } catch(e){
+    localStorage.removeItem("bisaya_fb_redirect_attempted");
     // Falls die Weiterleitung fehlschlägt, im Registrierungs-Fenster anzeigen (falls offen)
     const err = document.getElementById("fbSignupErr");
     if(err) err.textContent = firebaseErrorMessage(e);

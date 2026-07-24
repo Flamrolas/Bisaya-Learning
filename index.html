@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://visitor-badge.laobi.icu; connect-src 'self' https://formspree.io https://*.workers.dev https://oauth2.googleapis.com https://accounts.google.com; frame-src https://accounts.google.com; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none';">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Bisaya Lebendig — Birkenbihl-Methode</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" defer onload="initGoogleSignIn()"></script>
 <style>
 :root{
   --bg:#fbf7f0; --panel:rgba(255,255,255,0.90); --ink:#2b2420; --sub:#6b5f54;
@@ -94,6 +97,12 @@ h3{color:#5a4632; font-size:1.1rem; font-family:'Baloo 2',cursive; font-weight:7
 .lesson-tile .done{position:absolute; top:10px; right:12px; color:var(--good); font-weight:800;}
 .line-block{border-bottom:1px dashed var(--line); padding:14px 0;}
 .line-block:last-child{border-bottom:none;}
+.story-line{border-bottom:1px dashed var(--line); padding:14px 0;}
+.story-line:last-child{border-bottom:none;}
+.story-line .de-line{font-size:1rem; color:#3d3327; margin-bottom:6px;}
+.story-line .de-line .num{color:var(--sub); font-weight:700; margin-right:6px; font-size:0.82rem;}
+.story-line .bis-line{font-size:1.05rem; font-weight:700; color:var(--accent2); display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.story-line .bis-pron{font-size:0.85rem; color:var(--sub); font-family:"Courier New",monospace; font-weight:400;}
 .interlinear{display:flex; flex-wrap:wrap; gap:14px 10px; margin:6px 0 8px;}
 .tok{text-align:center;}
 .tok .w{font-size:1.08rem; font-weight:700; color:var(--ink);}
@@ -110,6 +119,31 @@ h3{color:#5a4632; font-size:1.1rem; font-family:'Baloo 2',cursive; font-weight:7
 .speak-btn:active{transform:scale(0.92);}
 .speak-btn.playing{background:var(--accent3); color:#fff;}
 .audio-note{font-size:0.78rem; color:var(--sub); font-style:italic;}
+.mic-btn{
+  border:1px solid var(--line); background:#fff; color:var(--warn); cursor:pointer;
+  border-radius:50%; width:26px; height:26px; font-size:0.85rem; line-height:1; display:inline-flex;
+  align-items:center; justify-content:center; padding:0; flex-shrink:0; margin-left:2px;
+}
+.mic-btn:hover{background:var(--chip);}
+.mic-btn:active{transform:scale(0.92);}
+.mic-btn:disabled{opacity:0.5; cursor:wait;}
+.mic-result{font-size:0.82rem; font-family:'Poppins',sans-serif; font-weight:600; margin-left:4px;}
+.mic-listening{color:var(--accent3);}
+.mic-good{color:var(--good);}
+.mic-ok{color:#b5860a;}
+.mic-bad, .mic-fail{color:var(--warn);}
+.vip-pill{
+  display:inline-block; background:linear-gradient(90deg,#c1502e,#d4782d); color:#fff; font-size:0.7rem;
+  font-weight:800; padding:2px 9px; border-radius:20px; letter-spacing:0.4px; vertical-align:middle;
+}
+.vip-lockbox{
+  background:repeating-linear-gradient(45deg,#f4efe3,#f4efe3 10px,#efe6d4 10px,#efe6d4 20px);
+  border:1px dashed var(--accent); border-radius:10px; padding:16px; text-align:center; margin-top:8px;
+}
+.vip-lockbox b{color:var(--accent);}
+.vip-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:16px; box-shadow:var(--shadow);}
+.vip-price{font-size:2.2rem; font-weight:800; color:var(--accent); font-family:'Baloo 2',cursive;}
+.vip-price span{font-size:1rem; color:var(--sub); font-weight:500;}
 .note{
   background:#f4efe3; border-left:4px solid var(--accent3); padding:10px 14px; border-radius:6px;
   font-size:0.88rem; margin:10px 0; color:#3d3327;
@@ -181,6 +215,10 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
   background:var(--chip); border-radius:10px; padding:12px; margin:12px 0;
 }
 .modal-box .steplink{font-size:0.82rem; color:var(--accent3); cursor:pointer; margin-top:10px; display:inline-block;}
+.divider-or{
+  display:flex; align-items:center; gap:10px; margin:14px 0; color:var(--sub); font-size:0.78rem;
+}
+.divider-or::before, .divider-or::after{content:""; flex:1; height:1px; background:var(--line);}
 </style>
 </head>
 <body>
@@ -246,6 +284,10 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
     <div id="regFormStep">
       <h2>Willkommen bei Bisaya Lebendig 🌴</h2>
       <p class="small">Trag kurz deinen Namen und deine E-Mail-Adresse ein. Deine E-Mail muss anschließend bestätigt werden. Alles bleibt lokal auf diesem Gerät gespeichert — es gibt keinen Server und kein echtes Konto.</p>
+      <div id="googleSignInWrap" style="margin:10px 0; display:none;">
+        <div id="googleSignInBtn"></div>
+        <div class="divider-or"><span>oder mit Name/E-Mail</span></div>
+      </div>
       <label for="regName">Name</label>
       <input type="text" id="regName" placeholder="z. B. Flamrolas">
       <label for="regEmail">E-Mail</label>
@@ -273,7 +315,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <header class="top">
   <div class="titlerow">
-    <span class="sun-badge">🌴☀️</span>
+    <span class="sun-badge">🌴☀️ 🇵🇭</span>
     <h1>Bisaya <span class="accent-word">Lebendig</span></h1>
   </div>
   <p>Cebuano/Bisaya lernen nach der Birkenbihl-Methode — dekodieren, verstehen, anwenden.</p>
@@ -294,9 +336,12 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
   <button data-view="lektionen">Lektionen</button>
   <button data-view="wortschatz">Wortschatz</button>
   <button data-view="wendungen">Wendungen</button>
+  <button data-view="geschichten">📖 Geschichten</button>
   <button data-view="anwenden">Anwenden</button>
   <button data-view="grammatik">Grammatik-Spickzettel</button>
   <button data-view="fortschritt">Fortschritt</button>
+  <button data-view="vip">⭐ VIP</button>
+  <button data-view="support">Support</button>
 </nav>
 
 <main>
@@ -362,7 +407,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <section class="view" id="view-wortschatz">
   <div class="card">
     <h2>Wortschatz-Trainer</h2>
-    <p class="small">Klicke auf die Karte, um die Übersetzung zu sehen. Markiere danach ehrlich, ob du das Wort schon kannst — dein Fortschritt wird lokal auf diesem Gerät gespeichert.</p>
+    <p class="small">Klicke auf die Karte, um die Übersetzung zu sehen. Markiere danach ehrlich, ob du das Wort schon kannst — dein Fortschritt wird lokal auf diesem Gerät gespeichert. Mit 🎤 kannst du deine eigene Aussprache direkt per Mikrofon prüfen (Browser fragt einmalig nach Mikrofon-Zugriff; Cebuano wird von keinem Browser direkt unterstützt, daher ist die Bewertung ein bestmöglicher Näherungswert über die verwandte Filipino-Spracherkennung — kein Ersatz für echtes Feedback von Muttersprachlern).</p>
     <div class="filterbar">
       <label class="small">Kategorie:
         <select id="catFilter" onchange="refreshDeck()"></select>
@@ -388,9 +433,14 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <section class="view" id="view-wendungen">
   <div class="card">
     <h2>Wendungen — Alltagsphrasen, Redewendungen &amp; Slang</h2>
-    <p class="small">Über 150 zusätzliche Ausdrücke aus echtem Alltags-Bisaya: praktische Sätze für unterwegs, bildhafte Redewendungen mit ihrer wörtlichen Bedeutung, und Jugendsprache/Slang, wie er heute in Cebu tatsächlich gesprochen wird. Alle Einträge stehen auch als Karteikarten im Wortschatz-Trainer zur Verfügung (Kategorien "Alltagsphrasen", "Redewendungen", "Slang &amp; Jugendsprache").</p>
+    <p class="small">Über 200 zusätzliche Ausdrücke aus echtem Alltags-Bisaya: praktische Sätze für unterwegs, bildhafte Redewendungen und Sprichwörter (panultihon) mit ihrer wörtlichen Bedeutung, und Jugendsprache/Slang, wie er heute in Cebu tatsächlich gesprochen wird. Alle Einträge stehen auch als Karteikarten im Wortschatz-Trainer zur Verfügung (Kategorien "Alltagsphrasen", "Redewendungen", "Slang &amp; Jugendsprache").</p>
   </div>
   <div id="wendungenList"></div>
+</section>
+
+<!-- GESCHICHTEN -->
+<section class="view" id="view-geschichten">
+  <div id="geschichtenList"></div>
 </section>
 
 <!-- ANWENDEN -->
@@ -483,11 +533,86 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
   </div>
 </section>
 
+<!-- VIP -->
+<section class="view" id="view-vip">
+  <div class="vip-box" style="text-align:center;">
+    <span class="vip-pill">⭐ VIP</span>
+    <h2 style="margin-top:10px;">Vollen Wortschatz freischalten</h2>
+    <p>Die ersten 100 Wörter &amp; Wendungen sind komplett kostenlos. Für den kompletten Wortschatz (über 1.000 Einträge, alle Lektionen-Extras und alle Wendungen) gibt es VIP.</p>
+    <div class="vip-price">5 € <span>/ Monat, jederzeit kündbar</span></div>
+  </div>
+  <div class="card" id="vipConfigWarning" style="display:none; border-color:var(--warn);">
+    <p class="small">⚠️ Der VIP-Zugang ist im Code dieser Datei noch nicht mit einem echten Bezahl-Server verbunden (Platzhalter-Adresse). Bis das eingerichtet ist, bleibt der volle Wortschatz für alle offen.</p>
+  </div>
+  <div class="vip-box">
+    <h3>Neu VIP werden</h3>
+    <label for="vipEmailNew">Deine E-Mail-Adresse</label>
+    <input type="text" id="vipEmailNew" placeholder="du@beispiel.de" style="width:100%;">
+    <div class="err" id="vipNewErr"></div>
+    <div class="btnrow" style="justify-content:flex-start; margin-top:10px;">
+      <button class="action primary" onclick="startVipCheckout()">Weiter zur sicheren Zahlung (Stripe)</button>
+    </div>
+    <p class="small" style="margin-top:8px;">Du wirst zu Stripe weitergeleitet — dort läuft die Zahlung sicher ab, diese Seite sieht deine Zahlungsdaten nie.</p>
+  </div>
+  <div class="vip-box">
+    <h3>Ich bin schon VIP — Zugang auf diesem Gerät holen</h3>
+    <label for="vipEmailRestore">E-Mail-Adresse, mit der du bezahlt hast</label>
+    <input type="text" id="vipEmailRestore" placeholder="du@beispiel.de" style="width:100%;">
+    <div class="err" id="vipRestoreErr"></div>
+    <div class="btnrow" style="justify-content:flex-start; margin-top:10px;">
+      <button class="action neutral" onclick="restoreVipAccess()">Zugang prüfen &amp; freischalten</button>
+    </div>
+  </div>
+  <div class="card" id="vipStatusCard" style="display:none;">
+    <h3>✅ Dein VIP-Status</h3>
+    <p id="vipStatusText"></p>
+    <button class="action neutral" onclick="logoutVip()">VIP-Zugang auf diesem Gerät entfernen</button>
+  </div>
+</section>
+
+<!-- SUPPORT -->
+<section class="view" id="view-support">
+  <div class="card">
+    <h2>Support &amp; Feedback</h2>
+    <p>Fehler gefunden, eine Übersetzung stimmt nicht, oder du hast einen Wunsch für neue Wörter/Lektionen? Schreib es hier rein.</p>
+    <div id="supportFormWrap">
+      <label for="suppName">Name (optional)</label>
+      <input type="text" id="suppName" placeholder="Dein Name">
+      <label for="suppEmail">E-Mail (falls du eine Antwort möchtest)</label>
+      <input type="text" id="suppEmail" placeholder="du@beispiel.de">
+      <label for="suppMsg">Nachricht</label>
+      <textarea id="suppMsg" placeholder="Was möchtest du mitteilen?" style="min-height:110px;"></textarea>
+      <div class="err" id="suppErr"></div>
+      <div class="btnrow" style="justify-content:flex-end; margin-top:10px;">
+        <button class="action primary" onclick="sendSupport()">Absenden</button>
+      </div>
+    </div>
+    <p class="small" id="suppNote">Wird per Formular-Weiterleitung als E-Mail zugestellt — keine Kommentare werden öffentlich auf der Seite angezeigt.</p>
+  </div>
+</section>
+
 </main>
 
-<footer class="appfoot">Bisaya Lebendig · Modul 1 · Erstellt nach der Birkenbihl-Lernphilosophie</footer>
+<footer class="appfoot">
+  Bisaya Lebendig · Modul 1 · Inspiriert von der Birkenbihl-Lernphilosophie
+  <div style="margin-top:8px;">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=flamrolas.bisaya-learning&left_text=Besucher"
+         alt="Besucherzähler" style="height:20px; vertical-align:middle;"
+         onerror="this.style.display='none'">
+  </div>
+</footer>
 
 <script>
+/* ============ SICHERHEIT: HTML-Escaping ============ */
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
 /* ============ DATA ============ */
 
 const CORE_VOCAB = [
@@ -1393,6 +1518,192 @@ const CORE_VOCAB = [
  {bis:"estante",de:"Regal",cat:"Zuhause"},
  {bis:"kabinet",de:"Schrank",cat:"Zuhause"},
  {bis:"aparador",de:"Kleiderschrank",cat:"Zuhause"},
+ // ---- Erweiterung: weitere Vokabeln ----
+ {bis:"silhig",de:"Besen",cat:"Zuhause",pron:"SIL-hig"},
+ {bis:"tualya",de:"Handtuch",cat:"Zuhause",pron:"too-AHL-yah"},
+ {bis:"habol",de:"Decke",cat:"Zuhause",pron:"HAH-bol"},
+ {bis:"lampara",de:"Lampe",cat:"Zuhause",pron:"lahm-PAH-rah"},
+ {bis:"kisame",de:"Zimmerdecke",cat:"Zuhause",pron:"kee-SAH-meh"},
+ {bis:"silong",de:"Raum unter dem Haus (Stelzenhaus)",cat:"Zuhause",pron:"SEE-long"},
+ {bis:"higdaanan",de:"Bett",cat:"Zuhause",pron:"hig-DAH-ah-nan"},
+ {bis:"ganghaan",de:"Tor, Eingang",cat:"Zuhause",pron:"gahng-HAH-ahn"},
+ {bis:"botelya",de:"Flasche",cat:"Zuhause",pron:"boh-TEHL-yah"},
+ {bis:"lingkuranan",de:"Sitzgelegenheit, Stuhl (allgemein)",cat:"Zuhause",pron:"ling-koo-RAH-nahn"},
+ {bis:"plantsa",de:"Bügeleisen",cat:"Zuhause",pron:"PLAHN-tsah"},
+ {bis:"garapon",de:"Glas, Einmachglas",cat:"Zuhause",pron:"gah-rah-POHN"},
+ {bis:"hagdan",de:"Treppe, Leiter",cat:"Zuhause",pron:"HAHG-dahn"},
+ {bis:"sawog",de:"Fußboden",cat:"Zuhause",pron:"SAH-wog"},
+ {bis:"bungbong",de:"Wand",cat:"Zuhause",pron:"boong-BONG"},
+ {bis:"kalan",de:"Herd, Kochstelle",cat:"Zuhause",pron:"KAH-lahn"},
+ {bis:"panaksan",de:"Schüssel",cat:"Zuhause",pron:"pah-NAHK-sahn"},
+ {bis:"bilao",de:"runde Bambus-Wanneschale (zum Worfeln/Servieren)",cat:"Zuhause",pron:"bee-LAH-oh"},
+ {bis:"lusong",de:"Mörser (zum Reisstampfen)",cat:"Zuhause",pron:"LOO-song"},
+ {bis:"bangkito",de:"Hocker",cat:"Zuhause",pron:"bahng-KEE-toh"},
+ {bis:"kudkuran",de:"Kokosnussraspel",cat:"Zuhause",pron:"kood-koo-RAHN"},
+ {bis:"palayok",de:"Tontopf (zum Kochen)",cat:"Zuhause",pron:"pah-LAH-yok"},
+ {bis:"suga",de:"Licht, Lampe",cat:"Zuhause",pron:"SOO-gah"},
+ {bis:"palengke",de:"Markt",cat:"Markt & Reise",pron:"pah-LENG-keh"},
+ {bis:"suki",de:"Stammkunde/Stammkundin",cat:"Markt & Reise",pron:"SOO-kee"},
+ {bis:"taboan",de:"Handelsplatz, Marktviertel",cat:"Markt & Reise",pron:"tah-boh-AHN"},
+ {bis:"presyo",de:"Preis",cat:"Markt & Reise",pron:"PREHS-yoh"},
+ {bis:"diskwento",de:"Rabatt",cat:"Markt & Reise",pron:"dees-KWEHN-toh"},
+ {bis:"resibo",de:"Quittung",cat:"Markt & Reise",pron:"reh-SEE-boh"},
+ {bis:"sakyanan",de:"Fahrzeug",cat:"Markt & Reise",pron:"sahk-YAH-nahn"},
+ {bis:"traysikel",de:"Tricycle (Motorrad-Taxi mit Beiwagen)",cat:"Markt & Reise",pron:"tray-SEE-kel"},
+ {bis:"pasahero",de:"Fahrgast, Passagier",cat:"Markt & Reise",pron:"pah-sah-HEH-roh"},
+ {bis:"sando",de:"ärmelloses Unterhemd",cat:"Kleidung",pron:"SAHN-doh"},
+ {bis:"saya",de:"Rock, traditionelles Kleid",cat:"Kleidung",pron:"SAH-yah"},
+ {bis:"barong",de:"Barong Tagalog (formelles Herrenhemd)",cat:"Kleidung",pron:"bah-ROHNG"},
+ {bis:"singsing",de:"Ring (Schmuck)",cat:"Kleidung",pron:"SING-sing"},
+ {bis:"pulseras",de:"Armband",cat:"Kleidung",pron:"pool-SEH-rahs"},
+ {bis:"hikaw",de:"Ohrringe",cat:"Kleidung",pron:"hee-KAW"},
+ {bis:"kwintas",de:"Halskette",cat:"Kleidung",pron:"KWIN-tahs"},
+ {bis:"salawal",de:"Hose",cat:"Kleidung",pron:"sah-LAH-wahl"},
+ {bis:"bestida",de:"festliches Kleid",cat:"Kleidung",pron:"behs-TEE-dah"},
+ {bis:"kuryente",de:"Strom, Elektrizität",cat:"Technik",pron:"koor-YEHN-teh"},
+ {bis:"baterya",de:"Batterie, Akku",cat:"Technik",pron:"bah-TEHR-yah"},
+ {bis:"de-kuryente",de:"elektrisch, strombetrieben",cat:"Technik",pron:"deh koor-YEHN-teh"},
+ {bis:"i-charge",de:"aufladen (Akku)",cat:"Technik",pron:"ee-CHARJ"},
+ {bis:"mag-text",de:"eine SMS schreiben",cat:"Technik",pron:"mahg-TEHKST"},
+ {bis:"gamot",de:"Wurzel",cat:"Natur",pron:"GAH-mot"},
+ {bis:"lasang",de:"Wald",cat:"Natur",pron:"LAH-sahng"},
+ {bis:"bungtod",de:"Hügel",cat:"Natur",pron:"BOONG-tod"},
+ {bis:"baybayon",de:"Strand, Ufer",cat:"Natur",pron:"bahy-bah-YOHN"},
+ {bis:"landong",de:"Schatten",cat:"Natur",pron:"LAHN-dong"},
+ {bis:"lapok",de:"Schlamm, Matsch",cat:"Natur",pron:"LAH-pok"},
+ {bis:"gabon",de:"Nebel",cat:"Natur",pron:"GAH-bon"},
+ {bis:"unos",de:"Sturm",cat:"Wetter",pron:"OO-nos"},
+ {bis:"kalintura",de:"Fieber",cat:"Gesundheit & Notfälle",pron:"kah-leen-TOO-rah"},
+ {bis:"kabag",de:"Blähbauch, Völlegefühl",cat:"Gesundheit & Notfälle",pron:"KAH-bahg"},
+ {bis:"agianan",de:"Weg, Route",cat:"Verkehr",pron:"ah-gee-AH-nahn"},
+ {bis:"drayber",de:"Fahrer",cat:"Verkehr",pron:"DRAHY-behr"},
+ {bis:"gasolina",de:"Benzin",cat:"Verkehr",pron:"gah-soh-LEE-nah"},
+ {bis:"kaguol",de:"Trauer, Kummer",cat:"Gefühle",pron:"kah-goo-OL"},
+ {bis:"kahadlok",de:"Angst, Furcht",cat:"Gefühle",pron:"kah-hahd-LOK"},
+ {bis:"kalibog",de:"Verwirrung",cat:"Gefühle",pron:"kah-LEE-bog"},
+ {bis:"kasuko",de:"Wut, Ärger",cat:"Gefühle",pron:"kah-SOO-koh"},
+ {bis:"sinuglaw",de:"gegrilltes Schweinebauch mit Kinilaw kombiniert",cat:"Essen",pron:"see-noog-LAHW"},
+ {bis:"puto maya",de:"klebriger Reis in Kokosmilch gekocht",cat:"Essen",pron:"POO-toh MAH-yah"},
+ {bis:"binignit",de:"süße Kokosmilch-Suppe mit Bananen, Taro und Sago",cat:"Essen",pron:"bee-neeg-NEET"},
+ {bis:"ngohiong",de:"Cebu-Frühlingsrolle mit Fünf-Gewürze-Aroma",cat:"Essen",pron:"ngoh-hee-OHNG"},
+ {bis:"budbud",de:"Reiskuchen, in Kokosblättern gegart",cat:"Essen",pron:"BOOD-bood"},
+ {bis:"otap",de:"Cebu-Blätterteiggebäck (süß)",cat:"Essen",pron:"OH-tahp"},
+ {bis:"rosquillos",de:"Cebu-Ringkekse mit Zucker",cat:"Essen",pron:"ros-KEE-yos"},
+ {bis:"mopalit",de:"kaufen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-PAH-lit"},
+ {bis:"paliton",de:"wird gekauft werden (Objekt-Fokus, Zukunft)",cat:"Verben",pron:"pah-LEE-ton"},
+ {bis:"mobaligya",de:"verkaufen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-bah-LEEG-yah"},
+ {bis:"ibaligya",de:"zu verkaufen anbieten (Objekt-Fokus)",cat:"Verben",pron:"ee-bah-LEEG-yah"},
+ {bis:"mokuha",de:"nehmen, holen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-KOO-hah"},
+ {bis:"kuhaon",de:"wird geholt werden (Objekt-Fokus)",cat:"Verben",pron:"koo-HAH-on"},
+ {bis:"mohatag",de:"geben (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-HAH-tahg"},
+ {bis:"ihatag",de:"geben, übergeben (Objekt-Fokus)",cat:"Verben",pron:"ee-HAH-tahg"},
+ {bis:"nagsulat",de:"schreibt/schrieb gerade (Akteur-Fokus, verlaufend)",cat:"Verben",pron:"nahg-SOO-laht"},
+ {bis:"gisulat",de:"geschrieben (Objekt-Fokus, abgeschlossen)",cat:"Verben",pron:"gee-SOO-laht"},
+ {bis:"nagbasa",de:"liest gerade (Akteur-Fokus, verlaufend)",cat:"Verben",pron:"nahg-BAH-sah"},
+ {bis:"nagluto",de:"kocht gerade (Akteur-Fokus, verlaufend)",cat:"Verben",pron:"nahg-LOO-toh"},
+ {bis:"nagtan-aw",de:"schaut gerade zu (Akteur-Fokus, verlaufend)",cat:"Verben",pron:"nahg-tahn-AHW"},
+ {bis:"gitan-aw",de:"angeschaut (Objekt-Fokus, abgeschlossen)",cat:"Verben",pron:"gee-tahn-AHW"},
+ {bis:"motabang",de:"helfen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-TAH-bahng"},
+ {bis:"tabangan",de:"jemandem geholfen werden (Objekt-Fokus)",cat:"Verben",pron:"tah-BAHNG-ahn"},
+ {bis:"motawag",de:"anrufen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-TAH-wahg"},
+ {bis:"tawgon",de:"angerufen werden (Objekt-Fokus)",cat:"Verben",pron:"tahw-GOHN"},
+ {bis:"modala",de:"mitbringen, tragen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-DAH-lah"},
+ {bis:"dad-on",de:"mitgebracht werden (Objekt-Fokus)",cat:"Verben",pron:"dahd-OHN"},
+ {bis:"maghulat",de:"warten (Akteur-Fokus)",cat:"Verben",pron:"mahg-HOO-laht"},
+ {bis:"hulaton",de:"abgewartet werden (Objekt-Fokus)",cat:"Verben",pron:"hoo-LAH-ton"},
+ {bis:"magbantay",de:"aufpassen, bewachen (Akteur-Fokus)",cat:"Verben",pron:"mahg-BAHN-tahy"},
+ {bis:"bantayan",de:"bewacht/beaufsichtigt werden (Objekt-Fokus)",cat:"Verben",pron:"bahn-TAH-yahn"},
+ {bis:"molabay",de:"wegwerfen (Akteur-Fokus, Zukunft)",cat:"Verben",pron:"moh-LAH-bahy"},
+ {bis:"ilabay",de:"weggeworfen werden (Objekt-Fokus)",cat:"Verben",pron:"ee-LAH-bahy"},
+ {bis:"nagtudlo",de:"unterrichtet gerade (Akteur-Fokus)",cat:"Verben",pron:"nahg-TOOD-loh"},
+ {bis:"mahigugma",de:"lieben (Akteur-Fokus)",cat:"Verben",pron:"mah-hee-GOOG-mah"},
+ {bis:"gihigugma",de:"geliebt (Objekt-Fokus)",cat:"Verben",pron:"gee-hee-GOOG-mah"},
+ {bis:"hilabihan",de:"äußerst, übermäßig (formeller)",cat:"Adjektive",pron:"hee-lah-BEE-hahn"},
+ {bis:"mas",de:"mehr, -er (Vergleichspartikel)",cat:"Adjektive",pron:"mahs"},
+ {bis:"labing",de:"am meisten, -st (Superlativ-Partikel)",cat:"Adjektive",pron:"LAH-bing"},
+ {bis:"pinaka-",de:"am ...sten (Superlativ-Vorsilbe)",cat:"Adjektive",pron:"pee-NAH-kah"},
+ {bis:"kaysa",de:"als (bei Vergleichen)",cat:"Adjektive",pron:"KAY-sah"},
+ {bis:"kapareha",de:"gleich, ebenso",cat:"Adjektive",pron:"kah-pah-REH-hah"},
+ {bis:"parehas",de:"gleich, identisch",cat:"Adjektive",pron:"pah-REH-hahs"},
+ {bis:"talagsaon",de:"selten, außergewöhnlich",cat:"Adjektive",pron:"tah-lahg-SAH-on"},
+ {bis:"lahi",de:"anders, fremd, seltsam",cat:"Adjektive",pron:"LAH-hee"},
+ {bis:"pareho",de:"gleich, ähnlich",cat:"Adjektive",pron:"pah-REH-ho"},
+ {bis:"bastos",de:"unhöflich, vulgär",cat:"Adjektive",pron:"bahs-TOS"},
+ {bis:"mapahitas-on",de:"arrogant, überheblich",cat:"Adjektive",pron:"mah-pah-hee-TAHS-on"},
+ {bis:"mapainubsanon",de:"bescheiden, demütig",cat:"Adjektive",pron:"mah-pah-ee-noob-SAH-non"},
+ {bis:"abtik",de:"schlagfertig, flink",cat:"Adjektive",pron:"AHB-tik"},
+ {bis:"lipong",de:"schwindelig",cat:"Adjektive",pron:"LEE-pong"},
+ {bis:"huyang",de:"schwach",cat:"Adjektive",pron:"HOO-yahng"},
+ {bis:"kusgan",de:"stark, kräftig",cat:"Adjektive",pron:"koos-GAHN"},
+ {bis:"gani",de:"sogar, tatsächlich; deshalb (Partikel)",cat:"Partikel",pron:"GAH-nee"},
+ {bis:"kuno",de:"angeblich, wie es heißt (Partikel für Hörensagen)",cat:"Partikel",pron:"KOO-noh"},
+ {bis:"tungod kay",de:"weil, wegen",cat:"Konnektoren",pron:"toong-OD kay"},
+ {bis:"samtang",de:"während",cat:"Konnektoren",pron:"SAHM-tahng"},
+ {bis:"sa dili pa",de:"bevor",cat:"Konnektoren",pron:"sah DEE-lee pah"},
+ {bis:"inig",de:"sobald, wenn (zeitlich)",cat:"Konnektoren",pron:"EE-nig"},
+ {bis:"gawas sa",de:"außer, abgesehen von",cat:"Konnektoren",pron:"GAH-wahs sah"},
+ {bis:"lakip sa",de:"einschließlich",cat:"Konnektoren",pron:"LAH-kip sah"},
+ {bis:"sama sa",de:"wie, so wie",cat:"Konnektoren",pron:"SAH-mah sah"},
+ {bis:"labi na",de:"besonders, vor allem",cat:"Konnektoren",pron:"LAH-bee nah"},
+ {bis:"gyud / jud",de:"wirklich, definitiv (Verstärkungspartikel)",cat:"Partikel",pron:"dyood"},
+ {bis:"unta",de:"hoffentlich, würde gerne (Wunschpartikel)",cat:"Partikel",pron:"OON-tah"},
+ {bis:"ano",de:"was, äh (Füllwort, 'du weißt schon')",cat:"Partikel",pron:"AH-noh"},
+ {bis:"ay",de:"oh! ach! (Ausruf)",cat:"Partikel",pron:"ahy"},
+ {bis:"abaw",de:"oh je! / wow! (typisch visayanischer Ausruf des Erstaunens)",cat:"Partikel",pron:"AH-bow"},
+ {bis:"palihug",de:"bitte (höflich, formeller Ausdruck)",cat:"Partikel",pron:"pah-LEE-hoog"},
+ {bis:"day",de:"Anrede für Mädchen/junge Frau (von 'inday')",cat:"Partikel",pron:"dahy"},
+ {bis:"dong",de:"Anrede für Jungen (von 'dodong')",cat:"Partikel",pron:"dohng"},
+ {bis:"lansang",de:"Nagel",cat:"Zuhause",pron:"lahn-SAHNG"},
+ {bis:"lagari",de:"Säge",cat:"Zuhause",pron:"lah-GAH-ree"},
+ {bis:"pala",de:"Schaufel",cat:"Zuhause",pron:"PAH-lah"},
+ {bis:"alat",de:"Fischreuse, geflochtener Fangkorb",cat:"Natur",pron:"AH-laht"},
+ {bis:"pukot",de:"Fischernetz",cat:"Natur",pron:"POO-kot"},
+ {bis:"alimyon",de:"Duft, Aroma (z. B. von Blumen)",cat:"Natur",pron:"ah-leem-YON"},
+ {bis:"tin-aw",de:"klar (z. B. Wasser, Sicht)",cat:"Adjektive",pron:"tin-OW"},
+ {bis:"lawom",de:"tief",cat:"Adjektive",pron:"LAH-wom"},
+ {bis:"mabaw",de:"flach, seicht",cat:"Adjektive",pron:"MAH-bow"},
+ {bis:"slay",de:"umwerfend gut aussehen (entlehnt aus dem Englischen)",cat:"Slang & Jugendsprache",pron:"sleh-EE"},
+ {bis:"lit",de:"überragend, geil (entlehnt aus dem Englischen)",cat:"Slang & Jugendsprache",pron:"leet"},
+ {bis:"push",de:"mach schon!, trau dich!",cat:"Slang & Jugendsprache",pron:"poosh"},
+ {bis:"low-key",de:"heimlich, irgendwie schon (dezent)",cat:"Slang & Jugendsprache",pron:"loh-kee"},
+ {bis:"mood",de:"Stimmung, nachvollziehbares Gefühl",cat:"Slang & Jugendsprache",pron:"mood"},
+ {bis:"chika",de:"Klatsch, Neuigkeiten",cat:"Slang & Jugendsprache",pron:"CHEE-kah"},
+ {bis:"kalinaw",de:"Frieden, innere Ruhe",cat:"Wörter mit Tiefgang",pron:"kah-LEE-now"},
+ {bis:"paglaom",de:"Hoffnung",cat:"Wörter mit Tiefgang",pron:"pahg-lah-OM"},
+ {bis:"pagsalig",de:"Vertrauen",cat:"Wörter mit Tiefgang",pron:"pahg-SAH-lig"},
+ {bis:"kagawasan",de:"Freiheit",cat:"Wörter mit Tiefgang",pron:"kah-gah-wah-SAHN"},
+ {bis:"kamatuoran",de:"Wahrheit",cat:"Wörter mit Tiefgang",pron:"kah-mah-too-OH-rahn"},
+ {bis:"handumanan",de:"Erinnerung, Andenken",cat:"Wörter mit Tiefgang",pron:"hahn-doo-mah-NAHN"},
+ {bis:"silingan",de:"Nachbar",cat:"Nomen",pron:"SEE-ling-ahn"},
+ {bis:"mangutana",de:"fragen (Akteur-Fokus)",cat:"Verben",pron:"mahng-oo-TAH-nah"},
+ {bis:"pangutan-on",de:"gefragt werden (Objekt-Fokus)",cat:"Verben",pron:"pahng-oo-tahn-OHN"},
+ {bis:"mosulti",de:"sprechen, sagen (Akteur-Fokus)",cat:"Verben",pron:"moh-SOOL-tee"},
+ {bis:"isulti",de:"sagen, mitteilen (Objekt-Fokus)",cat:"Verben",pron:"ee-SOOL-tee"},
+ {bis:"magtinabangay",de:"einander helfen, sich gegenseitig unterstützen",cat:"Verben",pron:"mahg-tee-nah-BAHNG-ahy"},
+ {bis:"naunsa",de:"was ist passiert (zusammengezogene Form)",cat:"Fragewörter",pron:"nah-OON-sah"},
+ {bis:"unsaon",de:"wie (man etwas tut)",cat:"Fragewörter",pron:"oon-SAH-on"},
+ {bis:"pila ka beses",de:"wie oft",cat:"Zahlen",pron:"PEE-lah kah BEH-sehs"},
+ {bis:"kausa",de:"einmal",cat:"Zahlen",pron:"kah-OO-sah"},
+ {bis:"kaduha",de:"zweimal",cat:"Zahlen",pron:"kah-DOO-hah"},
+ {bis:"katulo",de:"dreimal",cat:"Zahlen",pron:"kah-TOO-loh"},
+ {bis:"kasagaran",de:"meistens, oft",cat:"Zahlen",pron:"kah-sah-GAH-rahn"},
+ {bis:"panagsa",de:"selten, gelegentlich",cat:"Zahlen",pron:"pah-NAHG-sah"},
+ {bis:"pipila",de:"ein paar, einige",cat:"Zahlen",pron:"pee-PEE-lah"},
+ {bis:"hangtod",de:"bis",cat:"Zahlen",pron:"hahng-TOD"},
+ {bis:"sukad",de:"seit",cat:"Zahlen",pron:"SOO-kahd"},
+ {bis:"karon dayon",de:"sofort, jetzt gleich",cat:"Zahlen",pron:"KAH-ron DAH-yon"},
+ {bis:"sa gihapon",de:"immer noch, wie immer",cat:"Zahlen",pron:"sah gee-HAH-pon"},
+ {bis:"bos",de:"Chef, Kumpel (freundlich)",cat:"Slang & Jugendsprache",pron:"bohs"},
+ {bis:"charot",de:"nur Spaß!, war nicht ernst gemeint",cat:"Slang & Jugendsprache",pron:"chah-ROHT"},
+ {bis:"awts",de:"autsch, hoppla",cat:"Slang & Jugendsprache",pron:"owts"},
+ {bis:"werpa",de:"Power, Durchhalten (rückwärts 'power')",cat:"Slang & Jugendsprache",pron:"WEHR-pah"},
+ {bis:"petmalu",de:"cool, großartig (von 'malupit' rückwärts)",cat:"Slang & Jugendsprache",pron:"peht-MAH-loo"},
+ {bis:"tarungun",de:"richtig machen, ernst nehmen",cat:"Slang & Jugendsprache",pron:"tah-roo-NGOON"},
+ {bis:"salbahis",de:"frecher Schlingel (liebevoll für Kinder)",cat:"Slang & Jugendsprache",pron:"sahl-BAH-hees"},
+ {bis:"lupig",de:"zu viel, übertrieben",cat:"Slang & Jugendsprache",pron:"LOO-peeg"},
+ {bis:"budol",de:"zum Kaufen verleitet, Spontankauf getätigt",cat:"Slang & Jugendsprache",pron:"BOO-dol"},
+ {bis:"bagulbol",de:"vor sich hin murren, meckern",cat:"Slang & Jugendsprache",pron:"bah-gool-BOHL"},
+ {bis:"spill na",de:"erzähl schon!, raus damit!",cat:"Slang & Jugendsprache",pron:"speel nah"},
 ];
 
 // Lektions-Zusatzwortschatz (Wörter, die in den Dialogen neu vorkommen)
@@ -1570,6 +1881,155 @@ const PHRASES_VOCAB = [
  {bis:"Peste!",de:"Verdammt! (milder Fluch)",cat:"Slang & Jugendsprache",pron:"pes-teh"},
  {bis:"Inatay!",de:"Ugh! Wie nervig!",cat:"Slang & Jugendsprache",pron:"ee-nah-tie"},
  {bis:"Amaw!",de:"albern, verrückt (spielerisch)",cat:"Slang & Jugendsprache",pron:"ah-mao"},
+ // ---- Erweiterung: weitere Redewendungen & Sprichwörter ----
+ {bis:"Ang dila walay bukog apan makapikas.",de:"Die Zunge hat kein Bein, kann aber trotzdem etwas zerbrechen.",pron:"ahng DEE-lah wah-LAY boo-KOG ah-PAHN mah-kah-PEE-kahs",cat:"Redewendungen",note:"Cebuano-Sprichwort (panultihon): Worte können tiefer verletzen als Waffen; Warnung vor Klatsch und Verleumdung."},
+ {bis:"Ang amahan sa kaayohan mao ang paghago.",de:"Der Vater des Wohlstands ist harte Arbeit.",pron:"ahng ah-MAH-hahn sah kah-ah-yoh-HAHN mah-OH ahng pahg-HAH-goh",cat:"Redewendungen",note:"Panultihon über Fleiß: Erfolg kommt durch Arbeit, nicht durch Glück."},
+ {bis:"Dili tanan bulawan ang naggilak.",de:"Nicht alles, was glänzt, ist Gold.",pron:"DEE-lee TAH-nahn boo-LAH-wahn ahng nahg-GEE-lahk",cat:"Redewendungen",note:"Panultihon über Trugbilder und Äußerlichkeiten."},
+ {bis:"Ang tawo makailhan sa iyang mga buhat.",de:"Ein Mensch wird an seinen Taten erkannt.",pron:"ahng TAH-woh mah-kah-IL-hahn sah ee-YAHNG mah-NGAH BOO-haht",cat:"Redewendungen",note:"Panultihon: Charakter zeigt sich in Handlungen, nicht in Worten."},
+ {bis:"Ang maayo nga ngalan mas bililhon pa sa bulawan.",de:"Ein guter Name ist mehr wert als Gold.",pron:"ahng mah-AH-yoh ngah ngah-LAHN mahs bee-LEEL-hon pah sah boo-LAH-wahn",cat:"Redewendungen",note:"Panultihon über Ruf und Integrität."},
+ {bis:"Ang bata mao ang salamin sa ginikanan.",de:"Das Kind ist der Spiegel der Eltern.",pron:"ahng BAH-tah mah-OH ahng sah-LAH-min sah gee-nee-KAH-nahn",cat:"Redewendungen",note:"Panultihon: Erziehung spiegelt sich im Verhalten des Kindes."},
+ {bis:"Ang gagmay nga bato makapaanod sa dako nga barko.",de:"Kleine Steine können ein großes Schiff zum Kentern bringen.",pron:"ahng gahg-MAHY ngah BAH-toh mah-kah-pah-AH-nod sah DAH-koh ngah BAR-koh",cat:"Redewendungen",note:"Panultihon: Kleine, vernachlässigte Probleme können großen Schaden anrichten."},
+ {bis:"Ang mainantuson mao ang makadaog.",de:"Wer geduldig ist, gewinnt am Ende.",pron:"ahng mah-ee-nahn-TOO-son mah-OH ahng mah-kah-dah-OG",cat:"Redewendungen",note:"Panultihon über Geduld und Ausdauer."},
+ {bis:"Pagkuha og kahoy samtang bata pa.",de:"Sammle Feuerholz, solange du noch jung bist.",pron:"pahg-KOO-hah og kah-HOY sahm-TAHNG BAH-tah pah",cat:"Redewendungen",note:"Panultihon, vergleichbar mit 'schmiede das Eisen, solange es heiß ist' – nutze die Kraft der Jugend."},
+ {bis:"Ang tawo nga dili magtrabaho, dili usab mokaon.",de:"Wer nicht arbeitet, soll auch nicht essen.",pron:"ahng TAH-woh ngah DEE-lee mahg-trah-BAH-hoh DEE-lee OO-sahb moh-KAH-on",cat:"Redewendungen",note:"Panultihon über Arbeitsethik."},
+ {bis:"Puyra buyag.",de:"Kein böser Blick soll treffen (nach einem Kompliment).",pron:"POO-yrah BOO-yahg",cat:"Redewendungen",note:"Wird direkt nach einem Kompliment über ein Kind o.Ä. gesagt, um den Volksglauben 'buyag' (Fluch durch Bewunderung) abzuwehren."},
+ {bis:"Puhon.",de:"Hoffentlich, so Gott will.",pron:"POO-hohn",cat:"Redewendungen",note:"Wird an Zukunftspläne angehängt, ähnlich wie 'inshallah'."},
+ {bis:"Ambot lang.",de:"Ich habe wirklich keine Ahnung.",pron:"AHM-boht lahng",cat:"Redewendungen",note:"'Ambot' = ich weiß nicht (die Antwort); anders als 'wala ko kasabot' (ich habe es nicht verstanden)."},
+ {bis:"Wala ko kasabot.",de:"Ich habe das nicht verstanden.",pron:"wah-LAH koh kah-SAH-bot",cat:"Alltagsphrasen",note:"Für Verständnisprobleme, nicht für Unwissen über eine Antwort."},
+ {bis:"Mura'g okay ra ka.",de:"Du siehst irgendwie okay aus.",pron:"MOO-rahg oh-KAY rah kah",cat:"Alltagsphrasen",note:"'Mura'g' = es scheint als ob / sieht aus wie."},
+ {bis:"Pasensya na.",de:"Entschuldige bitte (für kleine Missgeschicke).",pron:"pah-SEHN-syah nah",cat:"Alltagsphrasen",note:"Milder als 'pasayloa ko', aus dem Spanischen 'paciencia'."},
+ {bis:"Lagi.",de:"Klar! Na klar! (bestätigend)",pron:"LAH-gee",cat:"Alltagsphrasen",note:"Wird oft ans Satzende gehängt, um Zustimmung/geteilte Erfahrung zu signalisieren."},
+ {bis:"Init lagi karon.",de:"Heiß heute, was?",pron:"EE-nit LAH-gee KAH-ron",cat:"Alltagsphrasen",note:"Beispiel für 'lagi' am Satzende."},
+ {bis:"Pwede ba mahal?",de:"Geht da noch was am Preis? (beim Feilschen)",pron:"PWEH-deh bah MAH-hahl",cat:"Markt & Reise",note:"Übliche, höfliche Feilsch-Formel auf dem Markt."},
+ {bis:"Unsa may chika?",de:"Was gibt's Neues? Was ist der neueste Tratsch?",pron:"OON-sah mahy CHEE-kah",cat:"Alltagsphrasen",note:"'Chika' = Klatsch/Neuigkeiten, ursprünglich aus dem Tagalog."},
+ {bis:"Bai, tara kaon ta!",de:"Kumpel, komm, lass uns essen gehen!",pron:"bahy TAH-rah KAH-on tah",cat:"Slang & Jugendsprache",note:"Typischer Freundes-Ausdruck mit 'tara' (los!)."},
+ {bis:"Lami jud!",de:"Wirklich lecker!",pron:"LAH-mee dyood",cat:"Slang & Jugendsprache",note:"'Jud/Gyud' verstärkt jede Aussage als 'wirklich, echt'."},
+ {bis:"Nindot uy!",de:"Wow, schön!",pron:"nin-DOT ooy",cat:"Slang & Jugendsprache",note:"'Uy' drückt Überraschung, Begeisterung oder Betonung aus."},
+ {bis:"Lisod bitaw ang Bisaya.",de:"Bisaya ist schon wirklich schwer, oder?",pron:"LEE-sod bee-TAW ahng bee-SAH-yah",cat:"Slang & Jugendsprache",note:"'Bitaw' = 'oder?', 'stimmt's', ähnlich wie ein Füllwort zur Bestätigung."},
+ {bis:"Mao!",de:"Genau! Stimmt!",pron:"mah-OH",cat:"Slang & Jugendsprache",note:"Kurze, sehr häufige Bestätigung im Gespräch."},
+ {bis:"G na!",de:"Auf geht's! Ich bin dabei!",pron:"jee nah",cat:"Slang & Jugendsprache",note:"Kurzform von 'game' – Zusage für einen Plan."},
+ {bis:"Chill lang.",de:"Immer locker, alles gut.",pron:"chill lahng",cat:"Slang & Jugendsprache",note:"Mix aus Englisch 'chill' und bisaya Partikel 'lang' (nur)."},
+ {bis:"Naa gyuy vibes!",de:"Da ist wirklich eine gute Stimmung!",pron:"NAH-ah dyoo-EE vaibs",cat:"Slang & Jugendsprache",note:"Beispiel für Bisaya-Englisch Code-Switching bei jüngeren Sprechern."},
+ {bis:"Okay na to, bai.",de:"Das reicht schon, Kumpel.",pron:"oh-KAY nah toh bahy",cat:"Slang & Jugendsprache",note:"Lockerer Abschluss eines Gesprächs oder einer Entscheidung."},
+ {bis:"Mas dako si Kuya kaysa nako.",de:"Mein großer Bruder ist größer als ich.",pron:"mahs DAH-koh see KOO-yah KAY-sah NAH-koh",cat:"Redewendungen",note:"Beispielsatz für den Komparativ mit 'mas ... kaysa'."},
+ {bis:"Labing maayo kini nga dalan.",de:"Das ist die beste Straße.",pron:"LAH-bing mah-AH-yoh KEE-nee ngah DAH-lahn",cat:"Redewendungen",note:"Beispielsatz für den Superlativ mit 'labing'."},
+ {bis:"Kapareha mi og edad.",de:"Wir sind gleich alt.",pron:"kah-pah-REH-hah mee og EH-dahd",cat:"Redewendungen",note:"Beispielsatz für Gleichheit mit 'kapareha'."},
+ {bis:"Ang nahibalo mopamaak, ang wala mahibalo mopangutana.",de:"Wer weiß, zeigt den Weg; wer nicht weiß, fragt.",pron:"ahng nah-hee-BAH-loh moh-pah-mah-AHK ahng wah-LAH mah-hee-BAH-loh moh-pahng-oo-TAH-nah",cat:"Redewendungen",note:"Panultihon über Wissen und Bescheidenheit: Es ist keine Schande zu fragen, wenn man etwas nicht weiß."},
+ {bis:"Ang tinuod nga gugma walay katapusan.",de:"Wahre Liebe hat kein Ende.",pron:"ahng tee-noo-OD ngah GOOG-mah wah-LAY kah-tah-poo-SAHN",cat:"Redewendungen",note:"Panultihon über Liebe, oft für elterliche wie romantische Liebe verwendet."},
+ {bis:"Ang gugma dili lang pulong, kinahanglan ipakita.",de:"Liebe sind nicht nur Worte, sie muss gezeigt werden.",pron:"ahng GOOG-mah DEE-lee lahng POO-long kee-nah-HAHNG-lahn ee-pah-KEE-tah",cat:"Redewendungen",note:"Panultihon: Liebesbekundungen ohne Taten sind hohl."},
+ {bis:"Naunsa man ka?",de:"Was ist mit dir los? Was ist passiert?",pron:"nah-OON-sah mahn kah",cat:"Alltagsphrasen",note:"Besorgte Nachfrage, wenn jemand komisch wirkt."},
+ {bis:"Asa ta paingon?",de:"Wo gehen wir hin?",pron:"AH-sah tah pah-EE-ngon",cat:"Alltagsphrasen",note:"Häufige Frage vor einem gemeinsamen Ausflug."},
+ {bis:"Kanus-a ni mahuman?",de:"Wann wird das fertig sein?",pron:"kah-noos-AH nee mah-HOO-mahn",cat:"Alltagsphrasen",note:"Nützliche Nachfrage zu Terminen/Fristen."},
+ {bis:"Tinuod ba na?",de:"Ist das wahr?",pron:"tee-noo-OD bah nah",cat:"Alltagsphrasen",note:"Rückfrage bei überraschenden Neuigkeiten."},
+ {bis:"Naa bay pwede itabang?",de:"Gibt es etwas, wobei ich helfen kann?",pron:"NAH-ah bahy PWEH-deh ee-TAH-bahng",cat:"Alltagsphrasen",note:"Höfliches Hilfsangebot."},
+ {bis:"Kon mahimo...",de:"Wenn möglich... (höfliche Bitte, formeller Register)",pron:"kon mah-HEE-moh",cat:"Alltagsphrasen",note:"Formelle Einleitung für Bitten, z. B. gegenüber Älteren oder Fremden."},
+ {bis:"Salamat kaayo.",de:"Vielen herzlichen Dank.",pron:"sah-LAH-maht kah-AH-yoh",cat:"Alltagsphrasen",note:"Emphatischere, formellere Steigerung von 'salamat'."},
+ {bis:"Walay sapayan.",de:"Kein Problem, macht nichts.",pron:"wah-LAY sah-PAH-yahn",cat:"Alltagsphrasen",note:"Lockere Antwort auf eine Entschuldigung oder ein Missgeschick."},
+];
+
+const STORIES_DATA = [
+  {
+    title:"Morgenroutine und Familie",
+    lines:[
+    {de:"Guten Morgen! Es ist schon sechs Uhr.",bis:"Maayong buntag! Alas sais na.",pron:"ma-AH-jong BUN-tak! AH-las SAI-is na."},
+    {de:"Wach auf, es ist Zeit für die Schule.",bis:"Mata na, oras na para sa eskwelahan.",pron:"MA-ta na, O-ras na PA-ra sa es-kwe-LA-han."},
+    {de:"Ich dusche und putze meine Zähne.",bis:"Naligo ko ug nagsepilyo sa akong ngipon.",pron:"na-LI-go ko ug nag-se-PI-ljo sa A-kong NGI-pon."},
+    {de:"Ich muss früh aufstehen, damit ich viel schaffen kann.",bis:"Kinahanglan ko momata og sayo aron daghan ko og mabuhat.",pron:"ki-na-HANG-lan ko mo-MA-ta og SA-jo A-ron DAG-han ko og ma-BU-hat."},
+    {de:"Mutter kocht Reis und Eier zum Frühstück.",bis:"Nagluto si Nanay og kan-on ug itlog para sa pamahaw.",pron:"nag-LU-to si NA-nai og KAN-on ug IT-log PA-ra sa pa-MA-hau."},
+    {de:"Was ist unser Frühstück heute?",bis:"Unsay atong pamahaw karon?",pron:"UN-sai A-tong pa-MA-hau KA-ron?"},
+    {de:"Kaffee und Brot sind unser Frühstück.",bis:"Kape ug pan ra ang among pamahaw.",pron:"KA-pe ug pan ra ang A-mong pa-MA-hau."},
+    {de:"Nach dem Frühstück gehe ich zur Schule.",bis:"Human sa pamahaw, moadto ko sa eskwelahan.",pron:"HU-man sa pa-MA-hau, mo-AD-to ko sa es-kwe-LA-han."},
+    {de:"Vater geht früh los zur Arbeit.",bis:"Sayo mulakaw si Tatay padulong sa trabaho.",pron:"SA-jo mu-LA-kau si TA-tai pa-du-LONG sa tra-BA-ho."},
+    {de:"Mein kleiner Bruder spielt noch im Bett.",bis:"Ang akong manghod nagdula pa sa higdaanan.",pron:"ang A-kong MANG-hod nag-DU-la pa sa hig-da-A-nan."},
+    {de:"Wir essen alle zusammen als Familie.",bis:"Mokaon ta tanan isip pamilya.",pron:"mo-KA-on ta TA-nan I-sip pa-MIL-ja."},
+    {de:"Ich bin froh über unsere Morgenroutine.",bis:"Nalipay ko sa among buntag nga rutina.",pron:"na-li-PAI ko sa A-mong BUN-tak nga ru-TI-na."}
+    ]
+  },
+  {
+    title:"Auf dem Markt",
+    lines:[
+    {de:"Guten Morgen! Ich möchte Gemüse kaufen.",bis:"Maayong buntag! Gusto ko mopalit og utanon.",pron:"ma-AH-jong BUN-tak! GUS-to ko mo-PA-lit og u-TA-non."},
+    {de:"Wie viel kosten die Tomaten?",bis:"Tagpila ang kamatis?",pron:"tag-PI-la ang ka-MA-tis?"},
+    {de:"Zehn Pesos pro Kilo.",bis:"Diyes pesos ang kada kilo.",pron:"DI-jes PE-sos ang KA-da KI-lo."},
+    {de:"Das ist etwas teuer. Gibt es einen Rabatt?",bis:"Medyo mahal kaayo. Naa bay diskwento?",pron:"ME-djo MA-hal ka-A-jo. na-A bai dis-KWEN-to?"},
+    {de:"Für Sie mache ich es acht Pesos.",bis:"Para nimo, otso pesos na lang.",pron:"PA-ra NI-mo, OT-so PE-sos na lang."},
+    {de:"In Ordnung, ich kaufe zwei Kilo.",bis:"Sige, palit ko og duha ka kilo.",pron:"SI-ge, PA-lit ko og DU-ha ka KI-lo."},
+    {de:"Hier ist Ihr Wechselgeld, zwei Pesos.",bis:"Ania ang imong sukli, duha ka pesos.",pron:"a-NI-a ang I-mong SUK-li, DU-ha ka PE-sos."},
+    {de:"Haben Sie auch frischen Fisch?",bis:"Naa ba moy sariwa nga isda?",pron:"na-A ba moi sa-RI-wa nga IS-da?"},
+    {de:"Ja, das haben wir. Schauen Sie hier.",bis:"Oo, naa. Tan-awa diri.",pron:"O-o, na-A. tan-A-wa DI-ri."},
+    {de:"Wie viel kostet das alles zusammen?",bis:"Pila tanan?",pron:"PI-la TA-nan?"},
+    {de:"Alles zusammen sind fünfzig Pesos.",bis:"Singkwenta pesos tanan.",pron:"sing-KWEN-ta PE-sos TA-nan."},
+    {de:"Vielen Dank! Auf Wiedersehen!",bis:"Salamat kaayo! Amping!",pron:"sa-LA-mat ka-A-jo! AM-ping!"}
+    ]
+  },
+  {
+    title:"Über das Wetter reden",
+    lines:[
+    {de:"Guten Morgen! Wie ist das Wetter heute?",bis:"Maayong buntag! Unsa ang panahon karon?",pron:"ma-AH-jong BUN-tak! UN-sa ang pa-NA-hon KA-ron?"},
+    {de:"Das Wetter ist heute Morgen schön.",bis:"Nindot ang panahon karong buntag.",pron:"NIN-dot ang pa-NA-hon KA-rong BUN-tak."},
+    {de:"Aber es ist ziemlich heiß.",bis:"Pero medyo init kaayo.",pron:"PE-ro ME-djo I-nit ka-A-jo."},
+    {de:"Ja, die Hitze in diesem Sommer ist extrem.",bis:"Oo, grabe ang init karong ting-init.",pron:"O-o, GRA-be ang I-nit KA-rong ting-I-nit."},
+    {de:"Ich möchte kaltes Wasser trinken.",bis:"Gusto ko moinom og bugnaw nga tubig.",pron:"GUS-to ko mo-I-nom og BUG-nau nga TU-big."},
+    {de:"Regnet es später?",bis:"Mag-ulan ba unya?",pron:"mag-U-lan ba UN-ja?"},
+    {de:"Vielleicht ja, weil Regenzeit ist.",bis:"Tingali oo, kay ting-ulan man.",pron:"ting-A-li O-o, kai ting-U-lan man."},
+    {de:"Dann nehme ich meinen Regenschirm mit.",bis:"Mao nga magdala ko og payong.",pron:"MA-o nga mag-DA-la ko og PA-jong."},
+    {de:"Es regnet schon wieder!",bis:"Ulan na sad!",pron:"U-lan na sad!"},
+    {de:"Im Dezember wird es kalt, oder?",bis:"Sa Disyembre, tugnaw, di ba?",pron:"sa di-SJEM-bre, TUG-nau, di ba?"},
+    {de:"Ja, wir brauchen eine Jacke, wenn es kalt ist.",bis:"Oo, kinahanglan namo og jacket kon tugnaw na.",pron:"O-o, ki-na-HANG-lan NA-mo og DSCHA-ket kon TUG-nau na."},
+    {de:"Ich hoffe, es ist morgen sonnig.",bis:"Naglaom ko nga init ang adlaw ugma.",pron:"nag-LA-om ko nga I-nit ang AD-lau UG-ma."}
+    ]
+  },
+  {
+    title:"Freunde treffen und Begrüßung",
+    lines:[
+    {de:"Hallo! Wie geht es dir?",bis:"Kumusta ka?",pron:"ku-MUS-ta ka?"},
+    {de:"Mir geht es gut, danke. Und dir?",bis:"Maayo man, salamat. Ikaw?",pron:"ma-A-jo man, sa-LA-mat. I-kau?"},
+    {de:"Es ist lange her, dass wir uns gesehen haben!",bis:"Dugay na ta wala nagkita!",pron:"DU-gai na ta WA-la nag-KI-ta!"},
+    {de:"Ja, ich habe dich sehr vermisst.",bis:"Oo, namingaw kaayo ko nimo.",pron:"O-o, na-MING-au ka-A-jo ko NI-mo."},
+    {de:"Was gibt es Neues bei dir?",bis:"Unsay bag-o nimo?",pron:"UN-sai BAG-o NI-mo?"},
+    {de:"Nichts Besonderes. Ich arbeite immer noch in der gleichen Firma.",bis:"Wala man. Nagtrabaho gihapon ko sa parehas nga kompanya.",pron:"WA-la man. nag-tra-BA-ho gi-HA-pon ko sa pa-RE-has nga kom-PA-nja."},
+    {de:"Möchtest du heute Kaffee trinken gehen?",bis:"Gusto ka moinom og kape karong adlawa?",pron:"GUS-to ka mo-I-nom og KA-pe KA-rong ad-LA-wa?"},
+    {de:"Klar, gerne! Wo treffen wir uns?",bis:"Sige, gusto ko! Asa ta magkita?",pron:"SI-ge, GUS-to ko! A-sa ta mag-KI-ta?"},
+    {de:"Lass uns im Café in der Stadt treffen.",bis:"Magkita ta sa kape shop sa syudad.",pron:"mag-KI-ta ta sa KA-pe schop sa sju-DAD."},
+    {de:"In Ordnung, ich sehe dich um drei Uhr.",bis:"Sige, kita ta sa alas tres.",pron:"SI-ge, KI-ta ta sa A-las tres."},
+    {de:"Bis später!",bis:"Kita ta unya!",pron:"KI-ta ta UN-ja!"},
+    {de:"Pass auf dich auf!",bis:"Pag-amping!",pron:"pag-AM-ping!"}
+    ]
+  },
+  {
+    title:"Nach dem Weg fragen",
+    lines:[
+    {de:"Entschuldigung, wo ist der Markt?",bis:"Pasayloa ko, asa ang merkado?",pron:"pa-sai-LO-a ko, A-sa ang mer-KA-do?"},
+    {de:"Gehen Sie geradeaus bis zur Ecke.",bis:"Diretso lang hangtod sa kanto.",pron:"di-RET-so lang HANG-tod sa KAN-to."},
+    {de:"Dann biegen Sie links ab.",bis:"Unya, liko sa wala.",pron:"UN-ja, LI-ko sa WA-la."},
+    {de:"Ist der Markt weit von hier?",bis:"Layo ba ang merkado gikan diri?",pron:"LA-jo ba ang mer-KA-do GI-kan DI-ri?"},
+    {de:"Nein, es ist nah. Nur fünf Minuten zu Fuß.",bis:"Dili, duol ra. Lima ka minuto lang paglakaw.",pron:"DI-li, DU-ol ra. LI-ma ka mi-NU-to lang pag-LA-kau."},
+    {de:"Vielen Dank für die Hilfe!",bis:"Salamat sa tabang!",pron:"sa-LA-mat sa TA-bang!"},
+    {de:"Gern geschehen. Sicheres Reisen!",bis:"Walay sapayan. Pag-amping sa imong paglakaw!",pron:"WA-lai sa-PA-jan. pag-AM-ping sa I-mong pag-LA-kau!"},
+    {de:"Entschuldigen Sie, ist das der Weg zur Kirche?",bis:"Pasayloa ko, mao ba ni ang dalan padulong sa simbahan?",pron:"pa-sai-LO-a ko, MA-o ba ni ang DA-lan pa-du-LONG sa sim-BA-han?"},
+    {de:"Ja, das ist richtig. Fahren Sie geradeaus weiter.",bis:"Oo, sakto na. Padayon lang og diretso.",pron:"O-o, SAK-to na. pa-DA-jon lang og di-RET-so."},
+    {de:"Wo kann ich ein Taxi finden?",bis:"Asa ko makakita og taksi?",pron:"A-sa ko ma-ka-KI-ta og TAK-si?"},
+    {de:"Der Taxistand ist dort drüben, neben der Bank.",bis:"Ang sakayanan og taksi tapad sa banko.",pron:"ang sa-ka-JA-nan og TAK-si TA-pad sa BAN-ko."},
+    {de:"Danke, jetzt weiß ich den Weg.",bis:"Salamat, nahibalo na ko sa dalan.",pron:"sa-LA-mat, na-hi-BA-lo na ko sa DA-lan."}
+    ]
+  },
+  {
+    title:"Essen bestellen in der Carinderia",
+    lines:[
+    {de:"Guten Tag! Was gibt es heute zu essen?",bis:"Maayong adlaw! Unsay sud-an karon?",pron:"ma-AH-jong AD-lau! UN-sai SUD-an KA-ron?"},
+    {de:"Wir haben heute Schweinefleisch-Adobo und gebratenen Fisch.",bis:"Naa mi karon og adobo nga baboy ug prito nga isda.",pron:"na-A mi KA-ron og a-DO-bo nga BA-boi ug PRI-to nga IS-da."},
+    {de:"Das klingt lecker! Ich nehme den Adobo.",bis:"Lami kaayo na! Kuhaon nako ang adobo.",pron:"LA-mi ka-A-jo na! ku-HA-on NA-ko ang a-DO-bo."},
+    {de:"Möchten Sie auch Reis?",bis:"Gusto ka og kan-on pud?",pron:"GUS-to ka og KAN-on pud?"},
+    {de:"Ja bitte, einen Teller Reis.",bis:"Oo, palihog, usa ka plato nga kan-on.",pron:"O-o, pa-LI-hog, U-sa ka PLA-to nga KAN-on."},
+    {de:"Haben Sie auch kalte Getränke?",bis:"Naa ba moy bugnaw nga ilimnon?",pron:"na-A ba moi BUG-nau nga i-LIM-non?"},
+    {de:"Ja, wir haben Cola und Saft.",bis:"Oo, naa. Naa mi Coke ug juice.",pron:"O-o, na-A. na-A mi kok ug dschus."},
+    {de:"Wie viel kostet alles zusammen?",bis:"Pila tanan?",pron:"PI-la TA-nan?"},
+    {de:"Insgesamt sind es fünfundsiebzig Pesos.",bis:"Setenta'y singko pesos tanan.",pron:"se-TEN-tai SING-ko PE-sos TA-nan."},
+    {de:"Hier ist das Geld. Behalten Sie den Rest.",bis:"Ania ang kwarta. Ikaw na lang ang sukli.",pron:"a-NI-a ang KWAR-ta. I-kau na lang ang SUK-li."},
+    {de:"Danke, das war sehr lecker.",bis:"Salamat, lami kaayo ang pagkaon.",pron:"sa-LA-mat, LA-mi ka-A-jo ang pag-KA-on."},
+    {de:"Gern geschehen! Kommen Sie wieder!",bis:"Walay sapayan! Balik-balik lang!",pron:"WA-lai sa-PA-jan! BA-lik-BA-lik lang!"}
+    ]
+  }
 ];
 
 const FUNCTION_WORDS = [
@@ -1809,6 +2269,87 @@ function speakBtn(bisText, pron){
   return `<button class="speak-btn" title="Anhören (Browser-Sprachausgabe)" onclick="event.stopPropagation(); speak('${safeBis}','${safePron}', this)">🔊</button>`;
 }
 
+/* ============ AUSSPRACHE-ÜBUNG MIT MIKROFON ============ */
+// Nutzt die Web Speech API (SpeechRecognition) — läuft komplett im Browser,
+// es werden keine Aufnahmen auf einem eigenen Server gespeichert.
+function micBtn(bisText){
+  const safe = bisText.replace(/'/g,"\\'");
+  return `<button class="mic-btn" title="Aussprache mit Mikrofon üben" onclick="event.stopPropagation(); checkPronunciation('${safe}', this)">🎤</button><span class="mic-result"></span>`;
+}
+
+function normalizeForCompare(s){
+  return (s||"").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9\s]/g,"")
+    .replace(/\s+/g," ").trim();
+}
+function levenshtein(a,b){
+  const m=a.length, n=b.length;
+  const dp = Array.from({length:m+1},()=>new Array(n+1).fill(0));
+  for(let i=0;i<=m;i++) dp[i][0]=i;
+  for(let j=0;j<=n;j++) dp[0][j]=j;
+  for(let i=1;i<=m;i++){
+    for(let j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function textSimilarity(a,b){
+  const na = normalizeForCompare(a), nb = normalizeForCompare(b);
+  if(!na || !nb) return 0;
+  const dist = levenshtein(na,nb);
+  const maxLen = Math.max(na.length, nb.length);
+  return maxLen===0 ? 1 : 1-(dist/maxLen);
+}
+
+let activeRecognition = null;
+function checkPronunciation(targetText, btnEl){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const resultEl = btnEl.nextElementSibling;
+  if(!SpeechRec){
+    if(resultEl) resultEl.innerHTML = `<span class="mic-fail">Spracherkennung wird von diesem Browser nicht unterstützt.</span>`;
+    return;
+  }
+  if(activeRecognition){ try{ activeRecognition.stop(); }catch(e){} }
+  const recog = new SpeechRec();
+  activeRecognition = recog;
+  // Cebuano wird von keiner Browser-Spracherkennung direkt unterstützt — "fil-PH" (Filipino)
+  // liegt lautlich am nächsten und liefert die brauchbarsten Ergebnisse als Näherung.
+  recog.lang = "fil-PH";
+  recog.maxAlternatives = 3;
+  recog.interimResults = false;
+  btnEl.disabled = true;
+  if(resultEl) resultEl.innerHTML = `<span class="mic-listening">🎙️ Höre zu…</span>`;
+  recog.onresult = (e)=>{
+    const alts = Array.from(e.results[0]).map(r=>r.transcript);
+    let best = 0;
+    alts.forEach(t=>{ const s = textSimilarity(t, targetText); if(s>best) best=s; });
+    let verdict;
+    if(best >= 0.8) verdict = `<span class="mic-good">✅ Sehr gut! (erkannt: "${escapeHtml(alts[0])}")</span>`;
+    else if(best >= 0.5) verdict = `<span class="mic-ok">🟡 Schon nah dran (erkannt: "${escapeHtml(alts[0])}") — nochmal versuchen</span>`;
+    else verdict = `<span class="mic-bad">🔁 Noch nicht ganz (erkannt: "${escapeHtml(alts[0])}") — versuch's nochmal</span>`;
+    if(resultEl) resultEl.innerHTML = verdict;
+  };
+  recog.onerror = (e)=>{
+    let msg = "Fehler bei der Spracherkennung (Code: " + (e.error||"unbekannt") + "). Bitte erneut versuchen.";
+    if(e.error === "not-allowed" || e.error === "permission-denied") msg = "Mikrofon-Zugriff wurde nicht erlaubt. Bitte in den Browser-/Website-Einstellungen freigeben.";
+    if(e.error === "service-not-allowed") msg = "Der Browser blockiert die Spracherkennung auf dieser Seite (evtl. weil sie nicht über https läuft, oder wegen Browser-Einstellungen).";
+    if(e.error === "no-speech") msg = "Nichts gehört — bitte nochmal versuchen.";
+    if(e.error === "audio-capture") msg = "Kein Mikrofon gefunden. Bitte prüfe, ob eins angeschlossen/aktiviert ist.";
+    if(e.error === "network") msg = "Netzwerkfehler — die Spracherkennung braucht eine Internetverbindung (die Auswertung läuft über den Server des Browsers). Bitte Verbindung prüfen oder Chrome verwenden.";
+    if(e.error === "language-not-supported") msg = "Diese Sprache wird von der Spracherkennung nicht unterstützt.";
+    if(e.error === "aborted") return; // Nutzer/Seite hat abgebrochen, keine Fehlermeldung nötig
+    if(resultEl) resultEl.innerHTML = `<span class="mic-fail">${msg}</span>`;
+  };
+  recog.onend = ()=>{ btnEl.disabled = false; activeRecognition = null; };
+  try{ recog.start(); }
+  catch(err){
+    if(resultEl) resultEl.innerHTML = `<span class="mic-fail">Mikrofon konnte nicht gestartet werden.</span>`;
+    btnEl.disabled = false;
+  }
+}
+
 /* ============ REGISTRIERUNG / PROFIL ============ */
 const PROFILE_KEY = "bisaya_profile_v1";
 function loadProfile(){
@@ -1850,8 +2391,8 @@ function goToConfirmStep(p){
 }
 
 function submitRegistration(){
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
+  const name = document.getElementById("regName").value.trim().slice(0,60);
+  const email = document.getElementById("regEmail").value.trim().slice(0,120);
   const err = document.getElementById("regErr");
   if(!name){ err.textContent = "Bitte gib deinen Namen ein."; return; }
   if(!isValidEmail(email)){ err.textContent = "Bitte gib eine gültige E-Mail-Adresse ein."; return; }
@@ -1893,15 +2434,58 @@ function backToForm(){
 }
 function editProfile(){ showRegOverlay(loadProfile()); }
 
+/* ============ GOOGLE-ANMELDUNG ============ */
+// Ersetze den Platzhalter durch deine eigene Google-Cloud-Client-ID
+// (siehe VIP-SETUP-ANLEITUNG.md, Abschnitt "Google-Anmeldung einrichten").
+const GOOGLE_CLIENT_ID = "DEIN-GOOGLE-CLIENT-ID.apps.googleusercontent.com";
+function googleConfigured(){ return !GOOGLE_CLIENT_ID.includes("DEIN-GOOGLE-CLIENT-ID"); }
+
+function initGoogleSignIn(){
+  if(!googleConfigured()) return; // Platzhalter noch nicht ersetzt -> Button bleibt versteckt
+  if(typeof google === "undefined" || !google.accounts || !google.accounts.id) return;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+  });
+  const wrap = document.getElementById("googleSignInWrap");
+  if(wrap) wrap.style.display = "block";
+  const target = document.getElementById("googleSignInBtn");
+  if(target){
+    google.accounts.id.renderButton(target, { theme:"outline", size:"large", width:280, text:"continue_with", locale:"de" });
+  }
+}
+
+async function handleGoogleCredential(response){
+  const err = document.getElementById("regErr");
+  try{
+    // Das Token wird bei Google selbst geprüft (Signatur + Ablaufzeit + passende Client-ID) —
+    // wir vertrauen dem Browser-Token also nicht blind, sondern lassen Google es bestätigen.
+    const check = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(response.credential));
+    if(!check.ok) throw new Error("Token ungültig");
+    const claims = await check.json();
+    if(claims.aud !== GOOGLE_CLIENT_ID) throw new Error("Client-ID stimmt nicht überein");
+    if(claims.email_verified !== "true" && claims.email_verified !== true) throw new Error("E-Mail bei Google nicht bestätigt");
+    if(!claims.email) throw new Error("Keine E-Mail erhalten");
+    const name = (claims.name || claims.given_name || claims.email.split("@")[0]).slice(0,60);
+    const email = claims.email.toLowerCase().slice(0,120);
+    // Google hat die E-Mail bereits geprüft -> kein zusätzlicher Bestätigungscode nötig
+    saveProfile({name, email, confirmed:true, via:"google"});
+    hideRegOverlay();
+    renderProfileBadge();
+  } catch(e){
+    if(err) err.textContent = "Google-Anmeldung fehlgeschlagen. Bitte erneut versuchen oder manuell registrieren.";
+  }
+}
+
 function renderProfileBadge(){
   const p = loadProfile();
   const badge = document.getElementById("profileBadge");
   if(p){
     badge.style.display = "flex";
     if(p.confirmed){
-      document.getElementById("profileGreeting").innerHTML = "👋 Hallo, " + p.name + " (" + p.email + ") <span title='bestätigt'>✅</span>";
+      document.getElementById("profileGreeting").innerHTML = "👋 Hallo, " + escapeHtml(p.name) + " (" + escapeHtml(p.email) + ") <span title='bestätigt'>✅</span>";
     } else {
-      document.getElementById("profileGreeting").innerHTML = "👋 Hallo, " + p.name + " — <span class='unconfirmed'>E-Mail noch nicht bestätigt</span>";
+      document.getElementById("profileGreeting").innerHTML = "👋 Hallo, " + escapeHtml(p.name) + " — <span class='unconfirmed'>E-Mail noch nicht bestätigt</span>";
     }
   } else {
     badge.style.display = "none";
@@ -1911,6 +2495,130 @@ function initRegistration(){
   const p = loadProfile();
   if(!p || !p.confirmed){ showRegOverlay(p); }
   renderProfileBadge();
+}
+
+/* ============ VIP-ZUGANG ============ */
+// Backend: siehe bisaya-vip-worker.js (Cloudflare Worker) + VIP-SETUP-ANLEITUNG.md
+// Diese URL hier durch deine echte Worker-Adresse ersetzen, z.B. https://bisaya-vip.DEINNAME.workers.dev
+const VIP_WORKER_URL = "https://DEIN-WORKER.workers.dev";
+const VIP_FREE_LIMIT = 100; // erste 100 Wörter/Wendungen sind immer kostenlos
+const VIP_KEY = "bisaya_vip_v1";
+
+function vipConfigured(){ return !VIP_WORKER_URL.includes("DEIN-WORKER"); }
+function loadVip(){
+  try{ return JSON.parse(localStorage.getItem(VIP_KEY)) || {email:null, active:false}; }
+  catch(e){ return {email:null, active:false}; }
+}
+function saveVip(v){ localStorage.setItem(VIP_KEY, JSON.stringify(v)); }
+function isVipActive(){
+  if(!vipConfigured()) return true; // Backend noch nicht eingerichtet -> nichts sperren
+  return !!loadVip().active;
+}
+
+async function startVipCheckout(){
+  const email = document.getElementById("vipEmailNew").value.trim();
+  const err = document.getElementById("vipNewErr");
+  if(!email.includes("@")){ err.textContent = "Bitte eine gültige E-Mail-Adresse eingeben."; return; }
+  if(!vipConfigured()){ err.textContent = "VIP-Backend ist noch nicht eingerichtet (siehe Hinweis oben)."; return; }
+  err.textContent = "Weiterleitung zu Stripe...";
+  localStorage.setItem("bisaya_vip_pending_email", email);
+  try{
+    const res = await fetch(VIP_WORKER_URL + "/create-checkout-session", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email})
+    });
+    const data = await res.json();
+    if(data.url){ window.location.href = data.url; }
+    else { err.textContent = "Fehler: " + (data.error || "unbekannt"); }
+  } catch(e){ err.textContent = "Verbindung zum VIP-Server fehlgeschlagen."; }
+}
+
+async function checkVipStatus(email){
+  if(!vipConfigured()) return true;
+  try{
+    const res = await fetch(VIP_WORKER_URL + "/verify-access?email=" + encodeURIComponent(email));
+    const data = await res.json();
+    return !!data.active;
+  } catch(e){ return false; }
+}
+
+async function restoreVipAccess(){
+  const email = document.getElementById("vipEmailRestore").value.trim();
+  const err = document.getElementById("vipRestoreErr");
+  if(!email.includes("@")){ err.textContent = "Bitte eine gültige E-Mail-Adresse eingeben."; return; }
+  err.textContent = "Prüfe...";
+  const active = await checkVipStatus(email);
+  if(active){
+    saveVip({email, active:true});
+    err.textContent = "";
+    renderVipStatus();
+    refreshDeck();
+  } else {
+    err.textContent = "Kein aktives VIP-Abo für diese E-Mail gefunden.";
+  }
+}
+function logoutVip(){
+  saveVip({email:null, active:false});
+  renderVipStatus();
+  refreshDeck();
+}
+function renderVipStatus(){
+  document.getElementById("vipConfigWarning").style.display = vipConfigured() ? "none" : "block";
+  const v = loadVip();
+  const card = document.getElementById("vipStatusCard");
+  if(v.active && v.email){
+    card.style.display = "block";
+    document.getElementById("vipStatusText").textContent = "Aktiv für " + v.email + " — voller Wortschatz ist auf diesem Gerät freigeschaltet.";
+  } else {
+    card.style.display = "none";
+  }
+}
+async function handleVipRedirect(){
+  const params = new URLSearchParams(window.location.search);
+  if(params.get("vip_success") === "true"){
+    const email = localStorage.getItem("bisaya_vip_pending_email");
+    if(email){
+      // kurze Verzögerung, damit der Stripe-Webhook Zeit hat, den KV-Speicher zu aktualisieren
+      await new Promise(r=>setTimeout(r, 2500));
+      const active = await checkVipStatus(email);
+      saveVip({email, active});
+      goView("vip");
+      renderVipStatus();
+      if(active) alert("🎉 Willkommen als VIP! Voller Wortschatz ist jetzt freigeschaltet.");
+    }
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
+/* ============ SUPPORT / KONTAKT ============ */
+// Formspree kostenlos einrichten unter https://formspree.io (kein Backend nötig):
+// neues Formular anlegen, die eigene E-Mail bestätigen, die Endpoint-URL unten eintragen.
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/DEINE_FORM_ID"; // <- hier ersetzen!
+async function sendSupport(){
+  const name = document.getElementById("suppName").value.trim();
+  const email = document.getElementById("suppEmail").value.trim();
+  const msg = document.getElementById("suppMsg").value.trim();
+  const err = document.getElementById("suppErr");
+  if(!msg){ err.textContent = "Bitte eine Nachricht eingeben."; return; }
+  if(FORMSPREE_ENDPOINT.includes("DEINE_FORM_ID")){
+    err.textContent = "Support-Formular ist noch nicht eingerichtet (fehlende Formspree-ID im Code).";
+    return;
+  }
+  err.textContent = "Wird gesendet...";
+  try{
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method:"POST",
+      headers:{"Content-Type":"application/json","Accept":"application/json"},
+      body: JSON.stringify({name: name || "(anonym)", email: email || "(keine)", message: msg, quelle:"Bisaya Lebendig App"})
+    });
+    if(res.ok){
+      document.getElementById("supportFormWrap").innerHTML = "<p>✅ Danke! Deine Nachricht wurde gesendet.</p>";
+    } else {
+      err.textContent = "Senden fehlgeschlagen. Bitte später erneut versuchen.";
+    }
+  } catch(e){
+    err.textContent = "Keine Internetverbindung oder Fehler beim Senden.";
+  }
 }
 
 /* ============ STATE / STORAGE ============ */
@@ -1928,6 +2636,8 @@ function allVocab(){
     LESSON_VOCAB[k].forEach(v=>all.push(Object.assign({cat:"Lektion "+k}, v)));
   });
   all = all.concat(PHRASES_VOCAB);
+  // Erste VIP_FREE_LIMIT Einträge sind kostenlos, der Rest ist VIP (siehe VIP-Sektion).
+  all.forEach((v,i)=>{ v.vip = i >= VIP_FREE_LIMIT; });
   return all;
 }
 
@@ -1941,14 +2651,17 @@ function goView(name){
   if(name==="lektionen") renderLessonList();
   if(name==="anwenden") renderAnwenden();
   if(name==="wendungen") renderWendungen();
+  if(name==="geschichten") renderStoryList();
+  if(name==="vip") renderVipStatus();
   window.scrollTo(0,0);
 }
 
 /* ============ WENDUNGEN ============ */
 function renderWendungen(){
+  allVocab(); // stellt sicher, dass .vip auf allen Einträgen (auch PHRASES_VOCAB) gesetzt ist
   const el = document.getElementById("wendungenList");
-  if(el.dataset.rendered) return;
-  el.dataset.rendered = "1";
+  el.innerHTML = ""; el.dataset.rendered = "";
+  const vipOk = isVipActive();
   const groups = [
     ["Alltagsphrasen", "Praktische Sätze für Begrüßung, Unterwegssein, Essen bestellen, Preise verhandeln u.v.m."],
     ["Redewendungen", "Bildhafte Ausdrücke — mit ihrer wörtlichen Bedeutung, damit du siehst, wie Bisaya wirklich \"denkt\"."],
@@ -1960,9 +2673,15 @@ function renderWendungen(){
     if(items.length===0) return;
     html += `<div class="card"><h3>${cat} <span class="small">(${items.length})</span></h3><p class="small">${desc}</p>`;
     items.forEach(p=>{
+      if(p.vip && !vipOk){
+        html += `<div class="line-block">
+          <div class="natural"><b>${p.bis}</b> — <span class="vip-pill">⭐ VIP</span></div>
+        </div>`;
+        return;
+      }
       html += `<div class="line-block">
         <div class="natural"><b>${p.bis}</b> — ${p.de}</div>
-        <div class="pron">${speakBtn(p.bis, p.pron)} ${p.pron || ''}</div>
+        <div class="pron">${speakBtn(p.bis, p.pron)} ${p.pron || ''} ${micBtn(p.bis)}</div>
         ${p.note ? `<div class="note">💡 ${p.note}</div>` : ''}
       </div>`;
     });
@@ -1973,6 +2692,43 @@ function renderWendungen(){
 document.getElementById("tabs").addEventListener("click", e=>{
   if(e.target.tagName==="BUTTON") goView(e.target.dataset.view);
 });
+
+/* ============ GESCHICHTEN ============ */
+function renderStoryList(){
+  const el = document.getElementById("geschichtenList");
+  el.innerHTML = `<div class="card">
+      <h2>📖 Geschichten — Birkenbihl live erleben</h2>
+      <p>Hier siehst du die Birkenbihl-Methode in Aktion: Zeile für Zeile erst der deutsche Satz, direkt darunter der passende Bisaya-Satz. Lies zuerst nur die deutschen Zeilen durch, dann die Bisaya-Zeilen laut mit — so verknüpft dein Gehirn Klang und Bedeutung, ohne Grammatikregeln zu pauken.</p>
+    </div>
+    <div class="lesson-grid">` +
+    STORIES_DATA.map((s,i)=>`
+      <div class="lesson-tile" onclick="openStory(${i})">
+        <div class="num">Geschichte ${i+1}</div>
+        <h4>${s.title}</h4>
+        <div class="sub">${s.lines.length} Zeilenpaare</div>
+      </div>`).join("") +
+    `</div>`;
+}
+function openStory(i){
+  const s = STORIES_DATA[i];
+  const el = document.getElementById("geschichtenList");
+  let html = `<div class="card">
+    <span class="backlink" onclick="renderStoryList()">← alle Geschichten</span>
+    <h2>${s.title}</h2>
+    <p class="small">Deutsch zuerst, dann Bisaya — genau wie beim Birkenbihl-Dekodieren. Nutze 🔊 zum Anhören.</p>`;
+  s.lines.forEach((line, idx)=>{
+    html += `<div class="story-line">
+      <div class="de-line"><span class="num">${idx+1}.</span>${line.de}</div>
+      <div class="bis-line">${speakBtn(line.bis, line.pron)} ${line.bis}
+        <span class="bis-pron">${line.pron || ''}</span>
+        ${micBtn(line.bis)}
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  el.innerHTML = html;
+  window.scrollTo(0,0);
+}
 
 /* ============ LEKTIONEN ============ */
 function renderLessonList(){
@@ -2000,7 +2756,7 @@ function openLesson(id){
       <div class="interlinear">` +
         line.decode.map(([w,g])=>`<div class="tok"><div class="w">${w}</div><div class="g">${g}</div></div>`).join("") +
       `</div>
-      <div class="pron">${speakBtn(line.bis, line.pron)} ${line.pron}</div>
+      <div class="pron">${speakBtn(line.bis, line.pron)} ${line.pron} ${micBtn(line.bis)}</div>
       <div class="natural"><b>→</b> ${line.natural}</div>
     </div>`;
   });
@@ -2050,9 +2806,16 @@ function showCard(){
     return;
   }
   const v = deck[deckIdx % deck.length];
-  document.getElementById("flashFront").textContent = v.bis;
-  document.getElementById("flashPron").innerHTML = speakBtn(v.bis, v.pron) + (v.pron ? " "+v.pron : " Aussprache anhören");
-  document.getElementById("flashBack").innerHTML = `<div style="font-size:1.2rem; font-weight:700; color:var(--accent2)">${v.de}</div><div class="small">${v.cat}</div>`;
+  const locked = v.vip && !isVipActive();
+  document.getElementById("flashFront").textContent = v.bis + (v.vip ? "" : "");
+  document.getElementById("flashPron").innerHTML = locked
+    ? `<span class="vip-pill">⭐ VIP</span>`
+    : speakBtn(v.bis, v.pron) + (v.pron ? " "+v.pron : " Aussprache anhören") + " " + micBtn(v.bis);
+  document.getElementById("flashBack").innerHTML = locked
+    ? `<div class="vip-lockbox">🔒 Nur für <b>VIP</b><br><span class="small">Schalte über 900 weitere Wörter &amp; Wendungen frei.</span><br>
+        <button class="action primary" style="margin-top:8px;" onclick="goView('vip')">VIP werden ab 5€/Monat</button>
+       </div>`
+    : `<div style="font-size:1.2rem; font-weight:700; color:var(--accent2)">${v.de}</div><div class="small">${v.cat}</div>`;
 }
 function flipCard(){ document.getElementById("flashCard").classList.toggle("flipped"); }
 function markCard(status){
@@ -2154,6 +2917,8 @@ initRegistration();
   document.getElementById(id).addEventListener("keydown", e=>{ if(e.key==="Enter") submitRegistration(); });
 });
 document.getElementById("confirmInput").addEventListener("keydown", e=>{ if(e.key==="Enter") confirmCode(); });
+renderVipStatus();
+handleVipRedirect();
 </script>
 </body>
 </html>

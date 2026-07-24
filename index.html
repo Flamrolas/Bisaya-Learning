@@ -2676,13 +2676,42 @@ async function firebaseForgotPassword(){
 }
 async function firebaseGoogleSignIn(){
   const err = document.getElementById("fbSignupErr");
+  const provider = new firebase.auth.GoogleAuthProvider();
+  // Safari (v.a. iOS/iPadOS) blockiert aus Datenschutzgründen häufig den Speicherzugriff,
+  // den ein Popup-Login braucht ("operation-not-supported-in-this-environment").
+  // Weiterleitung (signInWithRedirect) funktioniert dort zuverlässig, Popup nur auf den meisten Desktop-Browsern.
+  if(isSafariBrowser()){
+    // pendingView muss überleben, da die Seite bei der Weiterleitung komplett neu lädt
+    // (alle normalen JS-Variablen gehen sonst verloren).
+    if(pendingView) localStorage.setItem("bisaya_fb_pending_view", pendingView);
+    fbAuth.signInWithRedirect(provider); // Seite navigiert weg, Ergebnis wird nach Rückkehr in firebaseHandleRedirectResult() verarbeitet
+    return;
+  }
   try{
-    const provider = new firebase.auth.GoogleAuthProvider();
     const result = await fbAuth.signInWithPopup(provider);
     const u = result.user;
     saveProfile({name: u.displayName || (u.email||"").split("@")[0], email: u.email, confirmed:true, via:"google-firebase"});
     afterAuthSuccess();
   } catch(e){
+    if(err) err.textContent = firebaseErrorMessage(e);
+  }
+}
+async function firebaseHandleRedirectResult(){
+  if(!firebaseConfigured() || !fbAuth) return;
+  try{
+    const result = await fbAuth.getRedirectResult();
+    if(result && result.user){
+      const u = result.user;
+      saveProfile({name: u.displayName || (u.email||"").split("@")[0], email: u.email, confirmed:true, via:"google-firebase"});
+      const savedView = localStorage.getItem("bisaya_fb_pending_view");
+      localStorage.removeItem("bisaya_fb_pending_view");
+      hideRegOverlay();
+      renderProfileBadge();
+      if(savedView) goView(savedView);
+    }
+  } catch(e){
+    // Falls die Weiterleitung fehlschlägt, im Registrierungs-Fenster anzeigen (falls offen)
+    const err = document.getElementById("fbSignupErr");
     if(err) err.textContent = firebaseErrorMessage(e);
   }
 }
@@ -3208,6 +3237,7 @@ initRegistration();
 document.getElementById("confirmInput").addEventListener("keydown", e=>{ if(e.key==="Enter") confirmCode(); });
 renderVipStatus();
 handleVipRedirect();
+firebaseHandleRedirectResult();
 </script>
 </body>
 </html>

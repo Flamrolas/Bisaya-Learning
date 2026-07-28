@@ -8,7 +8,7 @@
 <title>Bisaya Lebendig lernen — inspiriert von Birkenbihl</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Poppins:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" defer onload="initGoogleSignIn()"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -51,8 +51,8 @@ header.top .sun-badge{
 }
 @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
 header.top h1{
-  margin:0; font-family:'Fredoka',cursive; font-weight:700; font-size:2.15rem; letter-spacing:0.3px;
-  text-shadow:0 3px 10px rgba(0,0,0,0.28); line-height:1.1;
+  margin:0; font-family:'Pacifico','Fredoka',cursive; font-weight:400; font-size:2.65rem; letter-spacing:0.5px;
+  text-shadow:0 3px 10px rgba(0,0,0,0.28); line-height:1.25;
 }
 header.top h1 .accent-word{
   background:linear-gradient(90deg,#ffe9a8,#fff3d6); -webkit-background-clip:text; background-clip:text;
@@ -219,6 +219,19 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 }
 .profile-badge button:hover{background:rgba(255,255,255,0.15);}
 .profile-badge .unconfirmed{color:#ffe1c9; font-weight:700;}
+.mode-toggle{
+  display:flex; gap:6px; margin-top:12px; position:relative; z-index:2; flex-wrap:wrap;
+}
+.mode-btn{
+  border:2px solid rgba(255,255,255,0.7); background:rgba(0,0,0,0.2); color:#fff;
+  padding:8px 14px; border-radius:20px; cursor:pointer; font-size:0.85rem; font-weight:700;
+  font-family:'Poppins',sans-serif; transition:.15s;
+}
+.mode-btn:hover{background:rgba(255,255,255,0.2);}
+.mode-btn.active{background:#fff; color:var(--accent); border-color:#fff;}
+.mode-de-only{display:none;}
+body.mode-de .mode-de-only{display:block;}
+body.mode-de .mode-bis-only{display:none;}
 .codebox{
   font-size:1.8rem; font-weight:800; letter-spacing:6px; text-align:center; color:var(--accent);
   background:var(--chip); border-radius:10px; padding:12px; margin:12px 0;
@@ -233,7 +246,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 /* ============ RESPONSIVE: kleine Handy-Displays (z.B. ältere/kompakte Android-Geräte) ============ */
 @media (max-width:480px){
   header.top{padding:20px 16px 34px;}
-  header.top h1{font-size:1.7rem;}
+  header.top h1{font-size:2.05rem;}
   header.top .sun-badge{font-size:1.7rem;}
   header.top p{font-size:0.88rem;}
   nav.tabs{padding:8px 10px; gap:5px;}
@@ -391,10 +404,14 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
     <span class="sun-badge">🌴☀️ 🇵🇭</span>
     <h1>Bisaya <span class="accent-word">Lebendig</span> lernen</h1>
   </div>
-  <p>Cebuano/Bisaya lernen — inspiriert von der Birkenbihl-Idee: dekodieren, verstehen, anwenden.</p>
+  <p id="headerSubtitle"><span class="mode-bis-only">Cebuano/Bisaya lernen — inspiriert von der Birkenbihl-Idee: dekodieren, verstehen, anwenden.</span><span class="mode-de-only">Pagtuon og German — dinasig sa ideya ni Birkenbihl: i-decode, sabta, gamita.</span></p>
   <div class="profile-badge" id="profileBadge" style="display:none;">
     <span id="profileGreeting"></span>
     <button onclick="profileButtonAction()" id="profileActionBtn">Profil bearbeiten</button>
+  </div>
+  <div class="mode-toggle" id="modeToggle" role="group" aria-label="Wähle deinen Lernmodus / Pagpili sa imong mood sa pagkat-on">
+    <button class="mode-btn" data-mode="learn-bis" onclick="setMode('learn-bis')" title="Für Deutschsprachige: Bisaya lernen (Standard-Modus dieser App)">🇩🇪 Ich lerne Bisaya</button>
+    <button class="mode-btn" data-mode="learn-de" onclick="setMode('learn-de')" title="Para sa mga Bisaya nga mamumulong: pagtuon og German">🇵🇭 Nagtuon ko og German</button>
   </div>
   <div class="wave-divider">
     <svg viewBox="0 0 1200 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -404,24 +421,24 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 </header>
 
 <nav class="tabs" id="tabs">
-  <button data-view="start" class="active">Start</button>
-  <button data-view="methode">Methode</button>
-  <button data-view="lektionen">Lektionen</button>
-  <button data-view="wortschatz">Wortschatz</button>
-  <button data-view="wendungen">Wendungen</button>
-  <button data-view="geschichten">📖 Geschichten</button>
-  <button data-view="anwenden">Anwenden</button>
-  <button data-view="grammatik">Grammatik-Spickzettel</button>
-  <button data-view="fortschritt">Fortschritt</button>
+  <button data-view="start" class="active"><span class="mode-bis-only">Start</span><span class="mode-de-only">Sugod</span></button>
+  <button data-view="methode"><span class="mode-bis-only">Methode</span><span class="mode-de-only">Pamaagi</span></button>
+  <button data-view="lektionen"><span class="mode-bis-only">Lektionen</span><span class="mode-de-only">Mga Leksyon</span></button>
+  <button data-view="wortschatz"><span class="mode-bis-only">Wortschatz</span><span class="mode-de-only">Bokabularyo</span></button>
+  <button data-view="wendungen"><span class="mode-bis-only">Wendungen</span><span class="mode-de-only">Pulong-pulong</span></button>
+  <button data-view="geschichten"><span class="mode-bis-only">📖 Geschichten</span><span class="mode-de-only">📖 Sugilanon</span></button>
+  <button data-view="anwenden"><span class="mode-bis-only">Anwenden</span><span class="mode-de-only">Gamiton</span></button>
+  <button data-view="grammatik"><span class="mode-bis-only">Grammatik-Spickzettel</span><span class="mode-de-only">Giya sa Gramatika</span></button>
+  <button data-view="fortschritt"><span class="mode-bis-only">Fortschritt</span><span class="mode-de-only">Kalamboan</span></button>
   <button data-view="vip">⭐ VIP</button>
-  <button data-view="support">Support</button>
+  <button data-view="support"><span class="mode-bis-only">Support</span><span class="mode-de-only">Tabang</span></button>
 </nav>
 
 <main>
 
 <!-- START -->
 <section class="view active" id="view-start">
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Willkommen!</h2>
     <p>Dieses Programm bringt dir <b>Bisaya (Cebuano)</b> bei — die Sprache, die in Cebu, Davao und weiten Teilen der Visayas und Mindanaos gesprochen wird. Der Ansatz ist von der <b>Idee von Vera F. Birkenbihl</b> inspiriert: kein Auswendiglernen von Grammatikregeln, sondern <i>dekodieren, verstehen, aufnehmen und dann lebendig anwenden</i>.</p>
     <p>Ziel ist nicht "die Grammatik können", sondern: <b>du sollst die Sprache tatsächlich benutzen können</b> — im Gespräch, beim Reisen, mit Freunden.</p>
@@ -430,45 +447,79 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
       <button class="action neutral" onclick="goView('lektionen')">Direkt zu Lektion 1</button>
     </div>
   </div>
-  <div class="statgrid">
-    <div class="stat"><div class="num">12</div><div class="lbl">Lektionen</div></div>
-    <div class="stat"><div class="num" id="vocabCountStart">–</div><div class="lbl">Wörter &amp; Wendungen</div></div>
-    <div class="stat"><div class="num">4</div><div class="lbl">Lernschritte</div></div>
+  <div class="card mode-de-only">
+    <h2>Maayong pag-abot!</h2>
+    <p>Kining programa magtudlo kanimo og <b>German (Aleman)</b> — ang pinulongan nga gigamit sa Alemanya, Austria ug bahin sa Switzerland. Ang pamaagi dinasig sa <b>ideya ni Vera F. Birkenbihl</b>: dili pagmemorya sa mga lagda sa gramatika, kondili <i>pag-decode, pagsabot, pagdawat, ug unya buhi nga paggamit</i>.</p>
+    <p>Ang tumong dili "kahibalo sa gramatika", kondili: <b>kinahanglan nga magamit gyud nimo ang pinulongan</b> — sa panagsulti, sa pagbiyahe, uban sa mga higala.</p>
+    <div class="btnrow">
+      <button class="action primary" onclick="goView('methode')">Unsaon paglihok ang pamaagi?</button>
+      <button class="action neutral" onclick="goView('lektionen')">Diretso sa Leksyon 1</button>
+    </div>
   </div>
-  <div class="card">
+  <div class="statgrid">
+    <div class="stat"><div class="num">12</div><div class="lbl mode-bis-only">Lektionen</div><div class="lbl mode-de-only">Mga Leksyon</div></div>
+    <div class="stat"><div class="num" id="vocabCountStart">–</div><div class="lbl mode-bis-only">Wörter &amp; Wendungen</div><div class="lbl mode-de-only">Mga Pulong &amp; Prase</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl mode-bis-only">Lernschritte</div><div class="lbl mode-de-only">Mga Lakang sa Pagkat-on</div></div>
+  </div>
+  <div class="card mode-bis-only">
     <h3>Was du in diesem Modul lernst</h3>
     <p>Zwölf Alltagsthemen — Begrüßung, Familie, Zahlen &amp; Uhrzeit, Wochentage, Markt, Essen, Wegbeschreibung, Wetter, Zuhause, Gefühle, Hobbys/Freunde, Reisen &amp; Abschied — jeweils als kurzer Dialog mit vollständiger Wort-für-Wort-Dekodierung, Lautschrift und natürlicher Übersetzung. Dazu ein wachsender Wortschatz von über 1.000 Wörtern und Wendungen als Karteikarten — von Verben über Körperteile, Berufe und Essen bis zu Redewendungen und Slang — plus Übungen, die dich zum aktiven Sprechen und Schreiben bringen.</p>
   </div>
-  <div class="version-tag">v1.6.0</div>
+  <div class="card mode-de-only">
+    <h3>Unsa imong makat-onan niini nga modyul</h3>
+    <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
+  </div>
+  <div class="version-tag">v1.8.2</div>
 </section>
 
 <!-- METHODE -->
 <section class="view" id="view-methode">
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Unsere Lernmethode — inspiriert von der Birkenbihl-Idee, angepasst für Bisaya</h2>
     <p>Die Idee von Vera F. Birkenbihl beruht auf vier Schritten, die wir hier als Inspiration aufgreifen und für Bisaya anpassen. Da wir hier textbasiert arbeiten (ohne eingebautes Audio), sind die Schritte leicht angepasst — du bringst dir am besten <b>eigenes Hörmaterial</b> (z. B. Cebuano-Podcasts, YouTube-Videos mit Muttersprachlern, Musik) parallel dazu mit.</p>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>1. Dekodieren (nicht übersetzen!)</h3>
     <p>Jeder Bisaya-Satz wird <b>Wort für Wort</b> in holprigem Deutsch dekodiert — nicht schön, aber ehrlich. So siehst du, wie Bisaya wirklich "denkt" und tickt, statt dir nur eine hübsche Übersetzung zu merken. Erst danach kommt die natürliche Übersetzung. Genau das findest du in jeder Lektion.</p>
     <div class="note">Beispiel: <i>Unsa imong ngalan?</i> → wörtlich "Was dein Name?" → natürlich "Wie heißt du?"</div>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>2. Aktives Hören / Aktives Lesen</h3>
     <p>Lies den Bisaya-Text laut mit, während du die Dekodierung mitliest — so verknüpfst du Klang, Wortfolge und Bedeutung gleichzeitig, ohne grammatikalisch "nachzudenken". Sprich die Lautschrift laut mit. Wiederhole jede Lektion 3–5 Mal an aufeinanderfolgenden Tagen.</p>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>3. Passives Hören</h3>
     <p>Lass Bisaya im Hintergrund laufen, während du etwas anderes tust (kochen, Auto fahren, aufräumen) — ohne aktiv zuzuhören. Das Gehirn arbeitet unbewusst weiter an Klangmustern. Suche dir dafür eigenes Audiomaterial (z. B. Cebuano-Radio, Podcasts, Sinulog-Vlogs); das Programm hier ist bewusst so gebaut, dass du eigene Audioquellen leicht parallel nutzen kannst.</p>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>4. Aktives Anwenden — das eigentliche Ziel</h3>
     <p>Dekodieren und Hören bereiten nur vor. Lebendig wird die Sprache erst, wenn du sie <b>benutzt</b>: eigene Sätze bauen, auf Fragen antworten, mit echten Menschen sprechen. Dafür gibt es den Bereich <b>„Anwenden"</b> — mit Chunking-Übungen (Bausteine kombinieren) und freien Schreib-/Sprechaufgaben.</p>
     <div class="btnrow"><button class="action primary" onclick="goView('anwenden')">Zu den Anwenden-Übungen</button></div>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>Vorgeschlagener Wochenrhythmus</h3>
     <p>Tag 1–2: Neue Lektion dekodieren + laut lesen. Tag 3–4: Wortschatz-Karteikarten der Lektion üben. Tag 5: Anwenden-Übungen zur Lektion. Tag 6–7: Passives Hören mit eigenem Audiomaterial + eine alte Lektion wiederholen. Dann weiter zur nächsten Lektion — bei 12 Lektionen bist du in ca. 12 Wochen durch das gesamte Modul, mit stetig wachsendem, wirklich verfügbarem Wortschatz.</p>
+  </div>
+  <div class="card mode-de-only">
+    <h2>Among Pamaagi sa Pagtuon — dinasig sa ideya ni Birkenbihl</h2>
+    <p>Ang ideya ni Vera F. Birkenbihl adunay upat ka lakang, nga among gigamit dinhi isip inspirasyon alang sa pagkat-on og German:</p>
+  </div>
+  <div class="card mode-de-only">
+    <h3>1. I-decode (dili lang hubaron)</h3>
+    <p>Ang matag German nga tudling-pulong gi-decode <b>pulong-por-pulong</b> ngadto sa Bisaya — dili ang matahom nga hubad, kondili ang literal nga kahulogan, aron makita nimo kung giunsa gyud "maghunahuna" ang German. Human niana, moabot ang natural nga hubad. Kini makita nimo sa matag Leksyon ug Sugilanon.</p>
+    <div class="note">Pananglitan: <i>Wie heißt du?</i> → literal "Unsaon ginganlan ikaw?" → natural "Unsa imong ngalan?"</div>
+  </div>
+  <div class="card mode-de-only">
+    <h3>2. Aktibo nga Pagpaminaw / Pagbasa</h3>
+    <p>Basaha ang German kusog samtang gibasa nimo ang Bisaya nga hubad — aron dungan nimong ma-ugnay ang tingog, pagkasunod-sunod sa pulong, ug kahulogan. Balika ang matag Leksyon o Sugilanon 3–5 ka beses sa sunod-sunod nga adlaw.</p>
+  </div>
+  <div class="card mode-de-only">
+    <h3>3. Pasibo nga Pagpaminaw</h3>
+    <p>Pasagdi ang German nga modagan sa background samtang naghimo ka og laing buluhaton (pagluto, pagmaneho, paghinlo) — nga dili aktibo nga naminaw. Ang utok magpadayon sa pag-proseso sa mga pattern sa tingog nga dili ka mahibalo. Pangita og kaugalingong audio (German nga podcast, YouTube, musika) aron gamiton uban niini nga programa.</p>
+  </div>
+  <div class="card mode-de-only">
+    <h3>4. Aktibo nga Paggamit — ang tinuod nga tumong</h3>
+    <p>Ang pag-decode ug pagpaminaw pang-andam ra. Mabuhi ang pinulongan kung imo na kining <b>gamiton</b>: paghimo og kaugalingong mga tudling-pulong, pagtubag sa mga pangutana, pagsulti sa tinuod nga mga tawo.</p>
   </div>
 </section>
 
@@ -479,9 +530,13 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <!-- WORTSCHATZ -->
 <section class="view" id="view-wortschatz">
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Wortschatz-Trainer</h2>
     <p class="small">Klicke auf die Karte, um die Übersetzung zu sehen. Markiere danach ehrlich, ob du das Wort schon kannst — dein Fortschritt wird lokal auf diesem Gerät gespeichert. Mit 🎤 kannst du deine eigene Aussprache direkt per Mikrofon prüfen (Browser fragt einmalig nach Mikrofon-Zugriff; Cebuano wird von keinem Browser direkt unterstützt, daher ist die Bewertung ein bestmöglicher Näherungswert über die verwandte Filipino-Spracherkennung — kein Ersatz für echtes Feedback von Muttersprachlern). <b>Hinweis:</b> die Mikrofon-Prüfung funktioniert zuverlässig in Chrome; Safari (auch auf dem Mac) unterstützt diese Funktion bislang nicht — dort steht dir aber weiterhin 🔊 zum Anhören zur Verfügung.</p>
+  </div>
+  <div class="card mode-de-only">
+    <h2>Bokabularyo Trainer</h2>
+    <p class="small">I-klik ang kard aron makita ang German nga hubad. Human niana, i-marka kon husto kung nahibaw-an na nimo ang pulong o dili — ang imong kalamboan gitipigan lokal niini nga aparato. Gamita ang 🔊 aron madungog ang tinuod nga German nga paglitok. Ang 🎤 aron sulayan ang imong kaugalingong paglitok sa German nga pulong pinaagi sa mikropono — kini mas kasaligan kaysa sa Bisaya nga bersyon, kay ang German maayo nga gisuportahan sa Chrome. Wala pa ni gisuportahan sa Safari.</p>
     <div class="filterbar">
       <label class="small">Kategorie:
         <select id="catFilter" onchange="refreshDeck()"></select>
@@ -505,9 +560,13 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <!-- WENDUNGEN -->
 <section class="view" id="view-wendungen">
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Wendungen — Alltagsphrasen, Redewendungen &amp; Slang</h2>
     <p class="small">Über 200 zusätzliche Ausdrücke aus echtem Alltags-Bisaya: praktische Sätze für unterwegs, bildhafte Redewendungen und Sprichwörter (panultihon) mit ihrer wörtlichen Bedeutung, und Jugendsprache/Slang, wie er heute in Cebu tatsächlich gesprochen wird. Alle Einträge stehen auch als Karteikarten im Wortschatz-Trainer zur Verfügung (Kategorien "Alltagsphrasen", "Redewendungen", "Slang &amp; Jugendsprache").</p>
+  </div>
+  <div class="card mode-de-only">
+    <h2>Mga Pulong-pulong — Adlaw-adlaw nga Prase &amp; Slang</h2>
+    <p class="small">Kapin sa 200 ka dugang nga ekspresyon: praktikal nga mga tudling-pulong nga German, mga idioms uban sa ilang literal nga kahulogan, ug German slang nga tinuod nga gigamit karon. Ang tanan nga entry naa usab isip flashcard sa Bokabularyo Trainer.</p>
   </div>
   <div id="wendungenList"></div>
 </section>
@@ -519,12 +578,16 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <!-- ANWENDEN -->
 <section class="view" id="view-anwenden">
-  <div class="card">
+  <div class="card mode-de-only">
+    <h2>Gamiton — moabot pa</h2>
+    <p>Kini nga bahin (paggama og kaugalingong German nga mga tudling-pulong) gi-andam pa para sa German-Lernmodus. Sa pagkakaron, gamita ang <b>Mga Leksyon</b> ug <b>Bokabularyo</b> aron magbansay sa German — basaha kusog ang German nga linya, dayon ang Bisaya, ug sulayi paghimo og kaugalingong mubo nga mga sentence gamit ang mga pulong nga imong nakat-onan.</p>
+  </div>
+  <div class="card mode-bis-only">
     <h2>Anwenden — jetzt wird's lebendig</h2>
     <p>Der wichtigste Teil. Bau eigene Sätze, beantworte Szenarien in eigenen Worten. Es gibt keine "Korrektur" durch das Programm — vergleiche deine Antwort einfach ehrlich mit dem Beispiel und feile weiter. Sprich deine Antwort laut aus, bevor du sie aufschreibst.</p>
   </div>
 
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>Baustein-Sätze (Chunking)</h3>
     <p class="small">Kombiniere Pronomen + Verb + Objekt/Ort zu eigenen, echten Sätzen. Wähle je eine Option und lies den Satz laut.</p>
     <div class="btnrow" style="justify-content:flex-start; margin-bottom:10px;">
@@ -537,12 +600,12 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
     </div>
   </div>
 
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>Lückensätze aus den Lektionen</h3>
     <div id="gapExercises"></div>
   </div>
 
-  <div class="card">
+  <div class="card mode-bis-only">
     <h3>Freie Anwendung — schreib &amp; sprich</h3>
     <div id="freeExercises"></div>
   </div>
@@ -550,7 +613,11 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 
 <!-- GRAMMATIK -->
 <section class="view" id="view-grammatik">
-  <div class="card">
+  <div class="card mode-de-only">
+    <h2>Giya sa Gramatika sa German — moabot pa</h2>
+    <p>Ang kompleto nga giya sa gramatika sa German (mga artikulo der/die/das, mga kaso, pag-conjugate sa verbo) nga gipatin-aw sa Bisaya gi-andam pa alang sa sunod nga update, aron masiguro ang kaayo nga pagkasakto. Sa pagkakaron, gamita ang Mga Leksyon ug Mga Sugilanon aron makat-on sa German pinaagi sa tinuod nga mga pananglitan.</p>
+  </div>
+  <div class="card mode-bis-only">
     <h2>Aussprache</h2>
     <p>Bisaya wird sehr lautgetreu geschrieben — was du liest, sprichst du auch. Fünf klare Vokale: <b>a</b> wie in "Vater", <b>e</b> wie in "Bett", <b>i</b> wie "ie" in "Liebe", <b>o</b> wie in "Sonne", <b>u</b> wie "u" in "Buch". Jeder Vokal wird einzeln gesprochen, auch wenn zwei nebeneinanderstehen (z. B. <i>maayo</i> = ma-a-yo).</p>
     <p>Der <b>Glottisschlag</b> (kurzer Stimmabsatz, wie im Deutschen zwischen "be-achten") taucht oft zwischen zwei Vokalen auf, z. B. in <i>pag-atiman</i> oder <i>bag-o</i> — im Text meist durch einen Bindestrich markiert.</p>
@@ -558,7 +625,7 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
     <p>Das <b>ng</b> wird wie im Englischen "sing" gesprochen — auch am Wortanfang, z. B. <i>ngano</i> (warum), was für deutsche Sprecher ungewohnt ist. Das <b>r</b> wird kurz "geschlagen" (ein einzelner Zungenschlag), nicht gerollt wie im Spanischen.</p>
     <p class="audio-note">🔊 Die kleinen Lautsprecher-Symbole neben der Lautschrift nutzen die Sprachausgabe deines Geräts (Web Speech API) — es gibt keine echte Cebuano-Stimme, daher ist das nur eine Annäherung (meist über eine philippinische/spanische oder ersatzweise englische Stimme). Verlass dich für die wirkliche Aussprache zusätzlich auf echtes Hörmaterial von Muttersprachlern (siehe „Methode" → Passives Hören).</p>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Pronomen-Tabelle</h2>
     <p class="small">Bisaya-Pronomen erscheinen in drei Formen: als Subjekt (Set 1), als angehängte Kurzform bzw. Objekt (Set 2) und als Possessivform vor einem Nomen (Set 3).</p>
     <table class="gram">
@@ -573,12 +640,12 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
     </table>
     <div class="note">Bisaya unterscheidet zwei Formen von "wir": <b>kita</b> schließt die angesprochene Person mit ein ("wir beide"), <b>kami</b> schließt sie aus ("wir, aber nicht du"). Das gibt es im Deutschen nicht — ein gutes Beispiel dafür, warum reines Übersetzen die Sprache verfälscht.</div>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Funktionswörter-Spickzettel</h2>
     <p class="small">Diese kleinen Wörter tauchen ständig auf und tragen die Satzmelodie — wichtiger als viele "große" Wörter.</p>
     <table class="gram" id="funcTable"></table>
   </div>
-  <div class="card">
+  <div class="card mode-bis-only">
     <h2>Das Verb-Fokus-System (kurz erklärt)</h2>
     <p>Bisaya-Verben zeigen nicht nur <i>wann</i> etwas passiert, sondern auch, <b>worauf der Satz fokussiert ist</b> — auf den Handelnden (Akteur-Fokus) oder auf das, was die Handlung erhält (Objekt-Fokus). Das ist ungewohnt für Deutschsprachige, aber keine Sorge: Für die Alltagskommunikation reichen die Akteur-Fokus-Formen völlig aus.</p>
     <table class="gram">
@@ -595,15 +662,18 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <!-- FORTSCHRITT -->
 <section class="view" id="view-fortschritt">
   <div class="card">
-    <h2>Dein Fortschritt</h2>
+    <h2 class="mode-bis-only">Dein Fortschritt</h2>
+    <h2 class="mode-de-only">Imong Kalamboan</h2>
     <div class="statgrid">
-      <div class="stat"><div class="num" id="statKnown">0</div><div class="lbl">Wörter gekonnt</div></div>
-      <div class="stat"><div class="num" id="statLearning">0</div><div class="lbl">in Übung</div></div>
-      <div class="stat"><div class="num" id="statLessons">0/12</div><div class="lbl">Lektionen abgeschlossen</div></div>
+      <div class="stat"><div class="num" id="statKnown">0</div><div class="lbl mode-bis-only">Wörter gekonnt</div><div class="lbl mode-de-only">Mga pulong nahibaw-an</div></div>
+      <div class="stat"><div class="num" id="statLearning">0</div><div class="lbl mode-bis-only">in Übung</div><div class="lbl mode-de-only">gibansay pa</div></div>
+      <div class="stat"><div class="num" id="statLessons">0/12</div><div class="lbl mode-bis-only">Lektionen abgeschlossen</div><div class="lbl mode-de-only">Leksyon nahuman</div></div>
     </div>
     <div class="progressbar"><div id="overallBar" style="width:0%"></div></div>
-    <p class="small" style="margin-top:16px;">Dein Fortschritt wird nur lokal in diesem Browser gespeichert (localStorage) — nicht in der Cloud. Öffne die Datei immer im selben Browser, um deinen Stand zu behalten.</p>
-    <button class="action neutral" onclick="resetProgress()">Fortschritt zurücksetzen</button>
+    <p class="small mode-bis-only" style="margin-top:16px;">Dein Fortschritt wird nur lokal in diesem Browser gespeichert (localStorage) — nicht in der Cloud. Öffne die Datei immer im selben Browser, um deinen Stand zu behalten.</p>
+    <p class="small mode-de-only" style="margin-top:16px;">Ang imong kalamboan gitipigan lokal ra niini nga browser (localStorage) — dili sa cloud. Ablihi kanunay sa mao gihapong browser aron dili mawala ang imong progreso.</p>
+    <button class="action neutral mode-bis-only" onclick="resetProgress()">Fortschritt zurücksetzen</button>
+    <button class="action neutral mode-de-only" onclick="resetProgress()">I-reset ang Kalamboan</button>
   </div>
 </section>
 
@@ -611,9 +681,11 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <section class="view" id="view-vip">
   <div class="vip-box" style="text-align:center;">
     <span class="vip-pill">⭐ VIP</span>
-    <h2 style="margin-top:10px;">Vollen Wortschatz freischalten</h2>
-    <p>Die ersten 100 Wörter &amp; Wendungen sind komplett kostenlos. Für den kompletten Wortschatz (über 1.000 Einträge, alle Lektionen-Extras und alle Wendungen) gibt es VIP.</p>
-    <div class="vip-price">5 € <span>/ Monat, jederzeit kündbar</span></div>
+    <h2 class="mode-bis-only" style="margin-top:10px;">Vollen Wortschatz freischalten</h2>
+    <h2 class="mode-de-only" style="margin-top:10px;">I-unlock ang Tibuok Bokabularyo</h2>
+    <p class="mode-bis-only">Die ersten 100 Wörter &amp; Wendungen sind komplett kostenlos. Für den kompletten Wortschatz (über 1.000 Einträge, alle Lektionen-Extras und alle Wendungen) gibt es VIP.</p>
+    <p class="mode-de-only">Ang unang 100 ka pulong &amp; prase libre gyud. Para sa tibuok bokabularyo (kapin sa 1.000 ka entry) naa ang VIP.</p>
+    <div class="vip-price">5 € <span class="mode-bis-only">/ Monat, jederzeit kündbar</span><span class="mode-de-only">/ bulan, mahimong kanselahon bisan kanus-a</span></div>
   </div>
   <div class="card" id="vipConfigWarning" style="display:none; border-color:var(--warn);">
     <p class="small">⚠️ Der VIP-Zugang ist im Code dieser Datei noch nicht mit einem echten Bezahl-Server verbunden (Platzhalter-Adresse). Bis das eingerichtet ist, bleibt der volle Wortschatz für alle offen.</p>
@@ -647,8 +719,10 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 <!-- SUPPORT -->
 <section class="view" id="view-support">
   <div class="card">
-    <h2>Support &amp; Feedback</h2>
-    <p>Fehler gefunden, eine Übersetzung stimmt nicht, oder du hast einen Wunsch für neue Wörter/Lektionen? Schreib es hier rein.</p>
+    <h2 class="mode-bis-only">Support &amp; Feedback</h2>
+    <h2 class="mode-de-only">Tabang &amp; Feedback</h2>
+    <p class="mode-bis-only">Fehler gefunden, eine Übersetzung stimmt nicht, oder du hast einen Wunsch für neue Wörter/Lektionen? Schreib es hier rein.</p>
+    <p class="mode-de-only">Nakit-an ba nimo ang sayop, sakto ba ang hubad, o naa kay gusto nga bag-ong pulong/leksyon? Isulat dinhi.</p>
     <div id="supportFormWrap">
       <label for="suppName">Name (optional)</label>
       <input type="text" id="suppName" placeholder="Dein Name">
@@ -668,7 +742,8 @@ footer.appfoot{text-align:center; color:var(--sub); font-size:0.8rem; padding:20
 </main>
 
 <footer class="appfoot">
-  Bisaya Lebendig · Modul 1 · Inspiriert von der Birkenbihl-Lernphilosophie
+  <span class="mode-bis-only">Bisaya Lebendig · Modul 1 · Inspiriert von der Birkenbihl-Lernphilosophie</span>
+  <span class="mode-de-only">Bisaya Lebendig · Modyul 2: German alang sa Bisaya · Dinasig sa ideya ni Birkenbihl</span>
   <div style="margin-top:8px;">
     <img src="https://visitor-badge.laobi.icu/badge?page_id=flamrolas.bisaya-learning&left_text=Besucher"
          alt="Besucherzähler" style="height:20px; vertical-align:middle;"
@@ -1796,6 +1871,444 @@ const CORE_VOCAB = [
  {bis:"budol",de:"zum Kaufen verleitet, Spontankauf getätigt",cat:"Slang & Jugendsprache",pron:"BOO-dol"},
  {bis:"bagulbol",de:"vor sich hin murren, meckern",cat:"Slang & Jugendsprache",pron:"bah-gool-BOHL"},
  {bis:"spill na",de:"erzähl schon!, raus damit!",cat:"Slang & Jugendsprache",pron:"speel nah"},
+ // ---- Erweiterung Runde 2 (Beta-Tester-Feedback: mehr Wortschatz) ----
+ {bis:"daro",de:"Pflug",cat:"Pagpanguma",pron:"DAH-roh"},
+ {bis:"pagdaro",de:"pflügen",cat:"Pagpanguma",pron:"pahg-DAH-roh"},
+ {bis:"asarol",de:"Hacke",cat:"Pagpanguma",pron:"ah-sah-ROHL"},
+ {bis:"garab",de:"Sichel",cat:"Pagpanguma",pron:"gah-RAHB"},
+ {bis:"paggarab",de:"mit der Sichel schneiden/ernten",cat:"Pagpanguma",pron:"pahg-gah-RAHB"},
+ {bis:"kalaykay",de:"Rechen",cat:"Pagpanguma",pron:"kah-lai-KAI"},
+ {bis:"wasay",de:"Axt",cat:"Pagpanguma",pron:"WAH-sai"},
+ {bis:"gabas",de:"Säge",cat:"Pagpanguma",pron:"GAH-bahs"},
+ {bis:"sanggot",de:"Erntemesser, Sichel",cat:"Pagpanguma",pron:"sahng-GOHT"},
+ {bis:"bakol",de:"Tragkorb",cat:"Pagpanguma",pron:"BAH-kohl"},
+ {bis:"kaing",de:"Erntekiste (geflochten)",cat:"Pagpanguma",pron:"KAH-eeng"},
+ {bis:"pisi",de:"Schnur, Seil",cat:"Pagpanguma",pron:"PEE-see"},
+ {bis:"yugo",de:"Joch für Zugtiere",cat:"Pagpanguma",pron:"YOO-goh"},
+ {bis:"kural",de:"Gehege, Zaun",cat:"Pagpanguma",pron:"KOO-rahl"},
+ {bis:"bakod",de:"Zaun",cat:"Pagpanguma",pron:"BAH-kohd"},
+ {bis:"kamalig",de:"Kornspeicher, Scheune",cat:"Pagpanguma",pron:"kah-mah-LEEG"},
+ {bis:"giokan",de:"Dreschplatz",cat:"Pagpanguma",pron:"gee-oh-KAHN"},
+ {bis:"sundang",de:"Buschmesser, Bolo",cat:"Pagpanguma",pron:"SOON-dahng"},
+ {bis:"pilapil",de:"Reisfelddamm",cat:"Pagpanguma",pron:"pee-lah-PEEL"},
+ {bis:"dagami",de:"Reisstroh",cat:"Pagpanguma",pron:"dah-GAH-mee"},
+ {bis:"tahop",de:"Reisspelzen, Spreu",cat:"Pagpanguma",pron:"TAH-hohp"},
+ {bis:"pagtanom",de:"pflanzen",cat:"Pagpanguma",pron:"pahg-tah-NOHM"},
+ {bis:"tanom",de:"Setzling; pflanzen",cat:"Pagpanguma",pron:"tah-NOHM"},
+ {bis:"pag-ani",de:"Ernte, ernten",cat:"Pagpanguma",pron:"pahg-AH-nee"},
+ {bis:"giok",de:"dreschen",cat:"Pagpanguma",pron:"GEE-ohk"},
+ {bis:"tikad",de:"das Land bestellen, bebauen",cat:"Pagpanguma",pron:"TEE-kahd"},
+ {bis:"bisbis",de:"gießen, bewässern",cat:"Pagpanguma",pron:"BEES-bees"},
+ {bis:"abuno",de:"Dünger",cat:"Pagpanguma",pron:"ah-BOO-noh"},
+ {bis:"binhi",de:"Samen, Saatgut",cat:"Pagpanguma",pron:"BEEN-hee"},
+ {bis:"tanaman",de:"Pflanzung, Anbaufläche",cat:"Pagpanguma",pron:"tah-NAH-mahn"},
+ {bis:"uma",de:"Acker, Feld",cat:"Pagpanguma",pron:"OO-mah"},
+ {bis:"basakan",de:"Nassreisfeld",cat:"Pagpanguma",pron:"bah-sah-KAHN"},
+ {bis:"kaingin",de:"Brandrodungsfeld",cat:"Pagpanguma",pron:"kah-EE-ngeen"},
+ {bis:"tag-ulan",de:"Regenzeit",cat:"Pagpanguma",pron:"tahg-oo-LAHN"},
+ {bis:"tag-init",de:"Trockenzeit",cat:"Pagpanguma",pron:"tahg-ee-NEET"},
+ {bis:"pananom",de:"Anbau, Pflanzenkultur",cat:"Pagpanguma",pron:"pah-nah-NOHM"},
+ {bis:"humay",de:"Reispflanze (ungeschält)",cat:"Pagpanguma",pron:"HOO-mai"},
+ {bis:"kamoteng kahoy",de:"Maniok",cat:"Pagpanguma",pron:"kah-MOH-tehng KAH-hoy"},
+ {bis:"balanghoy",de:"Maniok",cat:"Pagpanguma",pron:"bah-lahng-HOY"},
+ {bis:"ubi",de:"Purpur-Yamswurzel",cat:"Pagpanguma",pron:"OO-bee"},
+ {bis:"mani",de:"Erdnuss",cat:"Pagpanguma",pron:"mah-NEE"},
+ {bis:"patani",de:"Limabohne",cat:"Pagpanguma",pron:"pah-tah-NEE"},
+ {bis:"balatong",de:"Mungbohne",cat:"Pagpanguma",pron:"bah-lah-TOHNG"},
+ {bis:"labong",de:"Bambussprossen",cat:"Pagpanguma",pron:"lah-BOHNG"},
+ {bis:"tubo",de:"Zuckerrohr",cat:"Pagpanguma",pron:"TOO-boh"},
+ {bis:"okra",de:"Okra",cat:"Pagpanguma",pron:"OHK-rah"},
+ {bis:"kalabaw",de:"Wasserbüffel",cat:"Pagpanguma",pron:"kah-lah-BOW"},
+ {bis:"itik",de:"Ente",cat:"Pagpanguma",pron:"EE-teek"},
+ {bis:"pabo",de:"Truthahn",cat:"Pagpanguma",pron:"PAH-boh"},
+ {bis:"kuwadra",de:"Stall",cat:"Pagpanguma",pron:"koo-WAHD-rah"},
+ {bis:"toril",de:"Viehpferch",cat:"Pagpanguma",pron:"toh-REEL"},
+ {bis:"kulungan",de:"Käfig, Pferch",cat:"Pagpanguma",pron:"koo-loo-NGAHN"},
+ {bis:"pakaon",de:"füttern (Tiere)",cat:"Pagpanguma",pron:"pah-KAH-ohn"},
+ {bis:"lipak",de:"gespaltener Bambus",cat:"Pagpanguma",pron:"LEE-pahk"},
+ {bis:"tabas",de:"roden, zurechtschneiden (Pflanzen)",cat:"Pagpanguma",pron:"TAH-bahs"},
+ {bis:"tuod",de:"Baumstumpf",cat:"Pagpanguma",pron:"TOO-ohd"},
+ {bis:"patubig",de:"Bewässerung(ssystem)",cat:"Pagpanguma",pron:"pah-TOO-beeg"},
+ {bis:"kanal",de:"Bewässerungsgraben",cat:"Pagpanguma",pron:"kah-NAHL"},
+ {bis:"pugas",de:"Saat ausstreuen (bes. Reis)",cat:"Pagpanguma",pron:"POO-gahs"},
+ {bis:"pamugas",de:"Säen (Tätigkeit)",cat:"Pagpanguma",pron:"pah-MOO-gahs"},
+ {bis:"sabod",de:"Samen ausstreuen, säen",cat:"Pagpanguma",pron:"SAH-bohd"},
+ {bis:"peste",de:"Schädling",cat:"Pagpanguma",pron:"PEHS-teh"},
+ {bis:"tanga",de:"Zecke (Viehparasit)",cat:"Pagpanguma",pron:"TAH-ngah"},
+ {bis:"saop",de:"Landpächter",cat:"Pagpanguma",pron:"SAH-ohp"},
+ {bis:"bugkos",de:"Bündel (z. B. Reisbündel)",cat:"Pagpanguma",pron:"boog-KOHS"},
+ {bis:"pamugkos",de:"bündeln (Ernte)",cat:"Pagpanguma",pron:"pah-moog-KOHS"},
+ {bis:"kamada",de:"Stapel, Haufen (Ernte)",cat:"Pagpanguma",pron:"kah-MAH-dah"},
+ {bis:"gilingan",de:"Mühle (zum Mahlen von Mais/Reis)",cat:"Pagpanguma",pron:"gee-LEE-ngahn"},
+ {bis:"halo",de:"Reisstampfer (Stößel)",cat:"Pagpanguma",pron:"HAH-loh"},
+ {bis:"tugkaran",de:"Hof, Gehöft",cat:"Pagpanguma",pron:"toog-kah-RAHN"},
+ {bis:"pasungan",de:"Futtertrog (für Tiere)",cat:"Pagpanguma",pron:"pah-soo-NGAHN"},
+ {bis:"sabsaban",de:"Weide (Grasland zum Weiden)",cat:"Pagpanguma",pron:"sahb-sah-BAHN"},
+ {bis:"sabsab",de:"grasen (Tier frisst Gras)",cat:"Pagpanguma",pron:"SAHB-sahb"},
+ {bis:"tigom",de:"(Ernte) sammeln, einlagern",cat:"Pagpanguma",pron:"TEE-gohm"},
+ {bis:"bodega",de:"Lagerhaus, Speicher",cat:"Pagpanguma",pron:"boh-DEH-gah"},
+ {bis:"baroto",de:"Kanu, kleines Boot",cat:"Pagpangisda",pron:"bah-ROH-toh"},
+ {bis:"katig",de:"Ausleger (Outrigger)",cat:"Pagpangisda",pron:"kah-TEEG"},
+ {bis:"layag",de:"Segel",cat:"Pagpangisda",pron:"LAH-yahg"},
+ {bis:"bugsay",de:"Paddel",cat:"Pagpangisda",pron:"boog-SAI"},
+ {bis:"angkla",de:"Anker",cat:"Pagpangisda",pron:"AHNG-klah"},
+ {bis:"timon",de:"Steuerruder",cat:"Pagpangisda",pron:"tee-MOHN"},
+ {bis:"basnig",de:"Hebenetz-Fischerboot",cat:"Pagpangisda",pron:"BAHS-neeg"},
+ {bis:"basnigan",de:"großes Hebenetz-Fischerboot",cat:"Pagpangisda",pron:"bahs-nee-GAHN"},
+ {bis:"bubu",de:"Bambus-Fischreuse",cat:"Pagpangisda",pron:"BOO-boo"},
+ {bis:"baklad",de:"Fischzaun, Fischfalle",cat:"Pagpangisda",pron:"BAHK-lahd"},
+ {bis:"bingwit",de:"Angel, Angelschnur",cat:"Pagpangisda",pron:"BEENG-weet"},
+ {bis:"pasol",de:"Handangeln",cat:"Pagpangisda",pron:"pah-SOHL"},
+ {bis:"pamingwit",de:"Angeln (Tätigkeit)",cat:"Pagpangisda",pron:"pah-meeng-WEET"},
+ {bis:"lambat",de:"Netz",cat:"Pagpangisda",pron:"lahm-BAHT"},
+ {bis:"palangre",de:"Langleine",cat:"Pagpangisda",pron:"pah-lahng-REH"},
+ {bis:"bangus",de:"Milchfisch",cat:"Pagpangisda",pron:"BAHNG-oos"},
+ {bis:"lapu-lapu",de:"Zackenbarsch",cat:"Pagpangisda",pron:"lah-poo-LAH-poo"},
+ {bis:"tulingan",de:"Bonito",cat:"Pagpangisda",pron:"too-lee-NGAHN"},
+ {bis:"tambakol",de:"Echter Bonito",cat:"Pagpangisda",pron:"tahm-bah-KOHL"},
+ {bis:"galunggong",de:"Makrelenhering",cat:"Pagpangisda",pron:"gah-loong-GOHNG"},
+ {bis:"alumahan",de:"Indische Makrele",cat:"Pagpangisda",pron:"ah-loo-MAH-hahn"},
+ {bis:"tangigi",de:"Königsmakrele",cat:"Pagpangisda",pron:"tahng-EE-gee"},
+ {bis:"bulinaw",de:"Sardelle, Anchovi",cat:"Pagpangisda",pron:"boo-lee-NAO"},
+ {bis:"maya-maya",de:"Roter Schnapper",cat:"Pagpangisda",pron:"mah-yah-MAH-yah"},
+ {bis:"talakitok",de:"Stachelmakrele (Trevally)",cat:"Pagpangisda",pron:"tah-lah-kee-TOHK"},
+ {bis:"banak",de:"Meeräsche",cat:"Pagpangisda",pron:"bah-NAHK"},
+ {bis:"sap-sap",de:"Schlundzahnbrasse (Ponyfish)",cat:"Pagpangisda",pron:"SAHP-sahp"},
+ {bis:"apahap",de:"Barramundi, Wolfsbarsch",cat:"Pagpangisda",pron:"ah-PAH-hahp"},
+ {bis:"haluan",de:"Schlangenkopffisch (Süßwasser)",cat:"Pagpangisda",pron:"hah-loo-AHN"},
+ {bis:"pantat",de:"Wels",cat:"Pagpangisda",pron:"pahn-TAHT"},
+ {bis:"ito",de:"Wels",cat:"Pagpangisda",pron:"EE-toh"},
+ {bis:"iho",de:"Hai",cat:"Pagpangisda",pron:"EE-hoh"},
+ {bis:"balilan",de:"Walhai",cat:"Pagpangisda",pron:"bah-lee-LAHN"},
+ {bis:"tawiki",de:"Walhai",cat:"Pagpangisda",pron:"tah-WEE-kee"},
+ {bis:"bulis",de:"Bonito",cat:"Pagpangisda",pron:"BOO-lees"},
+ {bis:"barakuda",de:"Barrakuda",cat:"Pagpangisda",pron:"bah-rah-KOO-dah"},
+ {bis:"mulmol",de:"Papageifisch",cat:"Pagpangisda",pron:"MOOL-mohl"},
+ {bis:"botete",de:"Kugelfisch",cat:"Pagpangisda",pron:"boh-TEH-teh"},
+ {bis:"duto",de:"Stachelkugelfisch (Igelfisch)",cat:"Pagpangisda",pron:"DOO-toh"},
+ {bis:"tambasakan",de:"Schlammspringer",cat:"Pagpangisda",pron:"tahm-bah-sah-KAHN"},
+ {bis:"gunggong",de:"Streifenbarsch",cat:"Pagpangisda",pron:"goong-GOHNG"},
+ {bis:"bakasi",de:"Muräne (Art)",cat:"Pagpangisda",pron:"bah-kah-SEE"},
+ {bis:"sigarilyo",de:"Runder Stöcker (Round Scad)",cat:"Pagpangisda",pron:"see-gah-REEL-yoh"},
+ {bis:"aboabo",de:"Wellenlinien-Zackenbarsch",cat:"Pagpangisda",pron:"ah-boh-AH-boh"},
+ {bis:"agumaa",de:"Makrelenart",cat:"Pagpangisda",pron:"ah-goo-mah-AH"},
+ {bis:"alibangbangon",de:"Falterfisch",cat:"Pagpangisda",pron:"ah-lee-bahng-bah-NGOHN"},
+ {bis:"badlon",de:"Fadenfisch",cat:"Pagpangisda",pron:"bahd-LOHN"},
+ {bis:"bakolan",de:"Torpedo-Stöcker",cat:"Pagpangisda",pron:"bah-koh-LAHN"},
+ {bis:"balila",de:"Wolfshering",cat:"Pagpangisda",pron:"bah-LEE-lah"},
+ {bis:"bansikol",de:"Regenbogenläufer (Fisch)",cat:"Pagpangisda",pron:"bahn-see-KOHL"},
+ {bis:"bilongbilong",de:"Mondfisch",cat:"Pagpangisda",pron:"bee-lohng-bee-LOHNG"},
+ {bis:"dalapugan",de:"Fledermausfisch",cat:"Pagpangisda",pron:"dah-lah-poo-GAHN"},
+ {bis:"hukihok",de:"Fusilierfisch (Art)",cat:"Pagpangisda",pron:"hoo-kee-HOHK"},
+ {bis:"kalambangis",de:"Roter Schnapper (Art)",cat:"Pagpangisda",pron:"kah-lahm-bah-NGEES"},
+ {bis:"kitang",de:"Gefleckter Kaninchenfisch",cat:"Pagpangisda",pron:"KEE-tahng"},
+ {bis:"kitong",de:"Goldfleck-Kaninchenfisch",cat:"Pagpangisda",pron:"KEE-tohng"},
+ {bis:"labahita",de:"Doktorfisch",cat:"Pagpangisda",pron:"lah-bah-HEE-tah"},
+ {bis:"lali",de:"Goldmakrele (Mahi-Mahi)",cat:"Pagpangisda",pron:"LAH-lee"},
+ {bis:"malasugi",de:"Schwertfisch/Marlin",cat:"Pagpangisda",pron:"mah-lah-SOO-gee"},
+ {bis:"mamsa",de:"Riesen-Stachelmakrele",cat:"Pagpangisda",pron:"MAHM-sah"},
+ {bis:"suno",de:"Leoparden-Korallenbarsch",cat:"Pagpangisda",pron:"SOO-noh"},
+ {bis:"tagutongan",de:"Stachelkugelfisch",cat:"Pagpangisda",pron:"tah-goo-toh-NGAHN"},
+ {bis:"uwapay",de:"Zweifarben-Papageifisch",cat:"Pagpangisda",pron:"oo-wah-PAI"},
+ {bis:"lawong",de:"Rotfeuerfisch (Lionfish)",cat:"Pagpangisda",pron:"lah-WOHNG"},
+ {bis:"mahimahi",de:"Goldmakrele (Mahi-Mahi)",cat:"Pagpangisda",pron:"mah-hee-MAH-hee"},
+ {bis:"pakol",de:"Drückerfisch (Triggerfish)",cat:"Pagpangisda",pron:"PAH-kohl"},
+ {bis:"tikong",de:"Kugelfisch",cat:"Pagpangisda",pron:"tee-KOHNG"},
+ {bis:"tikos",de:"Drückerfisch",cat:"Pagpangisda",pron:"TEE-kohs"},
+ {bis:"talaungan",de:"Buckelkopf-Papageifisch",cat:"Pagpangisda",pron:"tah-lah-oo-NGAHN"},
+ {bis:"karbalyas",de:"Stachelmakrele (Crevally)",cat:"Pagpangisda",pron:"kahr-bahl-YAHS"},
+ {bis:"kabasi",de:"Rundhering (Gizzard Shad)",cat:"Pagpangisda",pron:"kah-BAH-see"},
+ {bis:"dagangdang",de:"Großaugen-Schnapper",cat:"Pagpangisda",pron:"dah-gahng-DAHNG"},
+ {bis:"dagomdagom",de:"Hornhecht (Needlefish)",cat:"Pagpangisda",pron:"dah-gohm-dah-GOHM"},
+ {bis:"linggiro",de:"Soldatenfisch",cat:"Pagpangisda",pron:"leeng-GEE-roh"},
+ {bis:"apdohan",de:"Kugelfisch (Art)",cat:"Pagpangisda",pron:"ahp-doh-HAHN"},
+ {bis:"awho",de:"Barrakuda",cat:"Pagpangisda",pron:"AH-who"},
+ {bis:"badyang",de:"Prachtponyfisch",cat:"Pagpangisda",pron:"BAHD-yahng"},
+ {bis:"bagi",de:"Nasendoktorfisch (Unicornfish)",cat:"Pagpangisda",pron:"BAH-gee"},
+ {bis:"bakwak",de:"Hornnasen-Doktorfisch",cat:"Pagpangisda",pron:"BAHK-wahk"},
+ {bis:"bilason",de:"Fusilier (Art)",cat:"Pagpangisda",pron:"bee-lah-SOHN"},
+ {bis:"karaho",de:"Eidechsenfisch (Lizardfish)",cat:"Pagpangisda",pron:"kah-RAH-hoh"},
+ {bis:"dugso",de:"Langnasen-Kaiserbrasse",cat:"Pagpangisda",pron:"DOOG-soh"},
+ {bis:"sunoga",de:"Plattkopf (Flathead)",cat:"Pagpangisda",pron:"soo-NOH-gah"},
+ {bis:"tad",de:"Zigarrenlippfisch",cat:"Pagpangisda",pron:"TAHD"},
+ {bis:"tigi",de:"Sardellenart",cat:"Pagpangisda",pron:"TEE-gee"},
+ {bis:"barunday",de:"Sardinenart",cat:"Pagpangisda",pron:"bah-roon-DAI"},
+ {bis:"daslo",de:"Sardinenbrut (junge Sardine)",cat:"Pagpangisda",pron:"DAHS-loh"},
+ {bis:"lupoy",de:"Fischbrut, kleine Jungfische",cat:"Pagpangisda",pron:"loo-POY"},
+ {bis:"semilya",de:"Setzling, Jungfisch (Aufzucht)",cat:"Pagpangisda",pron:"seh-MEEL-yah"},
+ {bis:"pasayan",de:"Garnele",cat:"Pagpangisda",pron:"pah-sah-YAHN"},
+ {bis:"sugpo",de:"Tigergarnele",cat:"Pagpangisda",pron:"soog-POH"},
+ {bis:"alimango",de:"Mangrovenkrabbe",cat:"Pagpangisda",pron:"ah-lee-MAHNG-oh"},
+ {bis:"alimasag",de:"Blaukrabbe",cat:"Pagpangisda",pron:"ah-lee-MAH-sahg"},
+ {bis:"pusit",de:"Tintenfisch, Kalmar",cat:"Pagpangisda",pron:"poo-SEET"},
+ {bis:"nukos",de:"Oktopus",cat:"Pagpangisda",pron:"noo-KOHS"},
+ {bis:"kasag",de:"kleine Krabbe",cat:"Pagpangisda",pron:"kah-SAHG"},
+ {bis:"kasili",de:"Aal",cat:"Pagpangisda",pron:"kah-SEE-lee"},
+ {bis:"pangisda",de:"fischen (Tätigkeit)",cat:"Pagpangisda",pron:"pahng-EES-dah"},
+ {bis:"mangisda",de:"fischen (aktiv)",cat:"Pagpangisda",pron:"mahng-EES-dah"},
+ {bis:"mananagat",de:"Fischer",cat:"Pagpangisda",pron:"mah-nah-NAH-gaht"},
+ {bis:"panagat",de:"auf Fischfang gehen",cat:"Pagpangisda",pron:"pah-nah-GAHT"},
+ {bis:"bira",de:"(Netz) einholen, ziehen",cat:"Pagpangisda",pron:"BEE-rah"},
+ {bis:"hakot",de:"(Fang) transportieren, einholen",cat:"Pagpangisda",pron:"HAH-koht"},
+ {bis:"bantay-dagat",de:"Meereswächter, Fischereiaufseher",cat:"Pagpangisda",pron:"BAHN-tai DAH-gaht"},
+ {bis:"sugba",de:"grillen",cat:"Pagluto",pron:"soog-BAH"},
+ {bis:"ihaw",de:"über offener Flamme grillen",cat:"Pagluto",pron:"EE-how"},
+ {bis:"bukal",de:"aufkochen, sprudeln (Wasser)",cat:"Pagluto",pron:"BOO-kahl"},
+ {bis:"tanok",de:"kochen, sieden",cat:"Pagluto",pron:"tah-NOHK"},
+ {bis:"kilaw",de:"roh in Essig marinieren",cat:"Pagluto",pron:"KEE-lao"},
+ {bis:"tuslob",de:"eintunken, eintauchen",cat:"Pagluto",pron:"TOOS-lohb"},
+ {bis:"haling",de:"Feuer anzünden/schüren (zum Kochen)",cat:"Pagluto",pron:"HAH-leeng"},
+ {bis:"guisa",de:"andünsten, anbraten",cat:"Pagluto",pron:"gee-SAH"},
+ {bis:"hurno",de:"im Ofen backen, rösten",cat:"Pagluto",pron:"HOOR-noh"},
+ {bis:"singaw",de:"verdampfen, Dampf aufsteigen lassen",cat:"Pagluto",pron:"SEE-ngao"},
+ {bis:"pasingaw",de:"dünsten, dämpfen",cat:"Pagluto",pron:"pah-SEE-ngao"},
+ {bis:"hiwa",de:"in Scheiben schneiden",cat:"Pagluto",pron:"HEE-wah"},
+ {bis:"tadtad",de:"fein hacken",cat:"Pagluto",pron:"tahd-TAHD"},
+ {bis:"gadgad",de:"reiben, raspeln",cat:"Pagluto",pron:"gahd-GAHD"},
+ {bis:"pislit",de:"auspressen",cat:"Pagluto",pron:"pees-LEET"},
+ {bis:"hasa",de:"(Messer) schärfen",cat:"Pagluto",pron:"HAH-sah"},
+ {bis:"tabon",de:"(Topf) zudecken",cat:"Pagluto",pron:"TAH-bohn"},
+ {bis:"sagol",de:"vermischen, mengen",cat:"Pagluto",pron:"SAH-gohl"},
+ {bis:"timpla",de:"würzen, abschmecken",cat:"Pagluto",pron:"TEEM-plah"},
+ {bis:"tunaw",de:"schmelzen",cat:"Pagluto",pron:"too-NAO"},
+ {bis:"paglutò",de:"das Kochen (Tätigkeit)",cat:"Pagluto",pron:"pahg-loo-TOH"},
+ {bis:"tuwa",de:"in klarer Brühe köcheln",cat:"Pagluto",pron:"TOO-wah"},
+ {bis:"sabawan",de:"eine Brühe/Suppe zubereiten",cat:"Pagluto",pron:"sah-bah-WAHN"},
+ {bis:"bulad",de:"in der Sonne trocknen (Fisch)",cat:"Pagluto",pron:"boo-LAHD"},
+ {bis:"tapa",de:"Fleisch pökeln/trocknen",cat:"Pagluto",pron:"TAH-pah"},
+ {bis:"haw-as",de:"abgießen, abseihen (Wasser)",cat:"Pagluto",pron:"hah-WAHS"},
+ {bis:"banlas",de:"abspülen, abwaschen (Zutaten)",cat:"Pagluto",pron:"bahn-LAHS"},
+ {bis:"tuslok",de:"aufspießen, durchstechen",cat:"Pagluto",pron:"too-SLOHK"},
+ {bis:"hikay",de:"(Essen/Tisch) vorbereiten",cat:"Pagluto",pron:"hee-KAI"},
+ {bis:"putos",de:"einwickeln (in Bananenblatt)",cat:"Pagluto",pron:"POO-tohs"},
+ {bis:"hulog",de:"hinzufügen, hineingeben (in den Topf)",cat:"Pagluto",pron:"HOO-lohg"},
+ {bis:"hinang",de:"zubereiten, herstellen (Speise)",cat:"Pagluto",pron:"HEE-nahng"},
+ {bis:"lamog",de:"zerdrücken, zerstampfen (Speise)",cat:"Pagluto",pron:"lah-MOHG"},
+ {bis:"buak",de:"aufbrechen, öffnen (Kokosnuss, Ei)",cat:"Pagluto",pron:"boo-AHK"},
+ {bis:"asinan",de:"einsalzen, einpökeln",cat:"Pagluto",pron:"ah-see-NAHN"},
+ {bis:"pabugnaw",de:"abkühlen lassen",cat:"Pagluto",pron:"pah-boog-NAO"},
+ {bis:"pabukal",de:"zum Kochen/Sieden bringen",cat:"Pagluto",pron:"pah-boo-KAHL"},
+ {bis:"sag-ob",de:"Wasser schöpfen (für die Küche)",cat:"Pagluto",pron:"SAHG-ohb"},
+ {bis:"giling",de:"mahlen (Reis, Mais, Kaffee)",cat:"Pagluto",pron:"GEE-leeng"},
+ {bis:"pista",de:"Fest, Fiesta",cat:"Piyesta ug Tradisyon",pron:"pis-ta"},
+ {bis:"sinulog",de:"Sinulog (Tanzfest zu Ehren des Santo Niño, von 'sulog' = wie Wasser fließen)",cat:"Piyesta ug Tradisyon",pron:"si-nu-log"},
+ {bis:"saulog",de:"feiern, begehen",cat:"Piyesta ug Tradisyon",pron:"sa-u-log"},
+ {bis:"prusisyon",de:"Prozession",cat:"Piyesta ug Tradisyon",pron:"pru-si-syon"},
+ {bis:"karosa",de:"Festwagen (Umzugswagen)",cat:"Piyesta ug Tradisyon",pron:"ka-ro-sa"},
+ {bis:"parada",de:"Parade",cat:"Piyesta ug Tradisyon",pron:"pa-ra-da"},
+ {bis:"banda",de:"Musikkapelle",cat:"Piyesta ug Tradisyon",pron:"ban-da"},
+ {bis:"tugtog",de:"Musik, (ein Instrument) spielen",cat:"Piyesta ug Tradisyon",pron:"tug-tog"},
+ {bis:"sayaw",de:"Tanz, tanzen",cat:"Piyesta ug Tradisyon",pron:"sa-yaw"},
+ {bis:"indak",de:"Tanzschritt, tanzen",cat:"Piyesta ug Tradisyon",pron:"in-dak"},
+ {bis:"harana",de:"Ständchen (Serenade)",cat:"Piyesta ug Tradisyon",pron:"ha-ra-na"},
+ {bis:"balitaw",de:"traditioneller Wechselgesang (Liebeswerbungslied)",cat:"Piyesta ug Tradisyon",pron:"ba-li-taw"},
+ {bis:"bandilyo",de:"öffentliche Bekanntmachung, laut ausrufen",cat:"Piyesta ug Tradisyon",pron:"ban-dil-yo"},
+ {bis:"kombira",de:"Festmahl, Bankett",cat:"Piyesta ug Tradisyon",pron:"kom-bi-ra"},
+ {bis:"panihapon",de:"Abendessen",cat:"Piyesta ug Tradisyon",pron:"pa-ni-ha-pon"},
+ {bis:"hudyaka",de:"ausgelassenes Feiern, Trubel",cat:"Piyesta ug Tradisyon",pron:"hud-ya-ka"},
+ {bis:"kasadya",de:"Fröhlichkeit",cat:"Piyesta ug Tradisyon",pron:"ka-sad-ya"},
+ {bis:"kasal",de:"Hochzeit",cat:"Piyesta ug Tradisyon",pron:"ka-sal"},
+ {bis:"lamay",de:"Totenwache",cat:"Piyesta ug Tradisyon",pron:"la-may"},
+ {bis:"nobena",de:"Novene (neuntägiges Gebet, oft bei Fiesta-Vorbereitung)",cat:"Piyesta ug Tradisyon",pron:"no-be-na"},
+ {bis:"patron",de:"Schutzpatron",cat:"Piyesta ug Tradisyon",pron:"pat-ron"},
+ {bis:"pasidungog",de:"Ehrung, Tribut",cat:"Piyesta ug Tradisyon",pron:"pa-si-dung-og"},
+ {bis:"dayeg",de:"loben, preisen",cat:"Piyesta ug Tradisyon",pron:"da-yeg"},
+ {bis:"kombite",de:"Einladung, Fest",cat:"Piyesta ug Tradisyon",pron:"kom-bi-te"},
+ {bis:"panagtigom",de:"Versammlung, Zusammenkunft",cat:"Piyesta ug Tradisyon",pron:"pa-nag-ti-gom"},
+ {bis:"duyog",de:"(musikalisch) begleiten, mitmachen",cat:"Piyesta ug Tradisyon",pron:"du-yog"},
+ {bis:"adlaw nga natawhan",de:"Geburtstag",cat:"Piyesta ug Tradisyon",pron:"ad-law nga na-taw-han"},
+ {bis:"karnabal",de:"Karneval, Jahrmarkt",cat:"Piyesta ug Tradisyon",pron:"kar-na-bal"},
+ {bis:"dulaan",de:"Schauspiel, Theaterstück",cat:"Piyesta ug Tradisyon",pron:"du-la-an"},
+ {bis:"awit",de:"Lied",cat:"Piyesta ug Tradisyon",pron:"a-wit"},
+ {bis:"balak",de:"Gedicht",cat:"Piyesta ug Tradisyon",pron:"ba-lak"},
+ {bis:"kulitawo",de:"scherzhaftes Liebeswerbungslied (Wechselgesang)",cat:"Piyesta ug Tradisyon",pron:"ku-li-ta-wo"},
+ {bis:"pasiaw",de:"Scherz, Spaß (bei Feiern)",cat:"Piyesta ug Tradisyon",pron:"pa-si-aw"},
+ {bis:"bantay sa patay",de:"Totenwache halten",cat:"Piyesta ug Tradisyon",pron:"ban-tay sa pa-tay"},
+ {bis:"Diyos",de:"Gott",cat:"Relihiyon",pron:"di-yos"},
+ {bis:"Ginoo",de:"Herr (Gott)",cat:"Relihiyon",pron:"gi-no-o"},
+ {bis:"obispo",de:"Bischof",cat:"Relihiyon",pron:"o-bis-po"},
+ {bis:"arsobispo",de:"Erzbischof",cat:"Relihiyon",pron:"ar-so-bis-po"},
+ {bis:"Santo Papa",de:"Papst",cat:"Relihiyon",pron:"san-to pa-pa"},
+ {bis:"madre",de:"Nonne",cat:"Relihiyon",pron:"mad-re"},
+ {bis:"monghe",de:"Mönch",cat:"Relihiyon",pron:"mong-he"},
+ {bis:"seminaryo",de:"Priesterseminar",cat:"Relihiyon",pron:"se-mi-nar-yo"},
+ {bis:"misa",de:"Messe",cat:"Relihiyon",pron:"mi-sa"},
+ {bis:"pangadye",de:"Gebet",cat:"Relihiyon",pron:"pang-ad-ye"},
+ {bis:"pag-ampo",de:"beten",cat:"Relihiyon",pron:"pag-am-po"},
+ {bis:"rosaryo",de:"Rosenkranz",cat:"Relihiyon",pron:"ro-sar-yo"},
+ {bis:"kumpisal",de:"Beichte",cat:"Relihiyon",pron:"kum-pi-sal"},
+ {bis:"bunyag",de:"Taufe",cat:"Relihiyon",pron:"bun-yag"},
+ {bis:"kumpil",de:"Firmung",cat:"Relihiyon",pron:"kum-pil"},
+ {bis:"Biblia",de:"Bibel",cat:"Relihiyon",pron:"bib-li-a"},
+ {bis:"ebanghelyo",de:"Evangelium",cat:"Relihiyon",pron:"e-bang-hel-yo"},
+ {bis:"santos",de:"Heilige",cat:"Relihiyon",pron:"san-tos"},
+ {bis:"anghel",de:"Engel",cat:"Relihiyon",pron:"ang-hel"},
+ {bis:"yawa",de:"Teufel, böser Geist",cat:"Relihiyon",pron:"ya-wa"},
+ {bis:"langit",de:"Himmel",cat:"Relihiyon",pron:"la-ngit"},
+ {bis:"impyerno",de:"Hölle",cat:"Relihiyon",pron:"im-pyer-no"},
+ {bis:"purgatoryo",de:"Fegefeuer",cat:"Relihiyon",pron:"pur-ga-tor-yo"},
+ {bis:"Kalag-kalag",de:"Allerseelen/Allerheiligen (Totengedenktage)",cat:"Relihiyon",pron:"ka-lag ka-lag"},
+ {bis:"Semana Santa",de:"Karwoche",cat:"Relihiyon",pron:"se-ma-na san-ta"},
+ {bis:"Biyernes Santo",de:"Karfreitag",cat:"Relihiyon",pron:"bi-yer-nes san-to"},
+ {bis:"Domingo de Ramos",de:"Palmsonntag",cat:"Relihiyon",pron:"do-min-go de ra-mos"},
+ {bis:"Pasko",de:"Weihnachten",cat:"Relihiyon",pron:"pas-ko"},
+ {bis:"Bag-ong Tuig",de:"Neujahr",cat:"Relihiyon",pron:"bag-ong tu-ig"},
+ {bis:"Simbang Gabi",de:"vorweihnachtliche Frühmessen (9 Tage)",cat:"Relihiyon",pron:"sim-bang ga-bi"},
+ {bis:"Pasyon",de:"Passionsgesang (Leidensgeschichte Christi)",cat:"Relihiyon",pron:"pas-yon"},
+ {bis:"eskapularyo",de:"Skapulier",cat:"Relihiyon",pron:"es-ka-pu-lar-yo"},
+ {bis:"altar",de:"Altar",cat:"Relihiyon",pron:"al-tar"},
+ {bis:"dios-dios",de:"Götze, Idol",cat:"Relihiyon",pron:"di-os di-os"},
+ {bis:"tambalan",de:"Heiler, Schamane",cat:"Relihiyon",pron:"tam-ba-lan"},
+ {bis:"engkanto",de:"Naturgeist",cat:"Relihiyon",pron:"eng-kan-to"},
+ {bis:"multo",de:"Geist, Gespenst",cat:"Relihiyon",pron:"mul-to"},
+ {bis:"diwata",de:"Naturgeist, Fee",cat:"Relihiyon",pron:"di-wa-ta"},
+ {bis:"kumpirmasyon",de:"Firmung (formell)",cat:"Relihiyon",pron:"kum-pir-mas-yon"},
+ {bis:"patag",de:"Ebene, flach",cat:"Geograpiya",pron:"pa-tag"},
+ {bis:"kapatagan",de:"Flachland, Ebene",cat:"Geograpiya",pron:"ka-pa-ta-gan"},
+ {bis:"isla",de:"Insel",cat:"Geograpiya",pron:"is-la"},
+ {bis:"pulo",de:"Insel",cat:"Geograpiya",pron:"pu-lo"},
+ {bis:"look",de:"Bucht",cat:"Geograpiya",pron:"lo-ok"},
+ {bis:"busay",de:"Wasserfall",cat:"Geograpiya",pron:"bu-say"},
+ {bis:"langub",de:"Höhle",cat:"Geograpiya",pron:"la-ngub"},
+ {bis:"kalasangan",de:"Waldgebiet",cat:"Geograpiya",pron:"ka-la-sa-ngan"},
+ {bis:"kabukiran",de:"Bergland, Gebirge",cat:"Geograpiya",pron:"ka-bu-ki-ran"},
+ {bis:"bakhawan",de:"Mangrovenwald",cat:"Geograpiya",pron:"bak-ha-wan"},
+ {bis:"katunggan",de:"Mangrovensumpf, Schlickwatt",cat:"Geograpiya",pron:"ka-tung-gan"},
+ {bis:"lungsod",de:"Stadt, Gemeinde",cat:"Geograpiya",pron:"lung-sod"},
+ {bis:"syudad",de:"Stadt",cat:"Geograpiya",pron:"syu-dad"},
+ {bis:"barangay",de:"Dorf, kleinste Verwaltungseinheit",cat:"Geograpiya",pron:"ba-rang-ay"},
+ {bis:"sitio",de:"Weiler, Siedlung",cat:"Geograpiya",pron:"sit-yo"},
+ {bis:"purok",de:"Ortsteil, Nachbarschaft",cat:"Geograpiya",pron:"pu-rok"},
+ {bis:"probinsya",de:"Provinz",cat:"Geograpiya",pron:"pro-bin-sya"},
+ {bis:"rehiyon",de:"Region",cat:"Geograpiya",pron:"re-hi-yon"},
+ {bis:"nasod",de:"Nation, Land",cat:"Geograpiya",pron:"na-sod"},
+ {bis:"kalibutan",de:"Welt",cat:"Geograpiya",pron:"ka-li-bu-tan"},
+ {bis:"utlanan",de:"Grenze",cat:"Geograpiya",pron:"ut-la-nan"},
+ {bis:"karsada",de:"Straße",cat:"Geograpiya",pron:"kar-sa-da"},
+ {bis:"habagatan",de:"Süden",cat:"Geograpiya",pron:"ha-ba-ga-tan"},
+ {bis:"sidlakan",de:"Osten",cat:"Geograpiya",pron:"sid-la-kan"},
+ {bis:"kasadpan",de:"Westen",cat:"Geograpiya",pron:"ka-sad-pan"},
+ {bis:"pangpang",de:"Flussufer, Steilufer",cat:"Geograpiya",pron:"pang-pang"},
+ {bis:"hulaw",de:"Dürre, Trockenzeit",cat:"Geograpiya",pron:"hu-law"},
+ {bis:"kadagatan",de:"Meeresgebiet, Gewässer",cat:"Geograpiya",pron:"ka-da-ga-tan"},
+ {bis:"kabaybayonan",de:"Küstengebiet",cat:"Geograpiya",pron:"ka-bay-ba-yo-nan"},
+ {bis:"negosyo",de:"Geschäft, Business",cat:"Negosyo",pron:"ne-gos-yo"},
+ {bis:"merkado",de:"Markt",cat:"Negosyo",pron:"mer-ka-do"},
+ {bis:"pamaligya",de:"handeln, verkaufen, feilbieten",cat:"Negosyo",pron:"pa-ma-lig-ya"},
+ {bis:"tindero",de:"Verkäufer",cat:"Negosyo",pron:"tin-de-ro"},
+ {bis:"tindera",de:"Verkäuferin",cat:"Negosyo",pron:"tin-de-ra"},
+ {bis:"puhunan",de:"Startkapital, Investition",cat:"Negosyo",pron:"pu-hu-nan"},
+ {bis:"ganansya",de:"Gewinn",cat:"Negosyo",pron:"ga-nans-ya"},
+ {bis:"utang",de:"Schulden, Kredit",cat:"Negosyo",pron:"u-tang"},
+ {bis:"salapi",de:"Geld, Währung",cat:"Negosyo",pron:"sa-la-pi"},
+ {bis:"kompanya",de:"Firma",cat:"Negosyo",pron:"kom-pan-ya"},
+ {bis:"sweldo",de:"Gehalt",cat:"Negosyo",pron:"swel-do"},
+ {bis:"empleyado",de:"Angestellter",cat:"Negosyo",pron:"em-ple-ya-do"},
+ {bis:"agalon",de:"Chef, Arbeitgeber",cat:"Negosyo",pron:"a-ga-lon"},
+ {bis:"produkto",de:"Produkt",cat:"Negosyo",pron:"pro-duk-to"},
+ {bis:"pautang",de:"Darlehen",cat:"Negosyo",pron:"pa-u-tang"},
+ {bis:"interes",de:"Zinsen",cat:"Negosyo",pron:"in-te-res"},
+ {bis:"benta",de:"Verkauf, Umsatz",cat:"Negosyo",pron:"ben-ta"},
+ {bis:"tinda",de:"Ware zum Verkauf",cat:"Negosyo",pron:"tin-da"},
+ {bis:"panginabuhi",de:"Lebensunterhalt",cat:"Negosyo",pron:"pa-ngi-na-bu-hi"},
+ {bis:"hanapbuhay",de:"Erwerbstätigkeit, Beruf",cat:"Negosyo",pron:"ha-nap-bu-hay"},
+ {bis:"kwenta",de:"Rechnung, Konto",cat:"Negosyo",pron:"kwen-ta"},
+ {bis:"imbentaryo",de:"Inventar, Warenbestand",cat:"Negosyo",pron:"im-ben-tar-yo"},
+ {bis:"patigayon",de:"Handel, Geschäft, Handelsangelegenheit",cat:"Negosyo",pron:"pa-ti-ga-yon"},
+ {bis:"paninda",de:"Ware zum Verkauf",cat:"Negosyo",pron:"pa-nin-da"},
+ {bis:"tawad",de:"Preisnachlass, feilschen",cat:"Negosyo",pron:"ta-wad"},
+ {bis:"presyohan",de:"über den Preis verhandeln",cat:"Negosyo",pron:"pre-syo-han"},
+ {bis:"gikan",de:"herkommen von, stammen aus",cat:"Verben",pron:"GI-kan"},
+ {bis:"larga",de:"losfahren, abreisen",cat:"Verben",pron:"LAR-ga"},
+ {bis:"lukso",de:"springen",cat:"Verben",pron:"LUK-so"},
+ {bis:"lupad",de:"fliegen",cat:"Verben",pron:"LU-pad"},
+ {bis:"libot",de:"herumgehen, umherziehen",cat:"Verben",pron:"LI-bot"},
+ {bis:"gukod",de:"jagen, verfolgen",cat:"Verben",pron:"GU-kod"},
+ {bis:"ikyas",de:"flüchten, entkommen",cat:"Verben",pron:"IK-yas"},
+ {bis:"tindog",de:"aufstehen, stehen",cat:"Verben",pron:"TIN-dog"},
+ {bis:"lingkod",de:"sich hinsetzen, sitzen",cat:"Verben",pron:"LING-kod"},
+ {bis:"hapa",de:"sich bäuchlings hinlegen",cat:"Verben",pron:"HA-pa"},
+ {bis:"palayo",de:"sich entfernen, weggehen",cat:"Verben",pron:"pa-LA-yo"},
+ {bis:"ingon",de:"sagen, äußern",cat:"Verben",pron:"I-ngon"},
+ {bis:"tug-an",de:"gestehen, anvertrauen, mitteilen",cat:"Verben",pron:"TUG-an"},
+ {bis:"hangyo",de:"bitten, um etwas bitten",cat:"Verben",pron:"HANG-yo"},
+ {bis:"saway",de:"ermahnen, zurechtweisen",cat:"Verben",pron:"SA-way"},
+ {bis:"badlong",de:"tadeln, rügen",cat:"Verben",pron:"BAD-long"},
+ {bis:"pasidaan",de:"warnen",cat:"Verben",pron:"pa-si-da-AN"},
+ {bis:"kalimot",de:"vergessen",cat:"Verben",pron:"ka-LI-mot"},
+ {bis:"duhaduha",de:"zweifeln",cat:"Verben",pron:"du-ha-DU-ha"},
+ {bis:"tuki",de:"untersuchen, analysieren",cat:"Verben",pron:"TU-ki"},
+ {bis:"ilha",de:"erkennen",cat:"Verben",pron:"IL-ha"},
+ {bis:"tagad",de:"beachten, aufpassen auf",cat:"Verben",pron:"TA-gad"},
+ {bis:"tag-iya",de:"Eigentümer sein, besitzen",cat:"Verben",pron:"tag-I-ya"},
+ {bis:"pahulam",de:"verleihen",cat:"Verben",pron:"pa-HU-lam"},
+ {bis:"kita",de:"sehen",cat:"Verben",pron:"KI-ta"},
+ {bis:"dungog",de:"hören",cat:"Verben",pron:"DU-ngog"},
+ {bis:"paminaw",de:"zuhören, lauschen",cat:"Verben",pron:"pa-MI-naw"},
+ {bis:"simhot",de:"riechen, schnuppern",cat:"Verben",pron:"SIM-hot"},
+ {bis:"panimaho",de:"riechen, einen Geruch wahrnehmen",cat:"Verben",pron:"pa-ni-MA-ho"},
+ {bis:"tilaw",de:"schmecken, probieren",cat:"Verben",pron:"TI-law"},
+ {bis:"hikap",de:"berühren, anfassen",cat:"Verben",pron:"HI-kap"},
+ {bis:"damgo",de:"träumen",cat:"Verben",pron:"DAM-go"},
+ {bis:"dala",de:"bringen, mitnehmen",cat:"Verben",pron:"DA-la"},
+ {bis:"tuon",de:"lernen, studieren",cat:"Verben",pron:"TU-on"},
+ // ---- Erweiterung Runde 2b (weitere Adjektive) ----
+ {bis:"kugihan",de:"fleißig, arbeitsam",cat:"Adjektive",pron:"ku-gi-HAN"},
+ {bis:"tapolan",de:"faul, träge",cat:"Adjektive",pron:"TA-pu-lan"},
+ {bis:"matinahoron",de:"höflich, respektvoll",cat:"Adjektive",pron:"ma-ti-na-HU-ron"},
+ {bis:"bakakon",de:"verlogen, lügnerisch",cat:"Adjektive",pron:"ba-KA-kon"},
+ {bis:"lig-on",de:"stark, robust, stabil",cat:"Adjektive",pron:"LIG-on"},
+ {bis:"paspas",de:"schnell",cat:"Adjektive",pron:"PAS-pas"},
+ {bis:"gwapo",de:"gutaussehend (männlich)",cat:"Adjektive",pron:"GWA-po"},
+ {bis:"gwapa",de:"hübsch (weiblich)",cat:"Adjektive",pron:"GWA-pa"},
+ {bis:"hamis",de:"glatt",cat:"Adjektive",pron:"HA-mis"},
+ {bis:"humok",de:"weich",cat:"Adjektive",pron:"HU-mok"},
+ {bis:"hait",de:"scharf, spitz",cat:"Adjektive",pron:"HA-it"},
+ {bis:"tigulang",de:"alt (Person)",cat:"Adjektive",pron:"ti-GU-lang"},
+ {bis:"kabus",de:"arm",cat:"Adjektive",pron:"KA-bus"},
+ {bis:"bantogan",de:"berühmt",cat:"Adjektive",pron:"ban-TO-gan"},
+ {bis:"buangbuang",de:"dumm, töricht",cat:"Adjektive",pron:"bu-ang-BU-ang"},
+ {bis:"utokan",de:"klug, gescheit",cat:"Adjektive",pron:"u-TO-kan"},
+ {bis:"tarong",de:"anständig, ordentlich",cat:"Adjektive",pron:"TA-rong"},
+ {bis:"maisugon",de:"mutig, tapfer",cat:"Adjektive",pron:"ma-i-SU-gon"},
+ {bis:"talawan",de:"feige",cat:"Adjektive",pron:"ta-LA-wan"},
+ {bis:"hakog",de:"gierig, habgierig",cat:"Adjektive",pron:"HA-kog"},
+ {bis:"bangis",de:"grausam, wild",cat:"Adjektive",pron:"BANG-is"},
+ {bis:"mapintas",de:"grausam, brutal",cat:"Adjektive",pron:"ma-PIN-tas"},
+ {bis:"malumo",de:"sanft, zart, mild",cat:"Adjektive",pron:"ma-LU-mo"},
+ {bis:"suplado",de:"eingebildet, arrogant",cat:"Adjektive",pron:"su-PLA-do"},
+ {bis:"mahiyain",de:"schüchtern",cat:"Adjektive",pron:"ma-hi-YA-in"},
+ {bis:"batid",de:"erfahren, kompetent",cat:"Adjektive",pron:"BA-tid"},
+ {bis:"hanas",de:"geübt, versiert",cat:"Adjektive",pron:"HA-nas"},
+ {bis:"himsog",de:"gesund, kräftig",cat:"Adjektive",pron:"HIM-sog"},
+ {bis:"masakiton",de:"kränklich, anfällig",cat:"Adjektive",pron:"ma-sa-KI-ton"},
+ {bis:"baho",de:"stinkend",cat:"Adjektive",pron:"BA-ho"},
+ {bis:"sutil",de:"trotzig, frech (Kind)",cat:"Adjektive",pron:"SU-til"},
+ {bis:"bug-at",de:"schwer",cat:"Adjektive",pron:"BUG-at"},
+ {bis:"gaan",de:"leicht (Gewicht)",cat:"Adjektive",pron:"GA-an"},
+ {bis:"nipis",de:"dünn (Material, Stoff)",cat:"Adjektive",pron:"NI-pis"},
+ {bis:"tinud-anon",de:"ehrlich, treu",cat:"Adjektive",pron:"ti-nud-A-non"},
+ {bis:"limbongan",de:"betrügerisch, hinterlistig",cat:"Adjektive",pron:"lim-bo-NGAN"},
+ {bis:"matinabangon",de:"hilfsbereit",cat:"Adjektive",pron:"ma-ti-na-BA-ngon"},
+ {bis:"mausisaon",de:"neugierig",cat:"Adjektive",pron:"ma-u-si-SA-on"},
+ {bis:"mapasensyahon",de:"geduldig",cat:"Adjektive",pron:"ma-pa-sen-SYA-hon"},
+ {bis:"lab-as",de:"frisch (Essen, Fisch)",cat:"Adjektive",pron:"LAB-as"},
+ {bis:"dunot",de:"verfault, verdorben",cat:"Adjektive",pron:"DU-not"},
+ {bis:"hinog",de:"reif (Frucht)",cat:"Adjektive",pron:"HI-nog"},
+ {bis:"hilaw",de:"unreif, roh",cat:"Adjektive",pron:"HI-law"},
+ {bis:"luag",de:"locker, weit (Kleidung)",cat:"Adjektive",pron:"LU-ag"},
+ {bis:"hugot",de:"eng, stramm",cat:"Adjektive",pron:"HU-got"},
+ {bis:"lisod",de:"schwierig",cat:"Adjektive",pron:"LI-sod"},
+ {bis:"makiangayon",de:"gerecht, fair",cat:"Adjektive",pron:"ma-ki-a-NGA-yon"},
+ {bis:"maluluy-on",de:"barmherzig, mitfühlend",cat:"Adjektive",pron:"ma-lu-lu-Y-on"},
+ {bis:"mabination",de:"gütig, freundlich",cat:"Adjektive",pron:"ma-bi-na-TI-on"},
+ {bis:"mapangahason",de:"wagemutig, kühn",cat:"Adjektive",pron:"ma-pa-nga-ha-SON"},
+ {bis:"mahadlokon",de:"ängstlich",cat:"Adjektive",pron:"ma-had-LO-kon"},
+ {bis:"mainiton",de:"hitzköpfig, reizbar",cat:"Adjektive",pron:"ma-i-NI-ton"},
+ {bis:"gamhanan",de:"mächtig",cat:"Adjektive",pron:"gam-HA-nan"},
+ {bis:"bantog",de:"berühmt, bekannt",cat:"Adjektive",pron:"BAN-tog"},
+ {bis:"law-ay",de:"unanständig, vulgär",cat:"Adjektive",pron:"LAW-ay"},
+ {bis:"walay batasan",de:"ungehobelt, unhöflich (wörtl. 'ohne Manieren')",cat:"Adjektive",pron:"wa-lay ba-TA-san"},
 ];
 
 // Lektions-Zusatzwortschatz (Wörter, die in den Dialogen neu vorkommen)
@@ -1965,7 +2478,7 @@ const PHRASES_VOCAB = [
  {bis:"Kuyaw",de:"krass, beeindruckend cool",cat:"Slang & Jugendsprache",pron:"KOO-yaw"},
  {bis:"Tambay",de:"abhängen, herumlungern",cat:"Slang & Jugendsprache",pron:"TAHM-bai"},
  {bis:"Tapulan",de:"faul, unmotiviert",cat:"Slang & Jugendsprache",pron:"tah-poo-LAHN"},
- {bis:"Labad ulo",de:"Kopfschmerzen (wörtlich & übertragen)",cat:"Slang & Jugendsprache",pron:"LAH-bahd OO-loh"},
+ {bis:"Labad ulo",de:"Kopfschmerzen (wörtlich und übertragen)",cat:"Slang & Jugendsprache",pron:"LAH-bahd OO-loh"},
  {bis:"Katulgon",de:"schläfrig, kann nicht wach bleiben",cat:"Slang & Jugendsprache",pron:"kah-tool-GOHN"},
  {bis:"Kulba",de:"nervös, ängstlich",cat:"Slang & Jugendsprache",pron:"KOOL-bah"},
  {bis:"Paspas",de:"beeil dich, schnell",cat:"Slang & Jugendsprache",pron:"PAHS-pahs"},
@@ -2017,6 +2530,245 @@ const PHRASES_VOCAB = [
  {bis:"Kon mahimo...",de:"Wenn möglich... (höfliche Bitte, formeller Register)",pron:"kon mah-HEE-moh",cat:"Alltagsphrasen",note:"Formelle Einleitung für Bitten, z. B. gegenüber Älteren oder Fremden."},
  {bis:"Salamat kaayo.",de:"Vielen herzlichen Dank.",pron:"sah-LAH-maht kah-AH-yoh",cat:"Alltagsphrasen",note:"Emphatischere, formellere Steigerung von 'salamat'."},
  {bis:"Walay sapayan.",de:"Kein Problem, macht nichts.",pron:"wah-LAY sah-PAH-yahn",cat:"Alltagsphrasen",note:"Lockere Antwort auf eine Entschuldigung oder ein Missgeschick."},
+ // ---- Erweiterung Runde 2 (Beta-Tester-Feedback: mehr Wortschatz) ----
+ {bis:"Kinahanglan ko og doktor.",de:"Ich brauche einen Arzt.",cat:"Alltagsphrasen",pron:"ki-na-HANG-lan ko og DOK-tor"},
+ {bis:"Naa koy appointment sa doktor.",de:"Ich habe einen Termin beim Arzt.",cat:"Alltagsphrasen",pron:"NAH-a koy a-POYNT-ment sa DOK-tor"},
+ {bis:"Unsa ang imong sakit?",de:"Was tut dir weh?",cat:"Alltagsphrasen",pron:"OON-sa ang ee-MONG SA-kit",note:"Woertlich: Was ist dein Schmerz? - typische Frage beim Check-in in der Klinik."},
+ {bis:"Sakit akong ulo.",de:"Mein Kopf tut weh.",cat:"Alltagsphrasen",pron:"SA-kit AH-kong OO-lo"},
+ {bis:"Sakit akong tiyan.",de:"Mein Bauch tut weh.",cat:"Alltagsphrasen",pron:"SA-kit AH-kong ti-YAN"},
+ {bis:"Naa koy hilanat.",de:"Ich habe Fieber.",cat:"Alltagsphrasen",pron:"NAH-a koy hee-LA-nat"},
+ {bis:"Nag-ubo ko.",de:"Ich huste.",cat:"Alltagsphrasen",pron:"nag-OO-bo ko"},
+ {bis:"Naa koy sip-on.",de:"Ich habe Schnupfen.",cat:"Alltagsphrasen",pron:"NAH-a koy SIP-on"},
+ {bis:"Nagsuka ko.",de:"Ich musste mich uebergeben.",cat:"Alltagsphrasen",pron:"nag-SOO-ka ko"},
+ {bis:"Nalibang ko.",de:"Mir ist schwindelig.",cat:"Alltagsphrasen",pron:"na-lee-BANG ko"},
+ {bis:"Lisod ko og ginhawa.",de:"Ich habe Atembeschwerden.",cat:"Alltagsphrasen",pron:"LEE-sod ko og gin-HA-wa"},
+ {bis:"Naa koy reseta.",de:"Ich habe ein Rezept.",cat:"Alltagsphrasen",pron:"NAH-a koy re-SE-ta"},
+ {bis:"Pila ka beses sa usa ka adlaw kini imnon?",de:"Wie oft am Tag soll ich das einnehmen?",cat:"Alltagsphrasen",pron:"PEE-la ka BE-ses sa OO-sa ka AD-law"},
+ {bis:"Kanus-a nagsugod ang sakit?",de:"Seit wann hast du die Schmerzen?",cat:"Alltagsphrasen",pron:"ka-noos-A nag-SOO-god ang SA-kit"},
+ {bis:"Asa man sakit?",de:"Wo genau tut es weh?",cat:"Alltagsphrasen",pron:"A-sa man SA-kit"},
+ {bis:"Kinahanglan nimo og tambal.",de:"Du brauchst Medizin.",cat:"Alltagsphrasen",pron:"ki-na-HANG-lan NEE-mo og TAM-bal"},
+ {bis:"Tawaga ang ambulansya!",de:"Ruft den Krankenwagen!",cat:"Alltagsphrasen",pron:"ta-WA-ga ang am-boo-LAN-sya"},
+ {bis:"Naay aksidente!",de:"Es gab einen Unfall!",cat:"Alltagsphrasen",pron:"NAH-ay ak-see-DEN-te"},
+ {bis:"Nasamdan ko.",de:"Ich bin verletzt.",cat:"Alltagsphrasen",pron:"na-SAM-dan ko"},
+ {bis:"Nagdugo ko.",de:"Ich blute.",cat:"Alltagsphrasen",pron:"nag-DOO-go ko"},
+ {bis:"Peligro na kaayo kini!",de:"Das ist sehr gefaehrlich!",cat:"Alltagsphrasen",pron:"pe-LEE-gro na ka-A-yo KEE-ni"},
+ {bis:"Asa ang pinakaduol nga ospital?",de:"Wo ist das naechste Krankenhaus?",cat:"Alltagsphrasen",pron:"A-sa ang pee-na-ka-DOO-ol nga os-PEE-tal"},
+ {bis:"Naa koy allergy.",de:"Ich habe eine Allergie.",cat:"Alltagsphrasen",pron:"NAH-a koy a-LER-jee"},
+ {bis:"Dugay na ba ni?",de:"Ist das schon lange so?",cat:"Alltagsphrasen",pron:"DOO-gay na ba ni"},
+ {bis:"Salamat sa tabang, doktor.",de:"Danke fuer die Hilfe, Doktor.",cat:"Alltagsphrasen",pron:"sa-LA-mat sa TA-bang DOK-tor"},
+ {bis:"Naa koy himuong reklamo.",de:"Ich moechte eine Beschwerde einreichen.",cat:"Alltagsphrasen",pron:"NAH-a koy hee-MOO-ong rek-LA-mo"},
+ {bis:"Asa ko mokuha og barangay clearance?",de:"Wo bekomme ich eine Barangay-Bescheinigung?",cat:"Alltagsphrasen",pron:"A-sa ko mo-KOO-ha og ba-RANG-gay KLIR-ans"},
+ {bis:"Naa koy gikinahanglan nga sertipiko.",de:"Ich brauche eine Bescheinigung.",cat:"Alltagsphrasen",pron:"NAH-a koy gi-ki-na-HANG-lan nga ser-tee-FEE-ko"},
+ {bis:"Pila ang bayad sa aplikasyon?",de:"Wie viel kostet der Antrag?",cat:"Alltagsphrasen",pron:"PEE-la ang BA-yad sa a-plee-ka-SYON"},
+ {bis:"Unsa ang mga requirements?",de:"Was sind die noetigen Unterlagen?",cat:"Alltagsphrasen",pron:"OON-sa ang mga ree-KWAYR-ments"},
+ {bis:"Naa koy dala nga ID.",de:"Ich habe einen Ausweis dabei.",cat:"Alltagsphrasen",pron:"NAH-a koy DA-la nga AY-dee"},
+ {bis:"Pila ka adlaw ang proseso?",de:"Wie viele Tage dauert der Vorgang?",cat:"Alltagsphrasen",pron:"PEE-la ka AD-law ang pro-SE-so"},
+ {bis:"Asa ko mopirma?",de:"Wo muss ich unterschreiben?",cat:"Alltagsphrasen",pron:"A-sa ko mo-PEER-ma"},
+ {bis:"Kinsa ang kapitan sa barangay?",de:"Wer ist der Barangay-Vorsteher?",cat:"Alltagsphrasen",pron:"KIN-sa ang ka-pee-TAN sa ba-RANG-gay"},
+ {bis:"Naa koy problema nga gusto ireport.",de:"Ich habe ein Problem, das ich melden moechte.",cat:"Alltagsphrasen",pron:"NAH-a koy pro-BLE-ma nga GOOS-to ee-re-PORT"},
+ {bis:"Kanus-a ang oras sa opisina?",de:"Wann sind die Bueroeffnungszeiten?",cat:"Alltagsphrasen",pron:"ka-noos-A ang O-ras sa o-pee-SEE-na"},
+ {bis:"Salamat sa imong pagtabang, sir.",de:"Danke fuer Ihre Hilfe.",cat:"Alltagsphrasen",pron:"sa-LA-mat sa ee-MONG pag-TA-bang"},
+ {bis:"Naa moy lamesa alang sa duha?",de:"Habt ihr einen Tisch fuer zwei?",cat:"Alltagsphrasen",pron:"NAH-a moy la-ME-sa a-LANG sa DOO-ha"},
+ {bis:"Pwede ba ko makakita sa menu?",de:"Kann ich die Speisekarte sehen?",cat:"Alltagsphrasen",pron:"PWE-de ba ko ma-ka-KEE-ta sa ME-noo"},
+ {bis:"Unsa imong irekomendar?",de:"Was empfiehlst du?",cat:"Alltagsphrasen",pron:"OON-sa ee-MONG ee-re-ko-men-DAR"},
+ {bis:"Gusto ko ug usa ka kape.",de:"Ich moechte einen Kaffee.",cat:"Alltagsphrasen",pron:"GOOS-to ko ug OO-sa ka KA-pe"},
+ {bis:"Naa moy hot chocolate?",de:"Habt ihr heisse Schokolade?",cat:"Alltagsphrasen",pron:"NAH-a moy hot CHO-ko-let"},
+ {bis:"Tubig lang, palihug.",de:"Nur Wasser, bitte.",cat:"Alltagsphrasen",pron:"TOO-big lang, pa-LEE-hoog"},
+ {bis:"Naa ba moy take-out?",de:"Bietet ihr das zum Mitnehmen an?",cat:"Alltagsphrasen",pron:"NAH-a ba moy TAKE-out"},
+ {bis:"Pwede ba nako i-order online?",de:"Kann ich online bestellen?",cat:"Alltagsphrasen",pron:"PWE-de ba NA-ko i-OR-der ON-lain"},
+ {bis:"Naa pa moy lamesa nga bakante?",de:"Habt ihr noch einen freien Tisch?",cat:"Alltagsphrasen",pron:"NAH-a pa moy la-ME-sa nga ba-KAN-te"},
+ {bis:"Gusto namo mag-split sa bayad.",de:"Wir moechten die Rechnung teilen.",cat:"Alltagsphrasen",pron:"GOOS-to NA-mo mag-split sa BA-yad"},
+ {bis:"Pwede ba ko mangayo og dugang tubig?",de:"Kann ich noch etwas Wasser bekommen?",cat:"Alltagsphrasen",pron:"PWE-de ba ko ma-NGA-yo og DOO-gang TOO-big"},
+ {bis:"Wala pa ba ang akong order?",de:"Ist meine Bestellung noch nicht da?",cat:"Alltagsphrasen",pron:"WA-la pa ba ang AH-kong OR-der"},
+ {bis:"Sayop ni akong order.",de:"Das ist die falsche Bestellung.",cat:"Alltagsphrasen",pron:"SA-yop ni AH-kong OR-der"},
+ {bis:"Pwede ba nako i-cancel akong order?",de:"Kann ich meine Bestellung stornieren?",cat:"Alltagsphrasen",pron:"PWE-de ba NA-ko i-CAN-cel AH-kong OR-der"},
+ {bis:"Naa moy vegetarian nga sud-an?",de:"Habt ihr vegetarische Beilagen?",cat:"Alltagsphrasen",pron:"NAH-a moy ve-je-TAR-yan nga SOOD-an"},
+ {bis:"Init pa ba ni?",de:"Ist das noch heiss?",cat:"Alltagsphrasen",pron:"EE-nit pa ba ni"},
+ {bis:"Dad-a diri, palihug.",de:"Bringt es bitte hierher.",cat:"Alltagsphrasen",pron:"DAD-a DEE-ri, pa-LEE-hoog"},
+ {bis:"Lami kaayo ang pagluto ninyo.",de:"Euer Essen schmeckt sehr lecker.",cat:"Alltagsphrasen",pron:"LA-mee ka-A-yo ang pag-LOO-to nin-YO"},
+ {bis:"Mobalik mi og lain adlaw.",de:"Wir kommen an einem anderen Tag wieder.",cat:"Alltagsphrasen",pron:"mo-BA-lik mi og LA-in AD-law"},
+ {bis:"Kumusta, palihug usa ka adobo ug kan-on.",de:"Hallo, bitte einmal Adobo mit Reis.",cat:"Alltagsphrasen",pron:"koo-MOOS-ta pa-LEE-hoog OO-sa ka a-DO-bo ug KAN-on"},
+ {bis:"Maayo kaayo ang among silingan.",de:"Unsere Nachbarn sind sehr nett.",cat:"Alltagsphrasen",pron:"ma-A-yo ka-A-yo ang A-mong see-LEE-ngan"},
+ {bis:"Pwede ko manghulam og asin?",de:"Kann ich mir etwas Salz ausleihen?",cat:"Alltagsphrasen",pron:"PWE-de ko mang-HOO-lam og A-sin"},
+ {bis:"Silingan lang mi.",de:"Wir sind nur Nachbarn.",cat:"Alltagsphrasen",pron:"see-LEE-ngan lang mi"},
+ {bis:"Naay bag-ong silingan sa tapad.",de:"Es gibt neue Nachbarn nebenan.",cat:"Alltagsphrasen",pron:"NAH-ay BAG-ong see-LEE-ngan sa TA-pad"},
+ {bis:"Tabangan namo mo mag-limpyo sa dalan.",de:"Wir helfen euch, die Strasse zu saeubern.",cat:"Alltagsphrasen",pron:"ta-BA-ngan NA-mo mo mag-LIM-pyo sa DA-lan"},
+ {bis:"Kusog kaayo ang tingog sa inyong TV.",de:"Euer Fernseher ist sehr laut.",cat:"Alltagsphrasen",pron:"KOO-sog ka-A-yo ang TEE-ngog sa in-YONG TV"},
+ {bis:"Pwede mahilom gamay?",de:"Koennt ihr bitte etwas leiser sein?",cat:"Alltagsphrasen",pron:"PWE-de ma-HEE-lom GA-may"},
+ {bis:"Amping mo sa balay samtang wala mi.",de:"Passt bitte auf unser Haus auf, waehrend wir weg sind.",cat:"Alltagsphrasen",pron:"AM-ping mo sa BA-lay SAM-tang WA-la mi"},
+ {bis:"Salamat sa pagtan-aw sa among balay.",de:"Danke, dass ihr auf unser Haus aufgepasst habt.",cat:"Alltagsphrasen",pron:"sa-LA-mat sa pag-tan-AW sa A-mong BA-lay"},
+ {bis:"Naa ba moy kutsara nga pwede hulamon?",de:"Habt ihr einen Loeffel, den ich mir ausleihen kann?",cat:"Alltagsphrasen",pron:"NAH-a ba moy koot-SA-ra nga PWE-de hoo-LA-mon"},
+ {bis:"Kanunay ta magkita sa tindahan.",de:"Wir sehen uns immer im Laden.",cat:"Alltagsphrasen",pron:"ka-NOO-nay ta mag-KEE-ta sa tin-DA-han"},
+ {bis:"Duol ra ang inyong balay sa amo.",de:"Euer Haus ist ganz in der Naehe von unserem.",cat:"Alltagsphrasen",pron:"DOO-ol ra ang in-YONG BA-lay sa A-mo"},
+ {bis:"Naa koy tawag sa telepono.",de:"Ich habe einen Anruf auf dem Telefon.",cat:"Alltagsphrasen",pron:"NAH-a koy TA-wag sa te-LE-po-no"},
+ {bis:"Tubaga ang telepono, palihug.",de:"Geh bitte ans Telefon.",cat:"Alltagsphrasen",pron:"too-BA-ga ang te-LE-po-no"},
+ {bis:"Kinsa ang nagtawag ganina?",de:"Wer hat vorhin angerufen?",cat:"Alltagsphrasen",pron:"KIN-sa ang nag-TA-wag ga-NEE-na"},
+ {bis:"Pwede ka motawag bisan kanus-a.",de:"Du kannst jederzeit anrufen.",cat:"Alltagsphrasen",pron:"PWE-de ka mo-TA-wag BEE-san ka-noos-A"},
+ {bis:"Busy ang linya.",de:"Die Leitung ist besetzt.",cat:"Alltagsphrasen",pron:"BOO-see ang LEEN-ya"},
+ {bis:"Wala ko kadungog nimo.",de:"Ich konnte dich nicht hoeren.",cat:"Alltagsphrasen",pron:"WA-la ko ka-doo-NGOG NEE-mo"},
+ {bis:"Nawad-an ko og signal.",de:"Ich habe das Signal verloren.",cat:"Alltagsphrasen",pron:"na-WAD-an ko og SIG-nal"},
+ {bis:"Tawagan tika unya.",de:"Ich rufe dich spaeter an.",cat:"Alltagsphrasen",pron:"ta-WA-gan TEE-ka oon-YA"},
+ {bis:"Palihug i-text lang ko kung busy ka.",de:"Schreib mir einfach eine SMS, wenn du beschaeftigt bist.",cat:"Alltagsphrasen",pron:"pa-LEE-hoog i-TEXT lang ko koong BOO-see ka"},
+ {bis:"Low bateri na akong cellphone.",de:"Mein Handy hat wenig Akku.",cat:"Alltagsphrasen",pron:"low ba-TE-ree na AH-kong CELL-phone"},
+ {bis:"Unsa may balita?",de:"Was gibt's Neues?",cat:"Alltagsphrasen",pron:"OON-sa may ba-LEE-ta"},
+ {bis:"Kumusta ang pamilya nimo?",de:"Wie geht's deiner Familie?",cat:"Alltagsphrasen",pron:"koo-MOOS-ta ang pa-MEEL-ya NEE-mo"},
+ {bis:"Unsa imong gibuhat karon?",de:"Was machst du gerade?",cat:"Alltagsphrasen",pron:"OON-sa ee-MONG gi-boo-HAT KA-ron"},
+ {bis:"Naa kay bag-ong istorya?",de:"Hast du was Neues zu erzaehlen?",cat:"Alltagsphrasen",pron:"NAH-a kay BAG-ong ees-TOR-ya"},
+ {bis:"Kumusta ang trabaho nimo?",de:"Wie laeuft's mit deiner Arbeit?",cat:"Alltagsphrasen",pron:"koo-MOOS-ta ang tra-ba-HO NEE-mo"},
+ {bis:"Init kaayo karon, no?",de:"Es ist heute sehr heiss, oder?",cat:"Alltagsphrasen",pron:"EE-nit ka-A-yo KA-ron, no"},
+ {bis:"Asa man ka nagpuyo karon?",de:"Wo wohnst du jetzt?",cat:"Alltagsphrasen",pron:"A-sa man ka nag-poo-YO KA-ron"},
+ {bis:"Unsay imong plano karong weekend?",de:"Was hast du dieses Wochenende vor?",cat:"Alltagsphrasen",pron:"OON-say ee-MONG PLA-no ka-RONG WEE-kend"},
+ {bis:"Naunsa naman ka?",de:"Was ist mit dir los?",cat:"Alltagsphrasen",pron:"na-OON-sa na-man ka"},
+ {bis:"Dugay na tang wala magkita!",de:"Wir haben uns lange nicht gesehen!",cat:"Alltagsphrasen",pron:"DOO-gay na tang WA-la mag-KEE-ta"},
+ {bis:"Nindot diay ang panahon karon.",de:"Das Wetter ist heute wirklich schoen.",cat:"Alltagsphrasen",pron:"NEEN-dot dee-AY ang pa-na-HON KA-ron"},
+ {bis:"Unsa imong hunahuna bahin ani?",de:"Was denkst du darueber?",cat:"Alltagsphrasen",pron:"OON-sa ee-MONG hoo-na-HOO-na BA-hin A-ni"},
+ {bis:"Wala lang, nangutana ra ko.",de:"Nichts weiter, ich habe nur gefragt.",cat:"Alltagsphrasen",pron:"WA-la lang, na-ngoo-TA-na ra ko"},
+ {bis:"Sige, magkita ta unya sa merkado.",de:"Okay, wir sehen uns spaeter auf dem Markt.",cat:"Alltagsphrasen",pron:"SEE-ge, mag-KEE-ta ta oon-YA sa mer-KA-do"},
+ {bis:"Maayong pagpaniudto.",de:"Guten Appetit beim Mittagessen.",cat:"Alltagsphrasen",pron:"ma-A-yong pag-pa-nee-OOD-to"},
+ {bis:"Balik-balik, ha.",de:"Komm bald wieder, ja.",cat:"Alltagsphrasen",pron:"ba-LIK ba-LIK, ha"},
+ {bis:"Gwapa ka. / Gwapo ka.",de:"Du bist huebsch. / Du bist gutaussehend.",cat:"Alltagsphrasen",pron:"GWA-pa ka / GWA-po ka"},
+ {bis:"Nindot imong sapot.",de:"Dein Outfit ist schoen.",cat:"Alltagsphrasen",pron:"NEEN-dot ee-MONG SA-pot"},
+ {bis:"Nindot imong pahiyom.",de:"Dein Laecheln ist wunderschoen.",cat:"Alltagsphrasen",pron:"NEEN-dot ee-MONG pa-HEE-yom"},
+ {bis:"Bag-o imong buhok? Ka-nindot!",de:"Neue Frisur? Wie schoen!",cat:"Alltagsphrasen",pron:"BAG-o ee-MONG BOO-hok? ka-NEEN-dot"},
+ {bis:"Maayo ka magluto.",de:"Du kochst sehr gut.",cat:"Alltagsphrasen",pron:"ma-A-yo ka mag-LOO-to"},
+ {bis:"Hawod ka sa imong trabaho.",de:"Du bist richtig gut in deiner Arbeit.",cat:"Alltagsphrasen",pron:"HA-wod ka sa ee-MONG tra-ba-HO"},
+ {bis:"Mabuot ka.",de:"Du bist gutherzig und wohlerzogen.",cat:"Alltagsphrasen",pron:"ma-BOO-ot ka"},
+ {bis:"Mabination ka.",de:"Du bist ruecksichtsvoll.",cat:"Alltagsphrasen",pron:"ma-bee-na-SYON ka"},
+ {bis:"Maayo kang tao.",de:"Du bist ein guter Mensch.",cat:"Alltagsphrasen",pron:"ma-A-yo kang TA-o"},
+ {bis:"Buotan kaayo si Inday.",de:"Inday ist so lieb und wohlerzogen.",cat:"Alltagsphrasen",pron:"boo-O-tan ka-A-yo si IN-day"},
+ {bis:"Talagsaon gyud ang inyong pamilya.",de:"Eure Familie ist wirklich besonders.",cat:"Alltagsphrasen",pron:"ta-lag-SA-on gyood ang in-YONG pa-MEEL-ya"},
+ {bis:"Lami kaayo ang sud-an.",de:"Das Essen ist sehr lecker.",cat:"Alltagsphrasen",pron:"LA-mee ka-A-yo ang SOOD-an"},
+ {bis:"Ay, salamat.",de:"Oh, danke.",cat:"Alltagsphrasen",pron:"ai sa-LA-mat",note:"Typische, bescheidene Antwort auf ein Kompliment."},
+ {bis:"Imo nang gisaaran.",de:"Du bist einfach nur nett zu mir.",cat:"Alltagsphrasen",pron:"EE-mo nang gi-sa-A-ran",note:"Klassische bescheidene Cebuano-Antwort, wenn man ein Kompliment abwehrt."},
+ {bis:"Pasayuan kaayo nimo.",de:"Du schmeichelst mir zu sehr.",cat:"Alltagsphrasen",pron:"pa-sa-YOO-an ka-A-yo NEE-mo"},
+ {bis:"Genius ka, gyud.",de:"Du bist wirklich ein Genie.",cat:"Alltagsphrasen",pron:"JEE-nyus ka, gyood"},
+ {bis:"Kuyaw imong bag-ong sakyanan.",de:"Dein neues Auto ist beeindruckend.",cat:"Alltagsphrasen",pron:"KOO-yaw ee-MONG BAG-ong sak-YA-nan"},
+ {bis:"Hayahay ka magdala sa kinabuhi.",de:"Du nimmst das Leben so gelassen.",cat:"Alltagsphrasen",pron:"HA-ya-hai ka mag-DA-la sa ki-na-BOO-hi"},
+ {bis:"Taas ug gwapa ka.",de:"Du bist gross und huebsch.",cat:"Alltagsphrasen",pron:"TAH-as ug GWA-pa ka"},
+ {bis:"Kusgan gyud ka.",de:"Du bist wirklich stark.",cat:"Alltagsphrasen",pron:"KOOS-gan gyood ka"},
+ {bis:"Bagay kaayo nimo ang asul.",de:"Blau steht dir wirklich gut.",cat:"Alltagsphrasen",pron:"BA-gay ka-A-yo NEE-mo ang a-SOOL"},
+ {bis:"Kugihan kaayo ka.",de:"Du bist sehr fleissig.",cat:"Alltagsphrasen",pron:"koo-GEE-han ka-A-yo ka"},
+ {bis:"Maayo kaayo ka mokanta.",de:"Du singst sehr gut.",cat:"Alltagsphrasen",pron:"ma-A-yo ka-A-yo ka mo-KAN-ta"},
+ {bis:"Murag modelo ka sa imong gitas-on.",de:"Mit deiner Groesse siehst du aus wie ein Model.",cat:"Alltagsphrasen",pron:"MOO-rag mo-DE-lo ka sa ee-MONG gee-TAS-on"},
+ {bis:"Pasayloa ko.",de:"Verzeih mir.",cat:"Alltagsphrasen",pron:"pa-sai-LO-a ko",note:"Standard-Entschuldigung, die in fast allen Situationen passt."},
+ {bis:"Pasensya na kaayo.",de:"Es tut mir wirklich leid.",cat:"Alltagsphrasen",pron:"pa-SEN-sya na ka-A-yo",note:"Verstaerkte Form von 'Pasensya na' - fuer etwas groessere Missgeschicke, aber noch nicht ganz formell."},
+ {bis:"Pasaylo-a ko, palihug.",de:"Bitte verzeih mir.",cat:"Alltagsphrasen",pron:"pa-sai-LO-a ko, pa-LEE-hoog",note:"Hoefliche, eher formelle Entschuldigung."},
+ {bis:"Gikasubo kaayo ko.",de:"Es tut mir zutiefst leid.",cat:"Alltagsphrasen",pron:"gi-ka-SOO-bo ka-A-yo ko",note:"Sehr ernste, formelle Entschuldigung fuer schwerwiegende Fehler."},
+ {bis:"Pasaylo-a ko sa akong sayop.",de:"Verzeih mir meinen Fehler.",cat:"Alltagsphrasen",pron:"pa-sai-LO-a ko sa AH-kong SA-yop",note:"Formell, uebernimmt explizit Verantwortung."},
+ {bis:"Wala ko tuyoa.",de:"Ich habe es nicht mit Absicht getan.",cat:"Alltagsphrasen",pron:"WA-la ko too-YO-a"},
+ {bis:"Dili na mahitabo pag-usab.",de:"Das wird nicht wieder passieren.",cat:"Alltagsphrasen",pron:"DEE-li na ma-hee-TA-bo pag-OO-sab"},
+ {bis:"Sori na gyud.",de:"Sorry, wirklich.",cat:"Alltagsphrasen",pron:"SOR-ee na gyood",note:"Sehr legere Entschuldigung unter Freunden."},
+ {bis:"Daghang salamat, sir.",de:"Vielen Dank.",cat:"Alltagsphrasen",pron:"DAG-hang sa-LA-mat, sir",note:"Formelle/respektvolle Dankesform, z. B. gegenueber Vorgesetzten oder Fremden."},
+ {bis:"Salamat sa imong pag-atiman.",de:"Danke fuer deine Fuersorge.",cat:"Alltagsphrasen",pron:"sa-LA-mat sa ee-MONG pag-a-TEE-man"},
+ {bis:"Wala ra na, salamat gihapon.",de:"Kein Problem, trotzdem danke.",cat:"Alltagsphrasen",pron:"WA-la ra na, sa-LA-mat gi-HA-pon"},
+ {bis:"Dako kaayo akong pasalamat.",de:"Ich bin dir sehr dankbar.",cat:"Alltagsphrasen",pron:"DA-ko ka-A-yo AH-kong pa-sa-LA-mat",note:"Gehobene, etwas literarische Dankesformel."},
+ {bis:"Pasaylo-a ko ninyo, Tito.",de:"Verzeiht mir bitte, Onkel.",cat:"Alltagsphrasen",pron:"pa-sai-LO-a ko nin-YO, TEE-to",note:"Die Anredeform 'ninyo' statt 'nimo' zeigt Respekt gegenueber Aelteren."},
+ {bis:"Sige lang, walay problema.",de:"Schon gut, kein Problem.",cat:"Alltagsphrasen",pron:"SEE-ge lang, WA-lay pro-BLE-ma",note:"Typische Antwort, wenn jemand sich entschuldigt."},
+ {bis:"Ganahan ka mokuyog nako?",de:"Moechtest du mich begleiten?",cat:"Alltagsphrasen",pron:"ga-NA-han ka mo-koo-YOG NA-ko"},
+ {bis:"Asa man ta moadto?",de:"Wohin gehen wir?",cat:"Alltagsphrasen",pron:"A-sa man ta mo-AD-to"},
+ {bis:"Mga unsa ta orasa magkita?",de:"Um wie viel Uhr treffen wir uns?",cat:"Alltagsphrasen",pron:"mga OON-sa ta o-RA-sa mag-KEE-ta"},
+ {bis:"Wa kay buhaton karon?",de:"Hast du gerade nichts zu tun?",cat:"Alltagsphrasen",pron:"wa kay boo-HA-ton KA-ron"},
+ {bis:"Mag-unsa man sad ta didto?",de:"Was machen wir dort dann?",cat:"Alltagsphrasen",pron:"mag-OON-sa man sad ta DEE-to"},
+ {bis:"Naa tay miting alas dos.",de:"Wir haben um zwei Uhr ein Treffen.",cat:"Alltagsphrasen",pron:"NAH-a tay MEE-ting A-las dos"},
+ {bis:"Pa-callback nato ugma.",de:"Lass uns das morgen nochmal vereinbaren.",cat:"Alltagsphrasen",pron:"pa-CALL-back NA-to oog-MA"},
+ {bis:"Sige, tagboon ta sa merkado.",de:"Gut, wir treffen uns auf dem Markt.",cat:"Alltagsphrasen",pron:"SEE-ge, tag-BO-on ta sa mer-KA-do"},
+ {bis:"Lain na lang nga adlaw, ha?",de:"Ein anderes Mal, okay?",cat:"Alltagsphrasen",pron:"LA-in na lang nga AD-law, ha",note:"Hoefliche Art, eine Verabredung abzusagen oder zu verschieben."},
+ {bis:"Magtan-aw lang ko unsa akong sched.",de:"Ich schaue erst mal, wie mein Zeitplan aussieht.",cat:"Alltagsphrasen",pron:"mag-tan-AW lang ko OON-sa AH-kong sked"},
+ {bis:"Sakto ba ang alas singko sa hapon?",de:"Passt fuenf Uhr nachmittags?",cat:"Alltagsphrasen",pron:"SAK-to ba ang A-las SING-ko sa HA-pon"},
+ {bis:"Dili ko kaapil karong adlawa, sunod na lang.",de:"Ich kann heute nicht dabei sein, ein anderes Mal.",cat:"Alltagsphrasen",pron:"DEE-li ko ka-A-pil ka-RONG ad-LA-wa"},
+ {bis:"Naa kay buhaton karong hapon?",de:"Hast du heute Nachmittag etwas vor?",cat:"Alltagsphrasen",pron:"NAH-a kay boo-HA-ton ka-RONG HA-pon"},
+ {bis:"Suroy ta unya.",de:"Lass uns spaeter etwas unternehmen.",cat:"Alltagsphrasen",pron:"SOO-roy ta oon-YA"},
+ {bis:"Ang barko ang moduol sa pantalan, dili ang pantalan moduol sa barko.",de:"Wer etwas erreichen will, muss selbst aktiv werden.",cat:"Redewendungen",pron:"ang BAR-ko ang mo-doo-OL sa pan-TA-lan, dee-LEE ang pan-TA-lan mo-doo-OL sa BAR-ko",note:"Woertlich: Das Schiff kommt zum Hafen, nicht der Hafen zum Schiff. Sinnbild dafuer, dass man selbst den ersten Schritt machen muss, und dass Vermoegende/Maechtige den Beduerftigen entgegenkommen sollten."},
+ {bis:"Ang makig-away sa iyang kaugalingon dili gyud mapildi.",de:"Wer gegen die eigenen Schwaechen kaempft, kann nie besiegt werden.",cat:"Redewendungen",pron:"ang ma-kig-a-WAY sa ee-YANG ka-oo-ga-LEE-ngon dee-LEE gyood ma-PIL-dee",note:"Woertlich: Wer Krieg gegen sich selbst fuehrt, wird nie erobert. Meint Selbstdisziplin als groessten Sieg im Leben."},
+ {bis:"Ang dunay kaalam dili gyud malumpag.",de:"Wer Weisheit besitzt, wird niemals zu Fall gebracht.",cat:"Redewendungen",pron:"ang DOO-nay ka-A-lam dee-LEE gyood ma-LOOM-pag",note:"Woertlich: Der mit Wissen wird nie umgestuerzt. Bildung/Weisheit gilt als stabilster Besitz, den einem niemand nehmen kann."},
+ {bis:"Ang kahigugmaon dili mabaligya, dili makuha sa kwarta.",de:"Liebe kann man nicht kaufen und nicht verkaufen.",cat:"Redewendungen",pron:"ang ka-hee-goog-MA-on dee-LEE ma-ba-lig-YA, dee-LEE ma-KOO-ha sa KWAR-ta",note:"Warnt woertlich davor, Geschenke oder Reichtum mit echter Liebe zu verwechseln."},
+ {bis:"Bisan unsa ka bug-at ang dala, kon magpadayon, makaabot gihapon.",de:"Egal wie schwer die Last ist - wer weitermacht, kommt trotzdem an.",cat:"Redewendungen",pron:"BEE-san OON-sa ka BOOG-at ang DA-la, kon mag-pa-da-YON, ma-ka-A-bot gee-HA-pon",note:"Nahezu woertliche Uebersetzung; Sinnbild fuer Durchhaltevermoegen bei Schwierigkeiten."},
+ {bis:"Ang gamay nga tipig, makapadako og bahandi.",de:"Kleine Ersparnisse lassen mit der Zeit grossen Reichtum wachsen.",cat:"Redewendungen",pron:"ang ga-MAY nga TEE-pig, ma-ka-pa-DA-ko og ba-HAN-dee",note:"Woertlich: Das kleine Aufbewahrte kann Vermoegen gross machen - vergleichbar mit 'Kleinvieh macht auch Mist'."},
+ {bis:"Bisan pa man og gamay ang pinutos, kon maghiusa malipay ang tanan.",de:"Auch wenn das Paeckchen klein ist - teilt man es, sind alle gluecklich.",cat:"Redewendungen",pron:"BEE-san pa man og ga-MAY ang pee-NOO-tos, kon mag-hee-OO-sa ma-LEE-pay ang TA-nan",note:"Woertlich uebersetzt ueber ein kleines eingewickeltes Geschenk/Essen; steht sinnbildlich fuer den bisaya-Wert des Teilens, selbst wenn man wenig hat."},
+ {bis:"Dili na mabalik ang baha paingon sa bukid.",de:"Geschehenes laesst sich nicht mehr rueckgaengig machen.",cat:"Redewendungen",pron:"dee-LEE na ma-BA-lik ang BA-ha pa-EE-ngon sa BOO-kid",note:"Woertlich: Die Flut kehrt nicht zum Berg zurueck. Vergleichbar mit 'verschuettete Milch' im Deutschen."},
+ {bis:"Ang pamilya mao ang pundasyon sa kinabuhi.",de:"Die Familie ist das Fundament des Lebens.",cat:"Redewendungen",pron:"ang pa-MEEL-ya ma-O ang poon-da-SYON sa ki-na-BOO-hi",note:"Wird fast woertlich verstanden; betont die zentrale Rolle der Familie als Halt im Leben in der bisaya-Kultur."},
+ {bis:"Kung ang usa magtahod, ang tanan mopanaog.",de:"Wenn einer Respekt zeigt, kommen alle entgegen.",cat:"Redewendungen",pron:"koong ang OO-sa mag-TA-hod, ang TA-nan mo-pa-na-OG",note:"Woertlich bezieht es sich auf das Herabsteigen/Entgegenkommen; sinnbildlich: Respekt erzeugt Respekt - eine Geste der Achtung bewegt die ganze Gemeinschaft."},
+ {bis:"Ang tawo nga dili mahibawo mobalik sa iyang gigikanan dili makaabot sa iyang destinasyon.",de:"Wer nicht weiss, wie er zu seinen Wurzeln zurueckfindet, erreicht sein Ziel nicht.",cat:"Redewendungen",pron:"ang TA-wo nga dee-LEE ma-hee-BA-wo mo-BA-lik sa ee-YANG gee-gi-KA-nan dee-LEE ma-ka-A-bot sa ee-YANG des-tee-na-SYON",note:"Fast woertliche Uebersetzung; meint, dass man seine Herkunft und Werte kennen muss, um im Leben wirklich anzukommen."},
+ {bis:"Dili tanang magkatawa malipayon.",de:"Nicht alle, die lachen, sind gluecklich.",cat:"Redewendungen",pron:"dee-LEE ta-NANG mag-ka-TA-wa ma-lee-PA-yon",note:"Woertlich uebersetzt; warnt davor, aeussere Froehlichkeit mit innerem Glueck zu verwechseln."},
+ {bis:"Kon gusto ikaw magdali, maghinay.",de:"Willst du schnell vorankommen, geh langsam.",cat:"Redewendungen",pron:"kon GOOS-to ee-KAW mag-DA-lee, mag-hee-NAY",note:"Klassisches 'Eile mit Weile': Hast fuehrt oft zu Fehlern, die am Ende alles verlangsamen."},
+ {bis:"Mas daghan ka nakuha, mas labaw ka mangita.",de:"Je mehr du bekommst, desto mehr willst du noch suchen.",cat:"Redewendungen",pron:"mas DAG-han ka na-KOO-ha, mas LA-baw ka ma-NGEE-ta",note:"Woertlich uebersetzt; warnt vor nie endender Gier - je mehr man hat, desto groesser wird der Wunsch nach mehr."},
+ {bis:"Asa kaman ipadpad maoy imong palad.",de:"Wohin dich der Wind auch trage, dort liegt dein Schicksal.",cat:"Redewendungen",pron:"A-sa ka-man ee-PAD-pad ma-OY ee-MONG PA-lad",note:"Bildhafter Ausdruck aus der klassischen Sprichwortsammlung: das Schicksal treibt einen wie der Wind, wohin es will."},
+ {bis:"Lods",de:"Bro, Kumpel (von 'idol' rueckwaerts gelesen)",cat:"Slang & Jugendsprache",pron:"lodz",note:"Klassiker der Cebuano-Jugendsprache, gender-neutral verwendet, z. B. 'Lods, tara kaon ta!' (Bro, lass uns essen gehen!)."},
+ {bis:"Uy!",de:"Hey! / Wow! (Aufmerksamkeits- und Waermepartikel)",cat:"Slang & Jugendsprache",pron:"ooy",note:"Sehr vielseitiges Wort - drueckt Ueberraschung, Betonung oder einfach Waerme in einem Satz aus."},
+ {bis:"Bitaw",de:"Stimmt! / Genau, oder? (Zustimmungspartikel)",cat:"Slang & Jugendsprache",pron:"bee-TAW"},
+ {bis:"Slay",de:"Umwerfend aussehen / etwas perfekt hinbekommen (aus dem Englischen)",cat:"Slang & Jugendsprache",pron:"slay",note:"Z. B. 'Slay kaayo imong outfit uy!' (Dein Outfit sitzt perfekt!)."},
+ {bis:"Push",de:"Los, mach das! / Trau dich (Ermunterung)",cat:"Slang & Jugendsprache",pron:"poosh",note:"Z. B. 'Push, bes!' - Los, versuch's!"},
+ {bis:"Tarungun",de:"Richtig machen / es ernst nehmen",cat:"Slang & Jugendsprache",pron:"ta-roo-NGOON",note:"Z. B. 'Tarungun na nimo.' - Mach es jetzt richtig."},
+ {bis:"Salbahis",de:"Schelm, kleiner Fratz (liebevoll fuer freche Kinder)",cat:"Slang & Jugendsprache",pron:"sal-BA-hees",note:"Wird liebevoll ueber verspielte, freche Kinder gesagt."},
+ {bis:"Lupig",de:"Zu viel, jenseits von gut und boese (im positiven Sinn)",cat:"Slang & Jugendsprache",pron:"LOO-peeg",note:"Z. B. 'Lupig na ka, bai!' - Du uebertreibst (im positiven Sinn)!"},
+ {bis:"Budol",de:"Sich zu einem Kauf haben verleiten lassen",cat:"Slang & Jugendsprache",pron:"BO-dol",note:"Z. B. 'Na-budol ko sa sale.' - Ich habe mich vom Angebot verfuehren lassen. Wird mit selbstironischem Humor benutzt."},
+ {bis:"Bagulbol",de:"Vor sich hin murren, meckern",cat:"Slang & Jugendsprache",pron:"ba-gool-BOL"},
+ {bis:"Usab-usab",de:"Immer wieder, staendig wiederholt",cat:"Slang & Jugendsprache",pron:"oo-SAB oo-SAB"},
+ {bis:"Ship (nako sila)",de:"Ich wuensche mir, dass die beiden zusammenkommen (Fandom-Ausdruck)",cat:"Slang & Jugendsprache",pron:"sheep NA-ko SEE-la",note:"Aus dem Englischen 'relationship' - man 'shippt' ein Paar."},
+ {bis:"Low-key",de:"Irgendwie, ein bisschen (heimlich zugegeben)",cat:"Slang & Jugendsprache",pron:"low-kee",note:"Z. B. 'Low-key gusto nako ana, bai.' - Ich mag das irgendwie schon, ehrlich gesagt."},
+ {bis:"Mood",de:"Stimmung, nachvollziehbares Gefuehl",cat:"Slang & Jugendsprache",pron:"mood",note:"Wird als Kommentar unter Posts benutzt, wenn man sich total wiedererkennt."},
+ {bis:"Ate bes",de:"Liebe Beste (Anrede unter engen Freundinnen)",cat:"Slang & Jugendsprache",pron:"ah-TEH behs"},
+ {bis:"Inday / Dodong",de:"Liebes Maedchen / Lieber Junge (liebevolle Anrede)",cat:"Slang & Jugendsprache",pron:"EEN-dai / DOH-dong",note:"Traditionelle Anredeform, wird heute auch scherzhaft in sozialen Medien verwendet."},
+ {bis:"Spill na!",de:"Erzaehl schon! / Pack aus!",cat:"Slang & Jugendsprache",pron:"speel na"},
+ {bis:"Hala, legit gyud!",de:"Wow, das ist wirklich echt wahr!",cat:"Slang & Jugendsprache",pron:"HA-la, le-JEET gyood",note:"Typisches Code-Switching zwischen Bisaya und Englisch, wie es unter jungen Cebuanos ueblich ist."},
+ {bis:"Sus, so random ba.",de:"Ach du meine Guete, das ist ja voellig aus dem Nichts.",cat:"Slang & Jugendsprache",pron:"soos, so RAY-dom ba"},
+ {bis:"Bai, honestly though...",de:"Ehrlich gesagt, Alter...",cat:"Slang & Jugendsprache",pron:"bai, ON-est-lee thoh"},
+ {bis:"Nindot gyud, period.",de:"Das ist wunderschoen, Punkt.",cat:"Slang & Jugendsprache",pron:"NEEN-dot gyood, PEE-ree-ad",note:"Das englische 'period' wird benutzt, um eine Aussage unwiderlegbar zu machen."},
+ {bis:"Lab",de:"Schatz, Liebling (kurz fuer 'love')",cat:"Slang & Jugendsprache",pron:"lahb"},
+ {bis:"Bhe / Beh",de:"Schatz, Baby (liebevolle Anrede unter Millennials/Gen Z)",cat:"Slang & Jugendsprache",pron:"beh"},
+ {bis:"Ka-text",de:"Person, mit der man ständig SMS/Chat austauscht",cat:"Slang & Jugendsprache",pron:"ka-TEXT"},
+ {bis:"Crush (nako siya)",de:"Ich habe einen Schwarm auf sie/ihn",cat:"Slang & Jugendsprache",pron:"kroosh NA-ko see-YA"},
+ {bis:"aw",de:"Ach so / Naja (sanfter Themenwechsel)",cat:"Slang & Jugendsprache",pron:"ow"},
+ {bis:"sad",de:"auch (fuegt einen weiteren Punkt locker hinzu)",cat:"Slang & Jugendsprache",pron:"sad"},
+ {bis:"way pag-asa",de:"hoffnungslos, aussichtslos",cat:"Slang & Jugendsprache",pron:"way pag-A-sa"},
+ {bis:"wala gyud",de:"ueberhaupt nichts, absolute Null",cat:"Slang & Jugendsprache",pron:"WA-la gyood"},
+ {bis:"daghan kaayo",de:"wirklich sehr viel",cat:"Slang & Jugendsprache",pron:"DAG-han ka-A-yo"},
+ {bis:"ka-init!",de:"ist das heiss!",cat:"Slang & Jugendsprache",pron:"ka-EE-nit",note:"Typische Wetterbeschwerde unter Freunden."},
+ {bis:"humot",de:"riecht gut (Parfuem oder Essen)",cat:"Slang & Jugendsprache",pron:"HOO-mot"},
+ {bis:"bigaon",de:"kokett, anhaenglich-flirtend (neckender Spitzname unter Freunden)",cat:"Slang & Jugendsprache",pron:"bee-ga-ON"},
+ {bis:"likoy",de:"frech, schelmisch (liebevolle leichte Zurechtweisung)",cat:"Slang & Jugendsprache",pron:"LEE-koy"},
+ {bis:"suroy ta",de:"lass uns rausgehen/abhaengen",cat:"Slang & Jugendsprache",pron:"SOO-roy ta"},
+ {bis:"pahuway sa",de:"mach erstmal eine Pause",cat:"Slang & Jugendsprache",pron:"pa-HOO-way sa"},
+ {bis:"lingkod sa",de:"setz dich erstmal hin",cat:"Slang & Jugendsprache",pron:"LING-kod sa"},
+ {bis:"paabot gamay",de:"warte kurz einen Moment",cat:"Slang & Jugendsprache",pron:"pa-A-bot ga-MAY"},
+ {bis:"dali ra",de:"beeil dich",cat:"Slang & Jugendsprache",pron:"DA-lee ra"},
+ {bis:"kuyog ko",de:"ich komme mit",cat:"Slang & Jugendsprache",pron:"KOO-yog ko"},
+ {bis:"long time no kita",de:"lang nicht gesehen (Taglish-Mischform)",cat:"Slang & Jugendsprache",pron:"long time no KEE-ta"},
+ {bis:"aha ka?",de:"wo warst du die ganze Zeit?",cat:"Slang & Jugendsprache",pron:"A-ha ka"},
+ {bis:"naa ka diha?",de:"bist du (online) da?",cat:"Slang & Jugendsprache",pron:"NAH-a ka DEE-ha"},
+ {bis:"tag pila ni?",de:"was kostet das hier? (leger, auf dem Markt)",cat:"Slang & Jugendsprache",pron:"tag PEE-la ni"},
+ {bis:"Grabe ka gwapa.",de:"Du bist wahnsinnig huebsch (uebertreibende Slang-Steigerung).",cat:"Slang & Jugendsprache",pron:"GRA-be ka GWA-pa"},
+ {bis:"ga-gwapa",de:"super huebsch (Verdopplung zur Verstaerkung)",cat:"Slang & Jugendsprache",pron:"ga-GWA-pa"},
+ {bis:"Maayong buntag, Sir/Ma'am.",de:"Guten Morgen, Herr/Frau [Name].",cat:"Alltagsphrasen",pron:"ma-A-yong BOON-tag, sir/ma'am",note:"Formelle Morgenbegruessung im Buero- oder Geschaeftskontext."},
+ {bis:"Kumusta ang weekend?",de:"Wie war dein Wochenende?",cat:"Alltagsphrasen",pron:"koo-MOOS-ta ang WEE-kend",note:"Typischer Montagmorgen-Small-Talk unter Kollegen."},
+ {bis:"Bag-o ko diri.",de:"Ich bin neu hier.",cat:"Alltagsphrasen",pron:"BAG-o ko DEE-ri"},
+ {bis:"Sakto ka.",de:"Du hast recht.",cat:"Alltagsphrasen",pron:"SAK-to ka",note:"Zustimmung in einer Besprechung."},
+ {bis:"Pwede ba'g lain nga angle?",de:"Koennen wir es aus einem anderen Blickwinkel betrachten?",cat:"Alltagsphrasen",pron:"PWE-de bag LA-in nga ANG-gul",note:"Hoefliche, indirekte Art, in Besprechungen zu widersprechen - direkter Widerspruch gilt als unhoeflich."},
+ {bis:"Posible siguro nga...",de:"Vielleicht ist es moeglich, dass...",cat:"Alltagsphrasen",pron:"po-SEE-ble see-GOO-ro nga",note:"Vorsichtige Formulierung, um sanft anderer Meinung zu sein."},
+ {bis:"Pwede usbon, palihog?",de:"Koennen Sie das bitte wiederholen?",cat:"Alltagsphrasen",pron:"PWE-de oos-BON, pa-LEE-hog"},
+ {bis:"Wala ko kasabot sa unang part.",de:"Ich habe den ersten Teil nicht verstanden.",cat:"Alltagsphrasen",pron:"WA-la ko ka-SA-bot sa OO-nang part"},
+ {bis:"Sa ato pa...",de:"Anders gesagt...",cat:"Alltagsphrasen",pron:"sa A-to pa",note:"Nuetzliche Floskel, um eine Aussage zur Bestaetigung umzuformulieren."},
+ {bis:"Sori, dili gyud nako kaya karon.",de:"Sorry, das schaffe ich jetzt wirklich nicht.",cat:"Alltagsphrasen",pron:"SOR-ee, dee-LEE gyood NA-ko KA-ya KA-ron",note:"Hoefliche, aber klare Absage im Arbeitskontext."},
+ {bis:"Naa ka'y example?",de:"Hast du ein Beispiel?",cat:"Alltagsphrasen",pron:"NAH-a kay ek-SAM-pul"},
+ {bis:"Mangaon na ta!",de:"Lass uns essen gehen!",cat:"Alltagsphrasen",pron:"ma-NGA-on na ta",note:"Ruf zum gemeinsamen Mittagessen, meist zwischen 11:45 und 12:15 Uhr."},
+ {bis:"Unsa imong paboritong pagkaon?",de:"Was ist dein Lieblingsessen?",cat:"Alltagsphrasen",pron:"OON-sa ee-MONG pa-bo-REE-tong pag-KA-on"},
+ {bis:"Buotan ug maayo ka.",de:"Du bist guetig und gut.",cat:"Alltagsphrasen",pron:"boo-O-tan ug ma-A-yo ka"},
+ {bis:"Kusay ka mosayaw.",de:"Du tanzt sehr geschickt.",cat:"Alltagsphrasen",pron:"KOO-say ka mo-SA-yaw"},
+ {bis:"Kugihan ug kusgan ka.",de:"Du bist fleissig und stark.",cat:"Alltagsphrasen",pron:"koo-GEE-han ug KOOS-gan ka"},
+ {bis:"Naa koy dala nga cedula.",de:"Ich habe meine Gemeindesteuerbescheinigung (Cedula) dabei.",cat:"Alltagsphrasen",pron:"NAH-a koy DA-la nga se-DOO-la",note:"Die Cedula ist ein in den Philippinen häufig verlangtes Dokument bei Behördengängen."},
+ {bis:"Mga unsa ta orasa manglakaw?",de:"Um wie viel Uhr gehen wir los?",cat:"Alltagsphrasen",pron:"mga OON-sa ta o-RA-sa mang-LA-kaw"},
+ {bis:"Grabe ka ka-amaw. Pero gihigugma gihapon ta ka.",de:"Du bist unglaublich tollpatschig. Aber ich liebe dich trotzdem.",cat:"Slang & Jugendsprache",pron:"GRA-be ka ka-A-maw. PEH-ro gi-hi-GOOG-ma gi-HA-pon ta ka",note:"Liebevolle Neckerei zwischen Geschwistern oder besten Freunden - die zweite Haelfte des Satzes 'rettet' die Beleidigung."},
+ {bis:"Kamao ka ra mokaon, wala ka dayon.",de:"Du kannst nur gut essen, sonst nichts.",cat:"Slang & Jugendsprache",pron:"ka-MA-o ka ra mo-KA-on, WA-la ka da-YON",note:"Scherzhafter Vorwurf an jemanden, der bei einer Aufgabe nichts beitraegt, aber sofort auftaucht, wenn Essen bereitsteht."},
+ {bis:"Hinog ka na kaayo.",de:"Du bist jetzt richtig 'reif' geworden (Sticheln wegen des Alters).",cat:"Slang & Jugendsprache",pron:"HEE-nog ka na ka-A-yo",note:"'Hinog' bedeutet eigentlich 'reif' (bei Fruechten); wird liebevoll-neckend benutzt, um jemanden mit seinem Alter aufzuziehen, typischerweise von Tanten bei Familienfeiern."},
+ {bis:"Bogo ka gamay, pero gwapo/gwapa gihapon.",de:"Du bist ein bisschen schusselig, aber trotzdem huebsch/gutaussehend.",cat:"Slang & Jugendsprache",pron:"BO-go ka ga-MAY, PEH-ro GWA-po/GWA-pa gi-HA-pon",note:"Typisches Muster liebevoller Beleidigungen unter engen Freunden: erst necken, dann mit einem Kompliment abfedern."},
+ {bis:"Bes, nurse ka na sa akong kalipay.",de:"Bes, du bist schon der Aufpasser meines Glücks.",cat:"Slang & Jugendsprache",pron:"behs, nurse ka na sa AH-kong ka-LEE-pay",note:"Scherzhafter, uebertriebener Kose-Ausdruck unter engen Freunden (Bes = Bestie), typisch fuer Cebuano-Chatsprache."},
+ {bis:"Hunung!",de:"Stopp!",cat:"Alltagsphrasen",pron:"HOO-noong",note:"Wichtiges Signalwort in Notfallsituationen."},
+ {bis:"Sunog!",de:"Feuer!",cat:"Alltagsphrasen",pron:"SOO-nog"},
+ {bis:"Tawaga ang pulis!",de:"Ruft die Polizei!",cat:"Alltagsphrasen",pron:"ta-WA-ga ang POO-lees"},
+ {bis:"Biya-i ra gud ko!",de:"Lass mich in Ruhe!",cat:"Alltagsphrasen",pron:"bee-YA-ee ra good ko",note:"Direkte, bestimmte Art, sich abzugrenzen - je nach Tonfall auch scherzhaft moeglich."},
+ {bis:"Ayo-ayo ha.",de:"Gute Besserung.",cat:"Alltagsphrasen",pron:"A-yo A-yo ha",note:"Wird Kranken oder Verletzten mitgegeben, oft mit einem sanften Tonfall."},
+ {bis:"Pahalipay!",de:"Herzlichen Glueckwunsch!",cat:"Alltagsphrasen",pron:"pa-ha-LEE-pay"},
+ {bis:"Ang telepono nagkinahanglan ug charger.",de:"Das Telefon braucht ein Ladegeraet.",cat:"Alltagsphrasen",pron:"ang te-LE-po-no nag-ki-na-HANG-lan ug CHAR-jer"},
 ];
 
 const STORIES_DATA = [
@@ -2288,6 +3040,14 @@ const LESSONS = [
  },
 ];
 
+// Bisaya-Untertitel der Lektionsthemen für den German-Lernmodus (l.title ist bereits Bisaya).
+const LESSON_SUBTITLE_BIS = {
+  1:"Pag-abiabi & Pagpaila sa Kaugalingon", 2:"Pamilya", 3:"Mga Numero & Oras",
+  4:"Mga Adlaw sa Semana & Rutina", 5:"Sa Merkado", 6:"Pagkaon & Pag-inom",
+  7:"Direksyon", 8:"Panahon", 9:"Sa Balay", 10:"Mga Pagbati",
+  11:"Kalingawan & Mga Higala", 12:"Pagbiyahe & Pagpanamilit",
+};
+
 const GAP_EXERCISES = [
  {sentence:"___ imong ngalan?", answer:"Unsa", hint:"Frage nach dem Namen (Lektion 1)", translation:"Wie heißt du?"},
  {sentence:"Maayong buntag! Kumusta ___?", answer:"ka", hint:"„du\" im Satz (Lektion 1)", translation:"Guten Morgen! Wie geht's dir?"},
@@ -2361,6 +3121,36 @@ function speakBtn(bisText, pron){
   return `<button class="speak-btn" title="Anhören (Browser-Sprachausgabe)" onclick="event.stopPropagation(); speak('${safeBis}','${safePron}', this)">🔊</button>`;
 }
 
+/* ============ DEUTSCH-AUDIO (für German-Lernmodus) ============ */
+// Deutsch wird von so gut wie jedem Browser mit einer echten Stimme unterstützt —
+// deshalb braucht es hier (anders als bei Bisaya) keinen Lautschrift-Fallback.
+function speakDe(text, btnEl){
+  if(!window.speechSynthesis){
+    alert("Wala pa'y suporta sa sini nga browser para sa audio.");
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const voice = pickVoice(["de"]);
+  const utt = new SpeechSynthesisUtterance(text);
+  if(voice) utt.voice = voice;
+  utt.rate = 0.88;
+  utt.pitch = 1.0;
+  if(btnEl){
+    utt.onstart = ()=>btnEl.classList.add("playing");
+    utt.onend = ()=>btnEl.classList.remove("playing");
+    utt.onerror = ()=>btnEl.classList.remove("playing");
+  }
+  window.speechSynthesis.speak(utt);
+}
+function speakDeBtn(text){
+  const safe = text.replace(/'/g,"\\'");
+  return `<button class="speak-btn" title="Paminawa (German nga tingog sa browser)" onclick="event.stopPropagation(); speakDe('${safe}', this)">🔊</button>`;
+}
+function micBtnDe(text){
+  const safe = text.replace(/'/g,"\\'");
+  return `<button class="mic-btn" title="Sulayi ang imong German nga paglitok" onclick="event.stopPropagation(); checkPronunciation('${safe}', this, 'de-DE')">🎤</button><span class="mic-result"></span>`;
+}
+
 /* ============ AUSSPRACHE-ÜBUNG MIT MIKROFON ============ */
 // Nutzt die Web Speech API (SpeechRecognition) — läuft komplett im Browser,
 // es werden keine Aufnahmen auf einem eigenen Server gespeichert.
@@ -2400,7 +3190,7 @@ function isSafariBrowser(){
   const ua = navigator.userAgent;
   return /^((?!chrome|crios|android).)*safari/i.test(ua);
 }
-function checkPronunciation(targetText, btnEl){
+function checkPronunciation(targetText, btnEl, lang){
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   const resultEl = btnEl.nextElementSibling;
   if(!SpeechRec){
@@ -2415,7 +3205,8 @@ function checkPronunciation(targetText, btnEl){
   activeRecognition = recog;
   // Cebuano wird von keiner Browser-Spracherkennung direkt unterstützt — "fil-PH" (Filipino)
   // liegt lautlich am nächsten und liefert die brauchbarsten Ergebnisse als Näherung.
-  recog.lang = "fil-PH";
+  // Für Deutsch (German-Lernmodus) wird "de-DE" übergeben — das ist echt und zuverlässig unterstützt.
+  recog.lang = lang || "fil-PH";
   recog.maxAlternatives = 3;
   recog.interimResults = false;
   btnEl.disabled = true;
@@ -2952,6 +3743,29 @@ function loadState(){
 let state = loadState();
 function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 
+/* ============ APP-MODUS (Bisaya lernen / German lernen) ============ */
+// "learn-bis": Standard-Modus dieser App, deutsche Oberfläche, lehrt Bisaya (Bisaya-Wort zuerst).
+// "learn-de": Bisaya-Oberfläche, lehrt German (German-Wort zuerst) — für Bisaya-Muttersprachler.
+function currentMode(){ return state.mode || "learn-bis"; }
+function setMode(mode){
+  state.mode = mode;
+  saveState();
+  document.body.classList.toggle("mode-de", mode==="learn-de");
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active", b.dataset.mode===mode));
+  const activeBtn = document.querySelector("nav.tabs button.active");
+  const activeView = activeBtn ? activeBtn.dataset.view : null;
+  if(activeView === "wortschatz") refreshDeck();
+  if(activeView === "wendungen") renderWendungen();
+  if(activeView === "geschichten") renderStoryList();
+  if(activeView === "lektionen") renderLessonList();
+  if(activeView === "fortschritt") renderProgress();
+}
+function initModeToggle(){
+  const mode = currentMode();
+  document.body.classList.toggle("mode-de", mode==="learn-de");
+  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active", b.dataset.mode===mode));
+}
+
 function allVocab(){
   let all = CORE_VOCAB.slice();
   Object.keys(LESSON_VOCAB).forEach(k=>{
@@ -2992,7 +3806,12 @@ function renderWendungen(){
   const el = document.getElementById("wendungenList");
   el.innerHTML = ""; el.dataset.rendered = "";
   const vipOk = isVipActive();
-  const groups = [
+  const mode = currentMode();
+  const groups = mode==="learn-de" ? [
+    ["Alltagsphrasen", "Praktikal nga mga tudling-pulong sa German para sa pag-abiabi, pagbiyahe, pag-order og pagkaon, ug uban pa."],
+    ["Redewendungen", "Mga German idioms uban sa ilang literal nga kahulogan, aron makita nimo kung giunsa 'maghunahuna' ang German."],
+    ["Slang & Jugendsprache", "Mao kini ang gigamit sa mga batan-on sa Germany karon — dili pormal apan kaylap gigamit."],
+  ] : [
     ["Alltagsphrasen", "Praktische Sätze für Begrüßung, Unterwegssein, Essen bestellen, Preise verhandeln u.v.m."],
     ["Redewendungen", "Bildhafte Ausdrücke — mit ihrer wörtlichen Bedeutung, damit du siehst, wie Bisaya wirklich \"denkt\"."],
     ["Slang & Jugendsprache", "So spricht man heute unter Freunden in Cebu — informell, aber weit verbreitet."],
@@ -3005,7 +3824,14 @@ function renderWendungen(){
     items.forEach(p=>{
       if(p.vip && !vipOk){
         html += `<div class="line-block">
-          <div class="natural"><b>${p.bis}</b> — <span class="vip-pill">⭐ VIP</span></div>
+          <div class="natural"><b>${mode==="learn-de" ? p.de : p.bis}</b> — <span class="vip-pill">⭐ VIP</span></div>
+        </div>`;
+        return;
+      }
+      if(mode==="learn-de"){
+        html += `<div class="line-block">
+          <div class="natural"><b>${p.de}</b> — ${p.bis}</div>
+          <div class="pron">${speakDeBtn(p.de)} ${micBtnDe(p.de)}</div>
         </div>`;
         return;
       }
@@ -3020,40 +3846,62 @@ function renderWendungen(){
   el.innerHTML = html;
 }
 document.getElementById("tabs").addEventListener("click", e=>{
-  if(e.target.tagName==="BUTTON") goView(e.target.dataset.view);
+  const btn = e.target.closest("button");
+  if(btn) goView(btn.dataset.view);
 });
 
 /* ============ GESCHICHTEN ============ */
 function renderStoryList(){
   const el = document.getElementById("geschichtenList");
-  el.innerHTML = `<div class="card">
-      <h2>📖 Geschichten — die Lernidee live erleben</h2>
-      <p>Hier siehst du das Prinzip in Aktion (inspiriert von Birkenbihl): Zeile für Zeile erst der deutsche Satz, direkt darunter der passende Bisaya-Satz. Lies zuerst nur die deutschen Zeilen durch, dann die Bisaya-Zeilen laut mit — so verknüpft dein Gehirn Klang und Bedeutung, ohne Grammatikregeln zu pauken.</p>
-    </div>
-    <div class="lesson-grid">` +
+  const mode = currentMode();
+  const heading = mode==="learn-de"
+    ? `<div class="card">
+        <h2>📖 Mga Sugilanon — tan-awa ang pamaagi sa buhat</h2>
+        <p>Linya-per-linya: una ang German, dayon ang Bisaya nga hubad. Basaha una ang German, dayon i-tuo ang Bisaya — aron ma-ugnay sa imong utok ang tingog ug kahulogan nga walay pagmemorya sa gramatika.</p>
+      </div>`
+    : `<div class="card">
+        <h2>📖 Geschichten — die Lernidee live erleben</h2>
+        <p>Hier siehst du das Prinzip in Aktion (inspiriert von Birkenbihl): Zeile für Zeile erst der deutsche Satz, direkt darunter der passende Bisaya-Satz. Lies zuerst nur die deutschen Zeilen durch, dann die Bisaya-Zeilen laut mit — so verknüpft dein Gehirn Klang und Bedeutung, ohne Grammatikregeln zu pauken.</p>
+      </div>`;
+  const tileLabel = mode==="learn-de" ? "Sugilanon" : "Geschichte";
+  const subLabel = mode==="learn-de" ? "ka pares nga linya" : "Zeilenpaare";
+  el.innerHTML = heading +
+    `<div class="lesson-grid">` +
     STORIES_DATA.map((s,i)=>`
       <div class="lesson-tile" onclick="openStory(${i})">
-        <div class="num">Geschichte ${i+1}</div>
+        <div class="num">${tileLabel} ${i+1}</div>
         <h4>${s.title}</h4>
-        <div class="sub">${s.lines.length} Zeilenpaare</div>
+        <div class="sub">${s.lines.length} ${subLabel}</div>
       </div>`).join("") +
     `</div>`;
 }
 function openStory(i){
   const s = STORIES_DATA[i];
   const el = document.getElementById("geschichtenList");
+  const mode = currentMode();
+  const backLabel = mode==="learn-de" ? "← tanang Sugilanon" : "← alle Geschichten";
+  const introText = mode==="learn-de"
+    ? "German una, dayon Bisaya — sundon nato ang pamaagi sa pag-decode. Gamita ang 🔊 aron paminawon ang German, ug 🎤 aron sulayan ang imong German nga paglitok."
+    : "Deutsch zuerst, dann Bisaya — genau wie beim Dekodieren nach dieser Lernidee. Nutze 🔊 zum Anhören.";
   let html = `<div class="card">
-    <span class="backlink" onclick="renderStoryList()">← alle Geschichten</span>
+    <span class="backlink" onclick="renderStoryList()">${backLabel}</span>
     <h2>${s.title}</h2>
-    <p class="small">Deutsch zuerst, dann Bisaya — genau wie beim Dekodieren nach dieser Lernidee. Nutze 🔊 zum Anhören.</p>`;
+    <p class="small">${introText}</p>`;
   s.lines.forEach((line, idx)=>{
-    html += `<div class="story-line">
-      <div class="de-line"><span class="num">${idx+1}.</span>${line.de}</div>
-      <div class="bis-line">${speakBtn(line.bis, line.pron)} ${line.bis}
-        <span class="bis-pron">${line.pron || ''}</span>
-        ${micBtn(line.bis)}
-      </div>
-    </div>`;
+    if(mode==="learn-de"){
+      html += `<div class="story-line">
+        <div class="de-line"><span class="num">${idx+1}.</span>${line.de} ${speakDeBtn(line.de)} ${micBtnDe(line.de)}</div>
+        <div class="bis-line">${line.bis}</div>
+      </div>`;
+    } else {
+      html += `<div class="story-line">
+        <div class="de-line"><span class="num">${idx+1}.</span>${line.de}</div>
+        <div class="bis-line">${speakBtn(line.bis, line.pron)} ${line.bis}
+          <span class="bis-pron">${line.pron || ''}</span>
+          ${micBtn(line.bis)}
+        </div>
+      </div>`;
+    }
   });
   html += `</div>`;
   el.innerHTML = html;
@@ -3063,13 +3911,19 @@ function openStory(i){
 /* ============ LEKTIONEN ============ */
 function renderLessonList(){
   const el = document.getElementById("lektionenList");
-  el.innerHTML = "<div class='card'><h2>Lektionen</h2><p>Klicke eine Lektion an — jede enthält einen kurzen Dialog mit vollständiger Wort-für-Wort-Dekodierung, Lautschrift und natürlicher Übersetzung.</p></div>" +
+  const mode = currentMode();
+  const introHtml = mode==="learn-de"
+    ? "<div class='card'><h2>Mga Leksyon</h2><p>Pagpili og leksyon — matag usa adunay mubo nga diyalogo, German una dayon ang Bisaya nga hubad, aron makita nimo ang pamaagi sa pagbasa dungan.</p></div>"
+    : "<div class='card'><h2>Lektionen</h2><p>Klicke eine Lektion an — jede enthält einen kurzen Dialog mit vollständiger Wort-für-Wort-Dekodierung, Lautschrift und natürlicher Übersetzung.</p></div>";
+  const label = mode==="learn-de" ? "Leksyon" : "Lektion";
+  el.innerHTML = introHtml +
    "<div class='lesson-grid'>" + LESSONS.map(l=>{
      const done = state.lessonsDone[l.id];
+     const subtitle = mode==="learn-de" ? (LESSON_SUBTITLE_BIS[l.id] || l.subtitle) : l.subtitle;
      return `<div class="lesson-tile" onclick="openLesson(${l.id})">
-       <div class="num">Lektion ${l.id}</div>
+       <div class="num">${label} ${l.id}</div>
        <h4>${l.title}</h4>
-       <div class="sub">${l.subtitle}</div>
+       <div class="sub">${subtitle}</div>
        ${done ? '<div class="done">✓</div>' : ''}
      </div>`;
    }).join("") + "</div>";
@@ -3077,6 +3931,27 @@ function renderLessonList(){
 function openLesson(id){
   const l = LESSONS.find(x=>x.id===id);
   const el = document.getElementById("lektionenList");
+  const mode = currentMode();
+  if(mode==="learn-de"){
+    const subtitle = LESSON_SUBTITLE_BIS[l.id] || l.subtitle;
+    let html = `<div class="card">
+      <span class="backlink" onclick="renderLessonList()">← tanang Leksyon</span>
+      <h2>Leksyon ${l.id}: ${l.title}</h2>
+      <p class="small">${subtitle}</p>`;
+    l.lines.forEach(line=>{
+      html += `<div class="story-line">
+        <div class="de-line">${line.natural} ${speakDeBtn(line.natural)} ${micBtnDe(line.natural)}</div>
+        <div class="bis-line">${line.bis}</div>
+      </div>`;
+    });
+    html += `<div class="btnrow">
+        <button class="action ${state.lessonsDone[l.id]?'good':'primary'}" onclick="toggleLessonDone(${l.id})">${state.lessonsDone[l.id]?'✓ nahuman na':'Markahi nga nahuman'}</button>
+      </div>
+    </div>`;
+    el.innerHTML = html;
+    window.scrollTo(0,0);
+    return;
+  }
   let html = `<div class="card">
     <span class="backlink" onclick="renderLessonList()">← alle Lektionen</span>
     <h2>Lektion ${l.id}: ${l.title}</h2>
@@ -3129,23 +4004,40 @@ function refreshDeck(){
 function showCard(){
   const card = document.getElementById("flashCard");
   card.classList.remove("flipped");
+  const mode = currentMode();
   if(deck.length===0){
-    document.getElementById("flashFront").textContent = "🎉 Keine Karten in diesem Filter";
+    document.getElementById("flashFront").textContent = mode==="learn-de" ? "🎉 Walay kard niini nga filter" : "🎉 Keine Karten in diesem Filter";
     document.getElementById("flashPron").innerHTML = "";
     document.getElementById("flashBack").innerHTML = "";
     return;
   }
   const v = deck[deckIdx % deck.length];
   const locked = v.vip && !isVipActive();
-  document.getElementById("flashFront").textContent = v.bis + (v.vip ? "" : "");
-  document.getElementById("flashPron").innerHTML = locked
-    ? `<span class="vip-pill">⭐ VIP</span>`
-    : speakBtn(v.bis, v.pron) + (v.pron ? " "+v.pron : " Aussprache anhören") + " " + micBtn(v.bis);
-  document.getElementById("flashBack").innerHTML = locked
-    ? `<div class="vip-lockbox">🔒 Nur für <b>VIP</b><br><span class="small">Schalte über 900 weitere Wörter &amp; Wendungen frei.</span><br>
+  if(mode==="learn-de"){
+    // German-Lernmodus: German-Wort/-Satz zuerst mit deutscher Audio/Mikro, Bisaya-Übersetzung auf der Rückseite.
+    document.getElementById("flashFront").textContent = v.de;
+    if(locked){
+      document.getElementById("flashPron").innerHTML = `<span class="vip-pill">⭐ VIP</span>`;
+      document.getElementById("flashBack").innerHTML = `<div class="vip-lockbox">🔒 Para ra sa <b>VIP</b><br><span class="small">I-unlock ang kapin sa 900 pa ka pulong &amp; prase.</span><br>
+          <button class="action primary" style="margin-top:8px;" onclick="goView('vip')">Mahimong VIP gikan sa 5€/bulan</button>
+         </div>`;
+      return;
+    }
+    document.getElementById("flashPron").innerHTML = speakDeBtn(v.de) + " " + micBtnDe(v.de);
+    document.getElementById("flashBack").innerHTML = `<div style="font-size:1.2rem; font-weight:700; color:var(--accent2)">${v.bis}</div><div class="small">${v.cat}</div>`;
+    return;
+  }
+  // Bisaya-Lernmodus: Bisaya-Wort zuerst (mit Aussprache/Mikrofon direkt sichtbar), Deutsch auf der Rückseite.
+  document.getElementById("flashFront").textContent = v.bis;
+  if(locked){
+    document.getElementById("flashPron").innerHTML = `<span class="vip-pill">⭐ VIP</span>`;
+    document.getElementById("flashBack").innerHTML = `<div class="vip-lockbox">🔒 Nur für <b>VIP</b><br><span class="small">Schalte über 900 weitere Wörter &amp; Wendungen frei.</span><br>
         <button class="action primary" style="margin-top:8px;" onclick="goView('vip')">VIP werden ab 5€/Monat</button>
-       </div>`
-    : `<div style="font-size:1.2rem; font-weight:700; color:var(--accent2)">${v.de}</div><div class="small">${v.cat}</div>`;
+       </div>`;
+    return;
+  }
+  document.getElementById("flashPron").innerHTML = speakBtn(v.bis, v.pron) + (v.pron ? " "+v.pron : " Aussprache anhören") + " " + micBtn(v.bis);
+  document.getElementById("flashBack").innerHTML = `<div style="font-size:1.2rem; font-weight:700; color:var(--accent2)">${v.de}</div><div class="small">${v.cat}</div>`;
 }
 function flipCard(){ document.getElementById("flashCard").classList.toggle("flipped"); }
 function markCard(status){
@@ -3231,7 +4123,8 @@ function renderProgress(){
 }
 function resetProgress(){
   if(confirm("Wirklich den gesamten Fortschritt zurücksetzen?")){
-    state = {words:{}, lessonsDone:{}};
+    // Modus-Einstellung bleibt erhalten — nur Wortschatz-/Lektionsfortschritt wird geleert.
+    state = {words:{}, lessonsDone:{}, mode: state.mode};
     saveState();
     renderProgress();
   }
@@ -3250,6 +4143,7 @@ document.getElementById("confirmInput").addEventListener("keydown", e=>{ if(e.ke
 renderVipStatus();
 handleVipRedirect();
 firebaseHandleRedirectResult();
+initModeToggle();
 </script>
 </body>
 </html>

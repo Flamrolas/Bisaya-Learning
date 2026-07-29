@@ -421,17 +421,18 @@ body.mode-de .mode-bis-only{display:none;}
 </header>
 
 <nav class="tabs" id="tabs">
-  <button data-view="start" class="active"><span class="mode-bis-only">Start</span><span class="mode-de-only">Sugod</span></button>
-  <button data-view="methode"><span class="mode-bis-only">Methode</span><span class="mode-de-only">Pamaagi</span></button>
-  <button data-view="lektionen"><span class="mode-bis-only">Lektionen</span><span class="mode-de-only">Mga Leksyon</span></button>
-  <button data-view="wortschatz"><span class="mode-bis-only">Wortschatz</span><span class="mode-de-only">Bokabularyo</span></button>
-  <button data-view="wendungen"><span class="mode-bis-only">Wendungen</span><span class="mode-de-only">Pulong-pulong</span></button>
-  <button data-view="geschichten"><span class="mode-bis-only">📖 Geschichten</span><span class="mode-de-only">📖 Sugilanon</span></button>
-  <button data-view="anwenden"><span class="mode-bis-only">Anwenden</span><span class="mode-de-only">Gamiton</span></button>
-  <button data-view="grammatik"><span class="mode-bis-only">Grammatik-Spickzettel</span><span class="mode-de-only">Giya sa Gramatika</span></button>
-  <button data-view="fortschritt"><span class="mode-bis-only">Fortschritt</span><span class="mode-de-only">Kalamboan</span></button>
+  <button data-view="start" class="active">Sugod</button>
+  <button data-view="methode">Pamaagi</button>
+  <button data-view="lektionen">Mga Leksyon</button>
+  <button data-view="wortschatz">Bokabularyo</button>
+  <button data-view="wendungen">Pulong-pulong</button>
+  <button data-view="geschichten">📖 Sugilanon</button>
+  <button data-view="anwenden">Gamiton</button>
+  <button data-view="grammatik">Giya sa Gramatika</button>
+  <button data-view="fortschritt">Kalamboan</button>
   <button data-view="vip">⭐ VIP</button>
-  <button data-view="support"><span class="mode-bis-only">Support</span><span class="mode-de-only">Tabang</span></button>
+  <button data-view="support">Tabang</button>
+  <button data-view="danke">💛 Special Thanks</button>
 </nav>
 
 <main>
@@ -469,7 +470,7 @@ body.mode-de .mode-bis-only{display:none;}
     <h3>Unsa imong makat-onan niini nga modyul</h3>
     <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
   </div>
-  <div class="version-tag">v1.8.2</div>
+  <div class="version-tag">v1.9.1</div>
 </section>
 
 <!-- METHODE -->
@@ -551,6 +552,7 @@ body.mode-de .mode-bis-only{display:none;}
       <div class="hint">antippen zum Umdrehen</div>
     </div>
     <div class="btnrow">
+      <button class="action neutral" onclick="prevCard()">⬅ zurück</button>
       <button class="action neutral" onclick="markCard('learning')">🔁 noch üben</button>
       <button class="action good" onclick="markCard('known')">✅ kann ich</button>
       <button class="action primary" onclick="nextCard()">weiter ➜</button>
@@ -736,6 +738,19 @@ body.mode-de .mode-bis-only{display:none;}
       </div>
     </div>
     <p class="small" id="suppNote">Wird per Formular-Weiterleitung als E-Mail zugestellt — keine Kommentare werden öffentlich auf der Seite angezeigt.</p>
+  </div>
+</section>
+
+<!-- SPECIAL THANKS -->
+<section class="view" id="view-danke">
+  <div class="vip-box" style="text-align:center;">
+    <span class="vip-pill">💛 Special Thanks</span>
+    <h2 style="margin-top:10px;">Vielen Dank an unseren Beta-Tester Albert Bulala!</h2>
+    <p>Ohne engagierte Muttersprachler wie Albert wäre diese App nicht das, was sie heute ist. Als Cebuano-Muttersprachler hat er unzählige Stunden investiert, um Wörter, Redewendungen und Aussprache gegenzuprüfen, Lücken im Wortschatz aufzuspüren und ehrliches, direktes Feedback zu geben — genau das, was eine App wie diese braucht, um wirklich authentisch statt nur "gut gemeint" zu sein. Sein Einsatz hat den Wortschatz von rund 1.270 auf fast 2.000 geprüfte Einträge wachsen lassen. Maayong pagpasalamat, Albert — daghang salamat!</p>
+  </div>
+  <div class="vip-box" style="text-align:center;">
+    <h2>Daghang Salamat sa Among Beta-Tester nga si Albert Bulala!</h2>
+    <p>Kung wala ang mga desidido nga native speaker sama kang Albert, dili unta mahimo kining app nga sama sa iya karon. Isip lumad nga mamumulong sa Cebuano, naggahin siya og dili maihap nga oras aron susihon ang mga pulong, mga pulong-pulong, ug paglitok, mag-ila sa mga kulang sa bokabularyo, ug maghatag og tinud-anay, prangka nga feedback — mao gyud kini ang gikinahanglan sa usa ka app sama niini aron mahimong tinuod ug epektibo, dili lang "maayo unta." Ang iyang paningkamot direktang misangpot sa pagtubo sa bokabularyo gikan sa mga 1.270 ngadto sa hapit 2.000 ka na-verify nga entry. Daghang salamat, Albert!</p>
   </div>
 </section>
 
@@ -2975,7 +2990,7 @@ const LESSONS = [
    id:7, title:"Direksyon", subtitle:"Wegbeschreibung",
    note:"„Tuo\" (rechts) und „wala\" (links) klingen unauffällig — aber „wala\" heißt in anderem Kontext auch „nichts/kein\". Nur der Satzzusammenhang verrät die Bedeutung.",
    lines:[
-    {bis:"Pasayloa ko, asa ang estasyon?", decode:[["Pasayloa","entschuldige"],["ko","mich"],["asa","wo"],["ang","[Subjektmarker]"],["estasyon","Bahnhof"]], natural:"Entschuldigung, wo ist der Bahnhof?", pron:"pah-sigh-LOH-ah koh, AH-sah ang es-tah-SYON"},
+    {bis:"Pasayloa ko, asa ang estasyon sa tren?", decode:[["Pasayloa","entschuldige"],["ko","mich"],["asa","wo"],["ang","[Subjektmarker]"],["estasyon","Station"],["sa","von"],["tren","Zug"]], natural:"Entschuldigung, wo ist der Bahnhof?", pron:"pah-sigh-LOH-ah koh, AH-sah ang es-tah-SYON sah tren"},
     {bis:"Diretso lang, unya liko sa tuo.", decode:[["Diretso","geradeaus"],["lang","einfach"],["unya","dann"],["liko","abbiegen"],["sa","nach"],["tuo","rechts"]], natural:"Geh einfach geradeaus, dann biege rechts ab.", pron:"dee-RET-soh lang, oon-YAH LEE-koh sah TOO-oh"},
     {bis:"Layo ba gikan diri?", decode:[["Layo","weit"],["ba","[Fragepartikel]"],["gikan","von"],["diri","hier"]], natural:"Ist es weit von hier?", pron:"LAH-yoh bah GEE-kahn DEE-ree"},
     {bis:"Dili layo, duol ra.", decode:[["Dili","nicht"],["layo","weit"],["duol","nah"],["ra","nur"]], natural:"Nicht weit, ziemlich nah.", pron:"DEE-lee LAH-yoh, DOO-ol rah"},
@@ -4048,6 +4063,12 @@ function markCard(status){
   nextCard();
 }
 function nextCard(){ deckIdx++; showCard(); }
+function prevCard(){
+  if(deck.length===0) return;
+  // +deck.length verhindert ein negatives Ergebnis bei der Modulo-Berechnung in showCard()
+  deckIdx = (deckIdx - 1 + deck.length) % deck.length;
+  showCard();
+}
 
 /* ============ ANWENDEN ============ */
 const CHUNK_PRONOUNS = [["ako","ich"],["ikaw","du"],["siya","er/sie"],["kami","wir (ohne dich)"],["kita","wir (mit dir)"],["sila","sie"]];

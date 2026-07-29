@@ -421,18 +421,18 @@ body.mode-de .mode-bis-only{display:none;}
 </header>
 
 <nav class="tabs" id="tabs">
-  <button data-view="start" class="active">Sugod</button>
-  <button data-view="methode">Pamaagi</button>
-  <button data-view="lektionen">Mga Leksyon</button>
-  <button data-view="wortschatz">Bokabularyo</button>
-  <button data-view="wendungen">Pulong-pulong</button>
-  <button data-view="geschichten">📖 Sugilanon</button>
-  <button data-view="anwenden">Gamiton</button>
-  <button data-view="grammatik">Giya sa Gramatika</button>
-  <button data-view="fortschritt">Kalamboan</button>
+  <button data-view="start" class="active"><span class="mode-bis-only">Start</span><span class="mode-de-only">Sugod</span></button>
+  <button data-view="methode"><span class="mode-bis-only">Methode</span><span class="mode-de-only">Pamaagi</span></button>
+  <button data-view="lektionen"><span class="mode-bis-only">Lektionen</span><span class="mode-de-only">Mga Leksyon</span></button>
+  <button data-view="wortschatz"><span class="mode-bis-only">Wortschatz</span><span class="mode-de-only">Bokabularyo</span></button>
+  <button data-view="wendungen"><span class="mode-bis-only">Wendungen</span><span class="mode-de-only">Pulong-pulong</span></button>
+  <button data-view="geschichten"><span class="mode-bis-only">📖 Geschichten</span><span class="mode-de-only">📖 Sugilanon</span></button>
+  <button data-view="anwenden"><span class="mode-bis-only">Anwenden</span><span class="mode-de-only">Gamiton</span></button>
+  <button data-view="grammatik"><span class="mode-bis-only">Grammatik-Spickzettel</span><span class="mode-de-only">Giya sa Gramatika</span></button>
+  <button data-view="fortschritt"><span class="mode-bis-only">Fortschritt</span><span class="mode-de-only">Kalamboan</span></button>
   <button data-view="vip">⭐ VIP</button>
-  <button data-view="support">Tabang</button>
-  <button data-view="danke">💛 Special Thanks</button>
+  <button data-view="support"><span class="mode-bis-only">Support</span><span class="mode-de-only">Tabang</span></button>
+  <button data-view="danke"><span class="mode-bis-only">💛 Special Thanks</span><span class="mode-de-only">💛 Daghang Salamat</span></button>
 </nav>
 
 <main>
@@ -470,7 +470,7 @@ body.mode-de .mode-bis-only{display:none;}
     <h3>Unsa imong makat-onan niini nga modyul</h3>
     <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
   </div>
-  <div class="version-tag">v1.9.1</div>
+  <div class="version-tag">v1.9.3</div>
 </section>
 
 <!-- METHODE -->
@@ -3001,7 +3001,7 @@ const LESSONS = [
    id:8, title:"Panahon", subtitle:"Wetter",
    note:"„Tingali\" (vielleicht) relativiert eine Vorhersage — sehr nützlich in einem Land mit häufigen, plötzlichen Regenschauern.",
    lines:[
-    {bis:"Unsaon ang panahon karon?", decode:[["Unsaon","wie-ist"],["ang","[Subjektmarker]"],["panahon","Wetter"],["karon","jetzt"]], natural:"Wie ist das Wetter heute?", pron:"oon-SAH-on ang pah-NAH-hon KAH-ron"},
+    {bis:"Unsa ang panahon karon?", decode:[["Unsa","was"],["ang","[Subjektmarker]"],["panahon","Wetter"],["karon","jetzt"]], natural:"Wie ist das Wetter heute?", pron:"OON-sah ang pah-NAH-hon KAH-ron"},
     {bis:"Init kaayo karon.", decode:[["Init","heiß"],["kaayo","sehr"],["karon","jetzt"]], natural:"Es ist heute sehr heiß.", pron:"EE-nit kah-AH-yo KAH-ron"},
     {bis:"Ugma, muulan tingali.", decode:[["Ugma","morgen"],["muulan","regnen-wird"],["tingali","vielleicht"]], natural:"Morgen wird es vielleicht regnen.", pron:"OOG-mah, moo-OO-lan teeng-AH-lee"},
     {bis:"Dad-a imong payong.", decode:[["Dad-a","bring-mit"],["imong","deinen"],["payong","Regenschirm"]], natural:"Bring deinen Regenschirm mit.", pron:"DAHD-ah ee-MONG PAH-yong"},

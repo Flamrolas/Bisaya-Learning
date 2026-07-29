@@ -470,7 +470,7 @@ body.mode-de .mode-bis-only{display:none;}
     <h3>Unsa imong makat-onan niini nga modyul</h3>
     <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
   </div>
-  <div class="version-tag">v1.9.3</div>
+  <div class="version-tag">v1.9.5</div>
 </section>
 
 <!-- METHODE -->
@@ -539,23 +539,23 @@ body.mode-de .mode-bis-only{display:none;}
     <h2>Bokabularyo Trainer</h2>
     <p class="small">I-klik ang kard aron makita ang German nga hubad. Human niana, i-marka kon husto kung nahibaw-an na nimo ang pulong o dili — ang imong kalamboan gitipigan lokal niini nga aparato. Gamita ang 🔊 aron madungog ang tinuod nga German nga paglitok. Ang 🎤 aron sulayan ang imong kaugalingong paglitok sa German nga pulong pinaagi sa mikropono — kini mas kasaligan kaysa sa Bisaya nga bersyon, kay ang German maayo nga gisuportahan sa Chrome. Wala pa ni gisuportahan sa Safari.</p>
     <div class="filterbar">
-      <label class="small">Kategorie:
+      <label class="small"><span class="mode-bis-only">Kategorie:</span><span class="mode-de-only">Kategoriya:</span>
         <select id="catFilter" onchange="refreshDeck()"></select>
       </label>
-      <label class="small"><input type="checkbox" id="onlyUnknown" onchange="refreshDeck()"> nur noch nicht gelernte</label>
+      <label class="small"><input type="checkbox" id="onlyUnknown" onchange="refreshDeck()"> <span class="mode-bis-only">nur noch nicht gelernte</span><span class="mode-de-only">wala pa nahibaw-i lang</span></label>
       <span class="small" id="deckCount"></span>
     </div>
     <div class="flash" id="flashCard" onclick="flipCard()">
       <div class="front" id="flashFront">–</div>
       <div class="pron2" id="flashPron"></div>
       <div class="back" id="flashBack"></div>
-      <div class="hint">antippen zum Umdrehen</div>
+      <div class="hint"><span class="mode-bis-only">antippen zum Umdrehen</span><span class="mode-de-only">i-tap aron molingi</span></div>
     </div>
     <div class="btnrow">
-      <button class="action neutral" onclick="prevCard()">⬅ zurück</button>
-      <button class="action neutral" onclick="markCard('learning')">🔁 noch üben</button>
-      <button class="action good" onclick="markCard('known')">✅ kann ich</button>
-      <button class="action primary" onclick="nextCard()">weiter ➜</button>
+      <button class="action neutral" onclick="prevCard()"><span class="mode-bis-only">⬅ zurück</span><span class="mode-de-only">⬅ balik</span></button>
+      <button class="action neutral" onclick="markCard('learning')"><span class="mode-bis-only">🔁 noch üben</span><span class="mode-de-only">🔁 bansayon pa</span></button>
+      <button class="action good" onclick="markCard('known')"><span class="mode-bis-only">✅ kann ich</span><span class="mode-de-only">✅ kaya na nako</span></button>
+      <button class="action primary" onclick="nextCard()"><span class="mode-bis-only">weiter ➜</span><span class="mode-de-only">sunod ➜</span></button>
     </div>
   </div>
 </section>
@@ -3719,34 +3719,27 @@ async function handleVipRedirect(){
 }
 
 /* ============ SUPPORT / KONTAKT ============ */
-// Formspree kostenlos einrichten unter https://formspree.io (kein Backend nötig):
-// neues Formular anlegen, die eigene E-Mail bestätigen, die Endpoint-URL unten eintragen.
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/DEINE_FORM_ID"; // <- hier ersetzen!
-async function sendSupport(){
+// Kein externer Dienst nötig: öffnet die Mail-App des Nutzers mit vorausgefüllter Nachricht.
+const SUPPORT_EMAIL = "dirkschnettler@icloud.com";
+function sendSupport(){
   const name = document.getElementById("suppName").value.trim();
   const email = document.getElementById("suppEmail").value.trim();
   const msg = document.getElementById("suppMsg").value.trim();
   const err = document.getElementById("suppErr");
   if(!msg){ err.textContent = "Bitte eine Nachricht eingeben."; return; }
-  if(FORMSPREE_ENDPOINT.includes("DEINE_FORM_ID")){
-    err.textContent = "Support-Formular ist noch nicht eingerichtet (fehlende Formspree-ID im Code).";
-    return;
-  }
-  err.textContent = "Wird gesendet...";
-  try{
-    const res = await fetch(FORMSPREE_ENDPOINT, {
-      method:"POST",
-      headers:{"Content-Type":"application/json","Accept":"application/json"},
-      body: JSON.stringify({name: name || "(anonym)", email: email || "(keine)", message: msg, quelle:"Bisaya Lebendig App"})
-    });
-    if(res.ok){
-      document.getElementById("supportFormWrap").innerHTML = "<p>✅ Danke! Deine Nachricht wurde gesendet.</p>";
-    } else {
-      err.textContent = "Senden fehlgeschlagen. Bitte später erneut versuchen.";
-    }
-  } catch(e){
-    err.textContent = "Keine Internetverbindung oder Fehler beim Senden.";
-  }
+  err.textContent = "";
+  const subject = encodeURIComponent("Bisaya Lebendig – Feedback");
+  const bodyLines = [
+    "Name: " + (name || "(anonym)"),
+    "E-Mail: " + (email || "(keine)"),
+    "",
+    msg
+  ];
+  const body = encodeURIComponent(bodyLines.join("\n"));
+  const mailLink = "mailto:" + SUPPORT_EMAIL + "?subject=" + subject + "&body=" + body;
+  window.location.href = mailLink;
+  document.getElementById("supportFormWrap").innerHTML =
+    "<p>✅ Deine Mail-App sollte sich jetzt mit einer vorausgefüllten Nachricht öffnen. Falls nicht, schreib einfach direkt an <strong>" + SUPPORT_EMAIL + "</strong>.</p>";
 }
 
 /* ============ STATE / STORAGE ============ */
@@ -3769,7 +3762,7 @@ function setMode(mode){
   document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active", b.dataset.mode===mode));
   const activeBtn = document.querySelector("nav.tabs button.active");
   const activeView = activeBtn ? activeBtn.dataset.view : null;
-  if(activeView === "wortschatz") refreshDeck();
+  if(activeView === "wortschatz"){ populateCatFilter(); refreshDeck(); }
   if(activeView === "wendungen") renderWendungen();
   if(activeView === "geschichten") renderStoryList();
   if(activeView === "lektionen") renderLessonList();
@@ -4000,7 +3993,8 @@ let deckIdx = 0;
 function populateCatFilter(){
   const cats = Array.from(new Set(allVocab().map(v=>v.cat)));
   const sel = document.getElementById("catFilter");
-  sel.innerHTML = '<option value="alle">Alle Kategorien</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join("");
+  const allLabel = currentMode()==="learn-de" ? "Tanang Kategoriya" : "Alle Kategorien";
+  sel.innerHTML = `<option value="alle">${allLabel}</option>` + cats.map(c=>`<option value="${c}">${c}</option>`).join("");
 }
 function refreshDeck(){
   const cat = document.getElementById("catFilter").value;
@@ -4013,7 +4007,7 @@ function refreshDeck(){
   // shuffle
   for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [deck[i],deck[j]]=[deck[j],deck[i]]; }
   deckIdx = 0;
-  document.getElementById("deckCount").textContent = deck.length + " Karten";
+  document.getElementById("deckCount").textContent = deck.length + (currentMode()==="learn-de" ? " ka kard" : " Karten");
   showCard();
 }
 function showCard(){

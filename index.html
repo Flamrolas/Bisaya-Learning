@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -480,7 +479,7 @@ body.mode-de .mode-bis-only{display:none;}
     <h3>Unsa imong makat-onan niini nga modyul</h3>
     <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
   </div>
-  <div class="version-tag">v1.12.1</div>
+  <div class="version-tag">v1.13.0</div>
 </section>
 
 <!-- METHODE -->
@@ -2945,7 +2944,14 @@ const LIEDER_DATA = [
       {de:"Die Sonne scheint über dem Meer.", bis:"Ang adlaw mosidlak sa ibabaw sa dagat.", pron:"ang AHD-lau moh-SEED-lak sah ee-BAH-bau sah DAH-gat"},
       {de:"Der Wind weht sanft und kühl.", bis:"Ang hangin mihuyop nga malumo ug bugnaw.", pron:"ang HAH-ngin mee-HOO-yop ngah mah-LOO-moh oog boog-NAU"},
       {de:"Das kleine Boot schwimmt auf dem offenen Meer.", bis:"Ang gamayng bangka naglutaw sa lawod.", pron:"ang gah-MAI-ng BANG-kah nag-loo-TAU sah LAH-wod"},
-      {de:"Ich bin glücklich, denn ich bin zuhause.", bis:"Malipayon ako, kay nia ako sa akong balay.", pron:"mah-lee-PAH-yon AH-koh, kai NEE-ah AH-koh sah AH-kong BAH-lai"}
+      {de:"Ich bin glücklich, denn ich bin zuhause.", bis:"Malipayon ako, kay nia ako sa akong balay.", pron:"mah-lee-PAH-yon AH-koh, kai NEE-ah AH-koh sah AH-kong BAH-lai"},
+      {de:"(Refrain) Cebu, meine Heimat, für immer in meinem Herzen.", bis:"Cebu, akong yutang natawhan, dayon sa akong kasingkasing.", pron:"SEH-boo, AH-kong yoo-TANG nah-tau-HAN, dah-YON sah AH-kong kah-sing-KAH-sing"},
+      {de:"(Refrain) Hier am Strand finde ich meinen Frieden.", bis:"Dinhi sa baybayon, makita nako ang akong kalinaw.", pron:"DEEN-hee sah bai-BAH-yon, mah-KEE-tah NAH-koh ang AH-kong kah-lee-NAU"},
+      {de:"Die Palmen tanzen im Rhythmus des Windes.", bis:"Ang mga lubi nagsayaw sa ritmo sa hangin.", pron:"ang mah-NGAH LOO-bee nag-sah-YAU sah REET-moh sah HAH-ngin"},
+      {de:"Die Fischer singen, während sie zurückkehren.", bis:"Ang mga mangingisda nag-awit samtang mopauli sila.", pron:"ang mah-NGAH mah-ngee-ngeess-DAH nag-AH-wit sahm-TANG moh-pah-OO-lee SEE-lah"},
+      {de:"Der Abend kommt, die Farbe des Himmels ändert sich.", bis:"Moabot ang kagabhion, mabalhin ang kolor sa langit.", pron:"moh-AH-bot ang kah-gab-HYON, mah-BAHL-hin ang KOH-lor sah LAH-ngit"},
+      {de:"(Refrain) Cebu, meine Heimat, für immer in meinem Herzen.", bis:"Cebu, akong yutang natawhan, dayon sa akong kasingkasing.", pron:"SEH-boo, AH-kong yoo-TANG nah-tau-HAN, dah-YON sah AH-kong kah-sing-KAH-sing"},
+      {de:"Bis zum nächsten Mal, Cebu, bis zum nächsten Mal.", bis:"Hangtud sa sunod, Cebu, hangtud sa sunod.", pron:"hang-TOOD sah SOO-nod, SEH-boo, hang-TOOD sah SOO-nod"}
     ]
   },
   {
@@ -2956,6 +2962,13 @@ const LIEDER_DATA = [
       {de:"Meine Familie ist mein größter Schatz.", bis:"Ang akong pamilya mao ang akong labing bililhon nga bahandi.", pron:"ang AH-kong pah-MEEL-yah MAH-oh ang AH-kong LAH-bing bee-LEEL-hon ngah bah-HAN-dee"},
       {de:"Die Liebe meiner Eltern kennt keine Grenzen.", bis:"Ang gugma sa akong ginikanan walay kinutuban.", pron:"ang GOOG-mah sah AH-kong gee-nee-KAH-nan WAH-lai kee-noo-TOO-ban"},
       {de:"Wohin ich auch gehe, sie sind in meinem Herzen.", bis:"Bisan asa ako moadto, nia sila sa akong kasingkasing.", pron:"BEE-san AH-sah AH-koh moh-AHD-toh, NEE-ah SEE-lah sah AH-kong kah-sing-KAH-sing"},
+      {de:"Danke, Mama, danke, Papa, für all eure Liebe.", bis:"Salamat, Nay, salamat, Tay, sa tanan ninyong gugma.", pron:"sah-LAH-mat, NAI, sah-LAH-mat, TAI, sah tah-NAN NEEN-yong GOOG-mah"},
+      {de:"(Refrain) Familie, du bist meine Stärke.", bis:"Pamilya, ikaw ang akong kalig-on.", pron:"pah-MEEL-yah, EE-kau ang AH-kong kah-LEEG-on"},
+      {de:"(Refrain) Was auch passiert, ich bin nie wirklich allein.", bis:"Bisan unsaon, dili gyud ko mag-inusara.", pron:"BEE-san oon-SAH-on, DEE-lee ghyood koh mag-ee-noo-SAH-rah"},
+      {de:"Meine Geschwister haben mich das Teilen gelehrt.", bis:"Ang akong mga igsoon nagtudlo kanako sa pag-ambit.", pron:"ang AH-kong mah-NGAH ig-SOH-on nag-tood-LOH kah-NAH-koh sah pag-AHM-bit"},
+      {de:"Unser Zuhause ist voller Lachen und Liebe.", bis:"Ang among panimalay puno sa katawa ug gugma.", pron:"ang AH-mong pah-nee-MAH-lai POO-noh sah kah-TAH-wah oog GOOG-mah"},
+      {de:"Jeden Tag bin ich dankbar, dass es euch gibt.", bis:"Kada adlaw, nagpasalamat ko nga anaa kamo.", pron:"KAH-dah AHD-lau, nag-pah-sah-LAH-mat koh ngah ah-NAH-ah KAH-moh"},
+      {de:"(Refrain) Familie, du bist meine Stärke.", bis:"Pamilya, ikaw ang akong kalig-on.", pron:"pah-MEEL-yah, EE-kau ang AH-kong kah-LEEG-on"},
       {de:"Danke, Mama, danke, Papa, für all eure Liebe.", bis:"Salamat, Nay, salamat, Tay, sa tanan ninyong gugma.", pron:"sah-LAH-mat, NAI, sah-LAH-mat, TAI, sah tah-NAN NEEN-yong GOOG-mah"}
     ]
   },
@@ -2968,6 +2981,11 @@ const LIEDER_DATA = [
       {de:"Der Mond wacht über dich vom Himmel aus.", bis:"Ang bulan nagbantay kanimo gikan sa langit.", pron:"ang BOO-lan nag-bahn-TAI kah-NEE-moh GEE-kan sah LAH-ngit"},
       {de:"Die Sterne funkeln ruhig.", bis:"Ang mga bituon mangidlap nga malinawon.", pron:"ang mah-NGAH bee-too-ON mah-ngid-LAP ngah mah-lee-NAH-won"},
       {de:"Ich bin hier, du bist nicht allein.", bis:"Dinhi ako, wala ka mag-inusara.", pron:"DEEN-hee AH-koh, WAH-lah kah mag-ee-noo-SAH-rah"},
+      {de:"Schlaf jetzt, schlaf jetzt, bis zum Morgen.", bis:"Tulog na, tulog na, hangtud sa buntag.", pron:"TOO-log nah, TOO-log nah, hang-TOOD sah BOON-tag"},
+      {de:"Der Wind weht, ein sanftes Lied.", bis:"Ang hangin mihuyop, malumo nga awit.", pron:"ang HAH-ngin mee-HOO-yop, mah-LOO-moh ngah AH-wit"},
+      {de:"Die Welt ist still geworden, damit du schlafen kannst.", bis:"Ang kalibutan mihilom aron ikaw makatulog.", pron:"ang kah-lee-boo-TAN mee-HEE-lom AH-ron EE-kau mah-kah-TOO-log"},
+      {de:"Morgen wartet ein neuer Tag auf dich.", bis:"Ugma may bag-ong adlaw nga maghulat kanimo.", pron:"OOG-mah mai bag-OHNG AHD-lau ngah mag-HOO-lat kah-NEE-moh"},
+      {de:"Aber jetzt, ruh dich erstmal aus.", bis:"Apan karon, pahulay lang una.", pron:"AH-pan KAH-ron, pah-HOO-lai lahng OO-nah"},
       {de:"Schlaf jetzt, schlaf jetzt, bis zum Morgen.", bis:"Tulog na, tulog na, hangtud sa buntag.", pron:"TOO-log nah, TOO-log nah, hang-TOOD sah BOON-tag"}
     ]
   }

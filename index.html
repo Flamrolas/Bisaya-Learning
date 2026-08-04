@@ -106,6 +106,7 @@ h3{color:#5a4632; font-size:1.1rem; font-family:'Fredoka',cursive; font-weight:7
 .story-line .de-line{font-size:1rem; color:#3d3327; margin-bottom:6px;}
 .story-line .de-line .num{color:var(--sub); font-weight:700; margin-right:6px; font-size:0.82rem;}
 .story-line .bis-line{font-size:1.05rem; font-weight:700; color:var(--accent2); display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.chord-tag{display:inline-block; font-family:monospace; font-weight:800; font-size:0.82rem; background:var(--chip); color:var(--accent); border-radius:6px; padding:2px 8px; margin-bottom:4px;}
 .story-line .bis-pron{font-size:0.85rem; color:var(--sub); font-family:"Courier New",monospace; font-weight:400;}
 .interlinear{display:flex; flex-wrap:wrap; gap:14px 10px; margin:6px 0 8px;}
 .tok{text-align:center;}
@@ -479,7 +480,7 @@ body.mode-de .mode-bis-only{display:none;}
     <h3>Unsa imong makat-onan niini nga modyul</h3>
     <p>Mga Leksyon ug Mga Sugilanon nga naggamit sa mao gihapong mga panid — apan karon German ang una nga linya, Bisaya ang sunod, aron makita nimo kung giunsa "molihok" ang German. Dugang pa: usa ka Bokabularyo Trainer nga adunay Bisaya ug German nga bahin sa matag pulong, uban sa 🔊 aron madungog ang German nga paglitok, ug 🎤 aron sulayan ang imong kaugalingong paglitok sa German (nga mas maayo mo-suporta sa mga browser kaysa Bisaya).</p>
   </div>
-  <div class="version-tag">v1.13.0</div>
+  <div class="version-tag">v1.15.0</div>
 </section>
 
 <!-- METHODE -->
@@ -2940,6 +2941,8 @@ const LIEDER_DATA = [
     title:"Awit sa Baybayon",
     titleDe:"Lied vom Strand",
     note:"Eigene Komposition für diese App, inspiriert von der Bootsszene im Header — kein bestehendes Lied. Grammatik noch nicht von einem Muttersprachler geprüft.",
+    keyInfo:"Tonart: G-Dur · 4/4-Takt · fröhliches Strandtempo · Strumming-Vorschlag: Down-Down-Up-Up-Down-Up · kein Kapodaster nötig",
+    chords:["G","Em","C","D","C","G","Em","C","D","C","G"],
     lines:[
       {de:"Die Sonne scheint über dem Meer.", bis:"Ang adlaw mosidlak sa ibabaw sa dagat.", pron:"ang AHD-lau moh-SEED-lak sah ee-BAH-bau sah DAH-gat"},
       {de:"Der Wind weht sanft und kühl.", bis:"Ang hangin mihuyop nga malumo ug bugnaw.", pron:"ang HAH-ngin mee-HOO-yop ngah mah-LOO-moh oog boog-NAU"},
@@ -2958,6 +2961,8 @@ const LIEDER_DATA = [
     title:"Awit sa Pasalamat",
     titleDe:"Danklied an die Familie",
     note:"Eigene Komposition für diese App, thematisch passend zu \"Nahigugma ko sa akong pamilya\" aus dem Wortschatz — kein bestehendes Lied. Grammatik noch nicht von einem Muttersprachler geprüft.",
+    keyInfo:"Tonart: D-Dur · 4/4-Takt · ruhiges, warmes Tempo · Strumming-Vorschlag: Down-Down-Up-Down-Up · kein Kapodaster nötig",
+    chords:["D","A","Bm","G","Bm","G","D","A","Bm","Bm","G"],
     lines:[
       {de:"Meine Familie ist mein größter Schatz.", bis:"Ang akong pamilya mao ang akong labing bililhon nga bahandi.", pron:"ang AH-kong pah-MEEL-yah MAH-oh ang AH-kong LAH-bing bee-LEEL-hon ngah bah-HAN-dee"},
       {de:"Die Liebe meiner Eltern kennt keine Grenzen.", bis:"Ang gugma sa akong ginikanan walay kinutuban.", pron:"ang GOOG-mah sah AH-kong gee-nee-KAH-nan WAH-lai kee-noo-TOO-ban"},
@@ -2976,6 +2981,8 @@ const LIEDER_DATA = [
     title:"Awit sa Pagpahulay",
     titleDe:"Schlaflied",
     note:"Eigene Komposition im Stil eines traditionellen Schlafliedes (angelehnt an das Konzept von \"Ili-Ili, Tulog Anay\", einem echten anonymen Hiligaynon-Schlaflied) — aber komplett neuer, eigener Cebuano-Text, kein bestehendes Lied. Grammatik noch nicht von einem Muttersprachler geprüft.",
+    keyInfo:"Tonart: C-Dur · ruhiger 3/4-Wiegentakt · sehr langsam, sanftes Fingerpicking oder leises Zupfen statt Strumming · kein Kapodaster nötig",
+    chords:["C","Am","F","G","C","F","G","Am","F","C"],
     lines:[
       {de:"Schlaf jetzt, mein Kind, denn es ist schon Nacht.", bis:"Tulog na, akong anak, kay gabii na.", pron:"TOO-log nah, AH-kong AH-nak, kai gah-BEE-ee nah"},
       {de:"Der Mond wacht über dich vom Himmel aus.", bis:"Ang bulan nagbantay kanimo gikan sa langit.", pron:"ang BOO-lan nag-bahn-TAI kah-NEE-moh GEE-kan sah LAH-ngit"},
@@ -3204,18 +3211,47 @@ function pickVoice(prefixes){
   }
   return null;
 }
+/* ============ VORGENERIERTE AZURE-AUDIODATEIEN (hohe Qualität, geräteunabhängig) ============ */
+// audio_map.json (falls vorhanden) bildet Bisaya-Text -> mp3-Dateiname im Ordner audio/ ab.
+// Erzeugt einmalig lokal per generate_audio.py (siehe audio-generator/-Ordner). Ohne diese Datei
+// funktioniert alles wie bisher über die Browser-Sprachausgabe (kein Fehler, nur kein Upgrade).
+let AUDIO_MAP = null;
+let audioMapLoadAttempted = false;
+async function ensureAudioMapLoaded(){
+  if(audioMapLoadAttempted) return;
+  audioMapLoadAttempted = true;
+  try{
+    const res = await fetch("audio_map.json");
+    if(res.ok) AUDIO_MAP = await res.json();
+  } catch(e){ /* keine Datei vorhanden -> einfach bei Browser-Sprachausgabe bleiben */ }
+}
+function playPregeneratedAudio(text, btnEl){
+  if(!AUDIO_MAP || !AUDIO_MAP[text]) return false;
+  const audio = new Audio("audio/" + AUDIO_MAP[text]);
+  if(btnEl){
+    audio.onplay = ()=>btnEl.classList.add("playing");
+    audio.onended = ()=>btnEl.classList.remove("playing");
+    audio.onerror = ()=>btnEl.classList.remove("playing");
+  }
+  audio.play().catch(()=>{ if(btnEl) btnEl.classList.remove("playing"); });
+  return true;
+}
+
 function speak(bisText, pronText, btnEl){
+  // 1) Falls eine hochwertige, vorgenerierte Audiodatei existiert: die nutzen.
+  if(playPregeneratedAudio(bisText, btnEl)) return;
+  // 2) Fallback: Browser-eigene Sprachausgabe (Qualität variiert je nach Gerät).
   if(!window.speechSynthesis){
     alert("Sprachausgabe wird von diesem Browser leider nicht unterstützt.");
     return;
   }
   window.speechSynthesis.cancel();
-  // 1) Versuch: philippinische oder spanische Stimme liest den echten Bisaya-Text
+  // 2a) Versuch: philippinische oder spanische Stimme liest den echten Bisaya-Text
   //    (ähnliches Vokal-/Konsonantensystem, klingt oft näher am Original als Englisch).
   let voice = pickVoice(["fil","tl","es"]);
   let textToSpeak = bisText;
   if(!voice){
-    // 2) Fallback: englische Stimme liest die Lautschrift (z.B. "koo-MOOS-tah")
+    // 2b) Fallback: englische Stimme liest die Lautschrift (z.B. "koo-MOOS-tah")
     voice = pickVoice(["en"]);
     textToSpeak = (pronText || bisText).replace(/-/g," ");
   }
@@ -4068,15 +4104,19 @@ function openLied(i){
     <span class="backlink" onclick="renderLiedList()">${backLabel}</span>
     <h2>${mode==="learn-de" ? s.title : (s.titleDe || s.title)}</h2>
     <p class="small">${introText}</p>
-    <p class="small" style="font-style:italic;">${escapeHtml(s.note || "")}</p>`;
+    <p class="small" style="font-style:italic;">${escapeHtml(s.note || "")}</p>
+    ${s.keyInfo ? `<p class="small" style="margin-top:8px;"><b>🎸 ${mode==="learn-de" ? "Gitara" : "Gitarre"}:</b> ${escapeHtml(s.keyInfo)}</p>` : ""}`;
   s.lines.forEach((line, idx)=>{
+    const chord = (s.chords && s.chords[idx]) ? `<span class="chord-tag">${escapeHtml(s.chords[idx])}</span>` : "";
     if(mode==="learn-de"){
       html += `<div class="story-line">
+        ${chord}
         <div class="de-line"><span class="num">${idx+1}.</span>${line.de} ${speakDeBtn(line.de)} ${micBtnDe(line.de)}</div>
         <div class="bis-line">${line.bis}</div>
       </div>`;
     } else {
       html += `<div class="story-line">
+        ${chord}
         <div class="de-line"><span class="num">${idx+1}.</span>${line.de}</div>
         <div class="bis-line">${speakBtn(line.bis, line.pron)} ${line.bis}
           <span class="bis-pron">${line.pron || ''}</span>
@@ -4430,6 +4470,7 @@ renderVipStatus();
 handleVipRedirect();
 firebaseHandleRedirectResult();
 initModeToggle();
+ensureAudioMapLoaded();
 if(!VIP_FEATURE_ENABLED){
   const vipTabBtn = document.querySelector('nav.tabs button[data-view="vip"]');
   if(vipTabBtn) vipTabBtn.style.display = "none";
